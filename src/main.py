@@ -15,6 +15,7 @@ from src.processor import (
 )
 from src.visualiser import (
     plot_platform_distribution,
+    plot_price_analysis,
     plot_price_vs_discount
 )
 
@@ -59,6 +60,7 @@ def run_pipeline(use_cache: bool = False):
 
     # 4. Generate Visualizations
     plot_platform_distribution(df_final)
+    plot_price_analysis(df_final)
     plot_price_vs_discount(df_final)
     logger.info("Pipeline executed successfully!")
 
