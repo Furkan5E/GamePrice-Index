@@ -2,6 +2,7 @@
 
 ![Python](https://img.shields.io/badge/Python-3.x-blue.svg)
 ![Build](https://img.shields.io/badge/Build-uv-purple.svg)
+![Docker](https://img.shields.io/badge/Docker-Supported-2496ED.svg?logo=docker)
 ![Selenium](https://img.shields.io/badge/Selenium-Supported-43B02A.svg?logo=selenium)
 ![Pandas](https://img.shields.io/badge/Pandas-Data%20ETL-150458.svg?logo=pandas)
 ![Tests](https://img.shields.io/badge/pytest-passing-brightgreen.svg)
@@ -19,6 +20,7 @@ An automated ETL (Extract, Transform, Load) and market intelligence pipeline tha
 * **Offline Caching:** Supports cached execution modes (`--cached`) to enable instant data processing and visualisation without re-triggering network requests.
 * **Unit Testing:** Includes a suite of automated tests using `pytest` to validate pandas data transformation and normalisation logic.
 * **Robust Logging:** Integrated Python `logging` to provide clear, real-time pipeline execution tracking.
+* **Containerised Deployment:** Fully containerised using Docker for consistent, environment agnostic execution.
 
 ---
 
@@ -41,6 +43,16 @@ uv run python -m src.main --cached
 Run the test suite:
 ```bash
 uv run python -m pytest
+```
+---
+## Docker
+Build the Docker image:
+```bash
+docker build -t gameprice-index .
+```
+Run the container, maps output files to your local data/ and plots/ directories:
+```bash
+docker run --rm -v "$(pwd)/data:/app/data" -v "$(pwd)/plots:/app/plots" gameprice-index
 ```
 ---
 ## Analytics & Visualisations
