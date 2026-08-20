@@ -4,6 +4,7 @@
 ![Build](https://img.shields.io/badge/Build-uv-purple.svg)
 ![Selenium](https://img.shields.io/badge/Selenium-Supported-43B02A.svg?logo=selenium)
 ![Pandas](https://img.shields.io/badge/Pandas-Data%20ETL-150458.svg?logo=pandas)
+![Tests](https://img.shields.io/badge/pytest-passing-brightgreen.svg)
 ![License](https://img.shields.io/badge/License-MIT-blue.svg)
 
 An automated ETL (Extract, Transform, Load) and market intelligence pipeline that scrapes, normalises, and analyses dynamic video game pricing across Nintendo eShop and PlayStation Direct platforms.
@@ -16,6 +17,7 @@ An automated ETL (Extract, Transform, Load) and market intelligence pipeline tha
 * **Automated Data Cleaning & ETL:** Cleans currency symbols, standardises product identifiers (`nsuid`, `product_code`), handles encoding quirks, and calculates pricing differentials via `pandas`.
 * **Data Visualisation:** Generates analytical scatter and bar plots comparing pricing and discount behaviours across platforms using `matplotlib`.
 * **Offline Caching:** Supports cached execution modes (`--cached`) to enable instant data processing and visualisation without re-triggering network requests.
+* **Unit Testing:** Includes a suite of automated tests using `pytest` to validate pandas data transformation and normalisation logic.
 * **Robust Logging:** Integrated Python `logging` to provide clear, real-time pipeline execution tracking.
 
 ---
@@ -35,6 +37,10 @@ uv run python -m src.main
 Run using cached local datasets:
 ```bash
 uv run python -m src.main --cached
+```
+Run the test suite:
+```bash
+uv run python -m pytest
 ```
 ---
 ## Analytics & Visualisations
