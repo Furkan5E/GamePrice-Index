@@ -11,7 +11,8 @@ from src.scraper import (
 from src.processor import (
     process_nintendo_data,
     process_playstation_data,
-    combine_and_format_data
+    combine_and_format_data,
+    save_data
 )
 from src.visualiser import (
     plot_platform_distribution,
@@ -55,7 +56,9 @@ def run_pipeline(use_cache: bool = False):
 
     # 3. Combine & Compute Metrics
     df_final = combine_and_format_data(df_nintendo_processed, df_ps_processed)
-    df_final.to_csv(final_data_path, index=False)
+    
+    #save to both CSV and DB
+    save_data(df_final, csv_path=final_data_path)
     logger.info(f"Saved master dataset to {final_data_path}")
 
     # 4. Generate Visualizations

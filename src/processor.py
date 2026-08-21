@@ -1,5 +1,6 @@
 import pandas as pd
 import logging
+import sqlite3
 from typing import List, Dict, Any
 
 logger = logging.getLogger(__name__)
@@ -78,3 +79,19 @@ def combine_and_format_data(df_nintendo: pd.DataFrame, df_ps: pd.DataFrame) -> p
     
     logger.info(f"Data processing complete. Final dataset contains {len(df_final)} rows.")
     return df_final
+
+def save_data(df: pd.DataFrame, db_path: str = "data/game_prices.db", csv_path: str = "data/final_prices.csv"):
+    """Saves the final dataframe to both a CSV and an SQLite database."""
+    logger.info(f"Saving data to {csv_path} and {db_path}...")
+    
+    df.to_csv(csv_path, index=False)
+
+    try:
+        with sqlite3.connect(db_path) as conn:
+            # Create a copy so the timestamp column isn't passed to the plotting functions
+            df_db = df.copy()
+            df_db['scrape_timestamp'] = pd.Timestamp.now() 
+            df_db.to_sql('prices', conn, if_exists='append', index=False)
+        logger.info("Data successfully saved to database.")
+    except Exception as e:
+        logger.error(f"Failed to save to database: {e}")

@@ -5,6 +5,7 @@
 ![Docker](https://img.shields.io/badge/Docker-Supported-2496ED.svg?logo=docker)
 ![Selenium](https://img.shields.io/badge/Selenium-Supported-43B02A.svg?logo=selenium)
 ![Pandas](https://img.shields.io/badge/Pandas-Data%20ETL-150458.svg?logo=pandas)
+![SQLite](https://img.shields.io/badge/SQLite-Database-003B57.svg?logo=sqlite)
 ![Tests](https://img.shields.io/badge/pytest-passing-brightgreen.svg)
 ![License](https://img.shields.io/badge/License-MIT-blue.svg)
 
@@ -15,7 +16,7 @@ An automated ETL (Extract, Transform, Load) and market intelligence pipeline tha
 ## Features
 
 * **Hybrid Scraping Architecture:** Combines fast static HTML parsing via `requests` and `BeautifulSoup` with headless `selenium` automation to handle dynamic JavaScript price rendering and pagination.
-* **Automated Data Cleaning & ETL:** Cleans currency symbols, standardises product identifiers (`nsuid`, `product_code`), handles encoding quirks, and calculates pricing differentials via `pandas`.
+* **Automated ETL & Historical Tracking:** Cleans currency symbols, standardises product identifiers, calculates pricing differentials via `pandas`, and ingests records into a local `SQLite` database to track price trends over time.
 * **Data Visualisation:** Generates analytical scatter and bar plots comparing pricing and discount behaviours across platforms using `matplotlib`.
 * **Offline Caching:** Supports cached execution modes (`--cached`) to enable instant data processing and visualisation without re-triggering network requests.
 * **Unit Testing:** Includes a suite of automated tests using `pytest` to validate pandas data transformation and normalisation logic.
