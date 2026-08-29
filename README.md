@@ -6,8 +6,8 @@
 ![Selenium](https://img.shields.io/badge/Selenium-Supported-43B02A.svg?logo=selenium)
 ![Pandas](https://img.shields.io/badge/Pandas-Data%20ETL-150458.svg?logo=pandas)
 ![SQLite](https://img.shields.io/badge/SQLite-Database-003B57.svg?logo=sqlite)
-![Tests](https://img.shields.io/badge/pytest-passing-brightgreen.svg)
 ![License](https://img.shields.io/badge/License-MIT-blue.svg)
+[![Test Suite](https://github.com/Furkan5E/GamePrice-Index/actions/workflows/test.yaml/badge.svg)](https://github.com/Furkan5E/GamePrice-Index/actions/workflows/test.yaml)
 
 An automated ETL (Extract, Transform, Load) and market intelligence pipeline that scrapes, normalises, and analyses dynamic video game pricing across Nintendo eShop and PlayStation Direct platforms.
 
