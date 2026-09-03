@@ -1,6 +1,6 @@
 # GamePrice-Index
 
-![Python](https://img.shields.io/badge/Python-3.x-blue.svg)
+![Python](https://img.shields.io/badge/Python-3.x-blue.svg?logo=python)
 ![Build](https://img.shields.io/badge/Build-uv-purple.svg)
 ![Docker](https://img.shields.io/badge/Docker-Supported-2496ED.svg?logo=docker)
 ![Selenium](https://img.shields.io/badge/Selenium-Supported-43B02A.svg?logo=selenium)
@@ -54,6 +54,10 @@ docker build -t gameprice-index .
 Run the container, maps output files to your local data/ and plots/ directories:
 ```bash
 docker run --rm -v "$(pwd)/data:/app/data" -v "$(pwd)/plots:/app/plots" gameprice-index
+```
+Pre-built container
+```bash
+docker run -it --rm -v "${PWD}/data:/app/data" ghcr.io/furkan5e/gameprice-index:latest
 ```
 ---
 ## Analytics & Visualisations
