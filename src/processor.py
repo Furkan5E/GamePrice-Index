@@ -43,7 +43,7 @@ def process_nintendo_data(base_data: List[Dict[str, Any]], price_data: List[Dict
 
     df_nintendo["nsuid"] = df_nintendo["nsuid"].astype(str).str.split("|").str[0]
     df_nintendo["product_code"] = df_nintendo["nsuid"]
-    df_nintendo["platform"] = df_nintendo["platform"].astype(str).str.split("â").str[0].str.strip()
+    df_nintendo["platform"] = df_nintendo["platform"].astype(str).str.strip()
     
     df_nintendo = clean_price_columns(df_nintendo)
     return df_nintendo

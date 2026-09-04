@@ -29,6 +29,8 @@ def scrape_nintendo_base(url: str) -> List[Dict[str, Any]]:
     try:
         response = requests.get(url)
         response.raise_for_status()
+        #the page is utf-8 but sends no charset header, so requests guesses latin-1
+        response.encoding = "utf-8"
         soup = BeautifulSoup(response.text, "html.parser")
         games = soup.select("li.page-list-group-item[data-nsuid]")
         
