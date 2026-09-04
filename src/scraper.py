@@ -64,6 +64,25 @@ def scrape_nintendo_base(url: str) -> List[Dict[str, Any]]:
         logger.error(f"Failed to scrape Nintendo base data: {e}")
         return []
 
+def parse_nintendo_price(price_container) -> tuple:
+    """Returns (price, price_old) from a Nintendo price element.
+
+    The site renders the regular price in span[data-price] and, when a game is
+    on sale, the reduced price in span.discount.
+    """
+    if not price_container:
+        return None, None
+
+    regular_tag = price_container.find("span", {"data-price": True})
+    regular = regular_tag.get_text(strip=True).replace("*", "") if regular_tag else None
+
+    sale_tag = price_container.find("span", class_="discount")
+    sale = sale_tag.get_text(strip=True).replace("*", "") if sale_tag else None
+
+    if sale:
+        return sale, regular or None
+    return regular or None, None
+
 def scrape_nintendo_prices(url: str) -> List[Dict[str, Any]]:
     """Scrapes dynamic pricing data from Nintendo using Selenium."""
     logger.info(f"Scraping Nintendo pricing data via Selenium from: {url}")
@@ -84,18 +103,8 @@ def scrape_nintendo_prices(url: str) -> List[Dict[str, Any]]:
             nsuid = g.get("data-nsuid")
             price_container = g.find("p", class_="price-small")
             
-            price = None
-            price_old = None
-            
-            if price_container:
-                price_tag = price_container.find("span", {"data-price": True})
-                if price_tag:
-                    price = price_tag.get_text(strip=True).replace("*", "")
-                    
-                price_old_tag = price_container.find("span", class_="discount")
-                if price_old_tag:
-                    price_old = price_old_tag.get_text(strip=True)
-                    
+            price, price_old = parse_nintendo_price(price_container)
+
             price_list.append({
                 "nsuid": nsuid,
                 "price": price,

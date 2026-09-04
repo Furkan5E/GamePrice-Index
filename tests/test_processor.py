@@ -63,3 +63,11 @@ def test_discount_calculation():
     
     spidey = final_df[final_df["name"] == "Spider-Man"].iloc[0]
     assert spidey["discount_amount"] == 10.00
+
+def test_discount_amount_is_never_negative():
+    """Regression: a sale price above the original price means the columns are swapped."""
+    df = pd.read_csv("data/data.csv")
+    discounts = df["discount_amount"].dropna()
+
+    assert not discounts.empty
+    assert (discounts >= 0).all()
