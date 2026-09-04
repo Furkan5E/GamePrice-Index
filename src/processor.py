@@ -29,6 +29,12 @@ def process_nintendo_data(base_data: List[Dict[str, Any]], price_data: List[Dict
         logger.warning("Nintendo base data is empty.")
         return df_base
 
+    #listing tiles without an nsuid have no price record to join to
+    has_nsuid = df_base["nsuid"].notna() & (df_base["nsuid"].astype(str).str.strip() != "")
+    if not has_nsuid.all():
+        logger.warning(f"Dropping {(~has_nsuid).sum()} Nintendo rows without an nsuid.")
+        df_base = df_base[has_nsuid].reset_index(drop=True)
+
     if not df_prices.empty:
         df_nintendo = df_base.merge(df_prices, on="nsuid", how="left", suffixes=("", "_new"))
         

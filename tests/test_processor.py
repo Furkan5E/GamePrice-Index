@@ -1,6 +1,6 @@
 import pandas as pd
 import pytest
-from src.processor import clean_price_columns, combine_and_format_data
+from src.processor import clean_price_columns, combine_and_format_data, process_nintendo_data
 
 def test_clean_price_columns():
     """Tests that currency symbols and asterisks are stripped and types converted to float."""
@@ -71,3 +71,22 @@ def test_discount_amount_is_never_negative():
 
     assert not discounts.empty
     assert (discounts >= 0).all()
+
+
+def test_nintendo_rows_without_nsuid_are_dropped():
+    """Tiles with no nsuid cannot be priced and must not end up as a 'None' id."""
+    base = [
+        {"name": "Mario Kart World", "platform": "Nintendo Switch 2", "nsuid": "70010000096802",
+         "price": None, "price_old": None},
+        {"name": "Farm 2+", "platform": "Nintendo Switch", "nsuid": None,
+         "price": None, "price_old": None},
+        {"name": "Blank", "platform": "Nintendo Switch", "nsuid": "",
+         "price": None, "price_old": None},
+    ]
+    prices = [{"nsuid": "70010000096802", "price": "£66.99", "price_old": None}]
+
+    df = process_nintendo_data(base, prices)
+
+    assert df["name"].tolist() == ["Mario Kart World"]
+    assert df["product_code"].tolist() == ["70010000096802"]
+    assert df["price"].tolist() == [66.99]
