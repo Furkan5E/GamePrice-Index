@@ -13,6 +13,15 @@ from selenium.webdriver.support import expected_conditions as EC
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+REQUEST_TIMEOUT = 30 #seconds
+REQUEST_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/126.0 Safari/537.36"
+    ),
+    "Accept-Language": "en-GB,en;q=0.9",
+}
+
 def setup_driver() -> webdriver.Chrome:
     """Configures and returns a headless Chrome WebDriver."""
     options = Options()
@@ -27,7 +36,7 @@ def scrape_nintendo_base(url: str) -> List[Dict[str, Any]]:
     """Scrapes base game data from Nintendo using requests."""
     logger.info(f"Scraping Nintendo base data from: {url}")
     try:
-        response = requests.get(url)
+        response = requests.get(url, headers=REQUEST_HEADERS, timeout=REQUEST_TIMEOUT)
         response.raise_for_status()
         #the page is utf-8 but sends no charset header, so requests guesses latin-1
         response.encoding = "utf-8"

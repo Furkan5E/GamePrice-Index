@@ -54,3 +54,17 @@ def test_scrape_nintendo_base_decodes_utf8(monkeypatch):
     assert len(games) == 1
     assert games[0]["name"] == "Emoji Killer – Casino Massacre"
     assert games[0]["platform"] == "Nintendo Switch"
+
+def test_scrape_nintendo_base_sends_timeout_and_user_agent(monkeypatch):
+    """A request without a timeout can hang the whole pipeline."""
+    seen = {}
+
+    def fake_get(url, **kwargs):
+        seen.update(kwargs)
+        return _fake_response(NINTENDO_LISTING)
+
+    monkeypatch.setattr(requests, "get", fake_get)
+    scrape_nintendo_base("https://example.test/games")
+
+    assert seen["timeout"] > 0
+    assert "User-Agent" in seen["headers"]
