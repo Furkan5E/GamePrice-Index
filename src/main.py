@@ -20,11 +20,14 @@ from src.visualiser import (
     plot_price_vs_discount
 )
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s"
-)
 logger = logging.getLogger(__name__)
+
+def configure_logging():
+    """Sets up logging once for the whole pipeline; modules only create loggers."""
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+    )
 
 NINTENDO_URL = "https://www.nintendo.com/en-gb/Games"
 PLAYSTATION_URL = "https://direct.playstation.com/en-gb/games/"
@@ -75,5 +78,6 @@ if __name__ == "__main__":
         help="Use existing raw CSV files in data/ instead of scraping live sites."
     )
     args = parser.parse_args()
-    
+
+    configure_logging()
     run_pipeline(use_cache=args.cached)
