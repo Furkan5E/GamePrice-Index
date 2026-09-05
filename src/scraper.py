@@ -14,6 +14,8 @@ logger = logging.getLogger(__name__)
 class ScrapeError(RuntimeError):
     """Raised when a source cannot be scraped or returns no items."""
 
+MAX_PLAYSTATION_PAGES = 50 #safety stop for the pagination loop
+PLAYSTATION_NEXT_BUTTON = "button.desktop-pagination__button.right-chevron-blue"
 REQUEST_TIMEOUT = 30 #seconds
 REQUEST_HEADERS = {
     "User-Agent": (
@@ -134,68 +136,81 @@ def scrape_nintendo_prices(url: str) -> List[Dict[str, Any]]:
     logger.info(f"Successfully extracted {len(price_list)} Nintendo price records.")
     return price_list
 
+def parse_playstation_tiles(html: str) -> List[Dict[str, Any]]:
+    """Extracts every product tile from one page of the PlayStation listing."""
+    soup = BeautifulSoup(html, "html.parser")
+    games = soup.select(".products-list-section .product-tile")
+
+    ps_list = []
+    for g in games:
+        name_tag = g.select_one("p.product-card-details__name")
+        name = name_tag.text.strip() if name_tag else None
+
+        link_tag = g.select_one(".product-card-image .product-tile__full-width a")
+        url_abs = link_tag["href"] if link_tag else None
+
+        price_tags = g.select("div.product-card-details__price .text-product-price span.price-whole-text")
+        price_now = price_tags[0].text.strip() if len(price_tags) >= 1 else None
+        price_old = price_tags[1].text.strip() if len(price_tags) >= 2 else None
+
+        badge_tag = g.select_one("div.badge .badge-label")
+        badge = badge_tag.text.strip() if badge_tag else None
+
+        date_tag = g.select_one("div.product-card_price .date-wrapper")
+        date_range = date_tag.text.strip() if date_tag else None
+
+        out_of_stock = g.select_one("p.out-stock-wrpr") is not None
+
+        btn = g.select_one("button[data-product-code]")
+        product_code = btn["data-product-code"] if btn else None
+
+        ps_list.append({
+            "name": name,
+            "price": price_now,
+            "price_old": price_old,
+            "badge": badge,
+            "date_range": date_range,
+            "url": url_abs,
+            "product_code": product_code,
+            "out_of_stock": out_of_stock,
+            "platform": "PS5",
+            "nsuid": None,
+            "source": "PlayStation"
+        })
+    return ps_list
+
 def scrape_playstation(url: str) -> List[Dict[str, Any]]:
-    """Scrapes PlayStation games and prices using Selenium."""
+    """Scrapes PlayStation games and prices from every listing page using Selenium."""
     logger.info(f"Scraping PlayStation data via Selenium from: {url}")
     driver = setup_driver()
     ps_list = []
-    
+    seen = set()
+
     try:
         driver.get(url)
-        WebDriverWait(driver, 10).until(
-            EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".product-tile"))
-        )
-        time.sleep(2)
-        
-        #multipage navigation handling
-        try:
-            next_btn = driver.find_element(By.CSS_SELECTOR, "button.desktop-pagination__button.right-chevron-blue")
-            driver.execute_script("arguments[0].click();", next_btn)
-            time.sleep(4) # Polite delay
+
+        for page in range(1, MAX_PLAYSTATION_PAGES + 1):
             WebDriverWait(driver, 10).until(
                 EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".product-tile"))
             )
-        except Exception:
-            logger.warning("Next page button not found or clickable. Proceeding with current page.")
-        
-        soup = BeautifulSoup(driver.page_source, "html.parser")
-        games = soup.select(".products-list-section .product-tile")
-        
-        for g in games:
-            name_tag = g.select_one("p.product-card-details__name")
-            name = name_tag.text.strip() if name_tag else None
-            
-            link_tag = g.select_one(".product-card-image .product-tile__full-width a")
-            url_abs = link_tag["href"] if link_tag else None
-            
-            price_tags = g.select("div.product-card-details__price .text-product-price span.price-whole-text")
-            price_now = price_tags[0].text.strip() if len(price_tags) >= 1 else None
-            price_old = price_tags[1].text.strip() if len(price_tags) >= 2 else None
-            
-            badge_tag = g.select_one("div.badge .badge-label")
-            badge = badge_tag.text.strip() if badge_tag else None
-            
-            date_tag = g.select_one("div.product-card_price .date-wrapper")
-            date_range = date_tag.text.strip() if date_tag else None
-            
-            out_of_stock = g.select_one("p.out-stock-wrpr") is not None
-            
-            btn = g.select_one("button[data-product-code]")
-            product_code = btn["data-product-code"] if btn else None
-            
-            ps_list.append({
-                "name": name,
-                "price": price_now,
-                "price_old": price_old,
-                "badge": badge,
-                "date_range": date_range,
-                "url": url_abs,
-                "product_code": product_code,
-                "out_of_stock": out_of_stock,
-                "platform": "PS5",
-                "nsuid": None,
-                "source": "PlayStation"
-            })
+            time.sleep(2)
+
+            #collect this page before moving on, skipping tiles already seen
+            new_items = []
+            for item in parse_playstation_tiles(driver.page_source):
+                key = item["product_code"] or item["url"] or item["name"]
+                if key not in seen:
+                    seen.add(key)
+                    new_items.append(item)
+            ps_list.extend(new_items)
+            logger.info(f"PlayStation page {page}: {len(new_items)} new items.")
+
+            next_btns = driver.find_elements(By.CSS_SELECTOR, PLAYSTATION_NEXT_BUTTON)
+            if not new_items or not next_btns or not next_btns[0].is_enabled():
+                break
+
+            driver.execute_script("arguments[0].click();", next_btns[0])
+            time.sleep(4) # Polite delay
     except Exception as e:
         raise ScrapeError(f"Failed to scrape PlayStation data: {e}") from e
     finally:
