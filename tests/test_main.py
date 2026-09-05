@@ -20,3 +20,17 @@ def test_load_cache_reports_empty_file(tmp_path):
 
     with pytest.raises(ScrapeError, match="is empty"):
         load_cache(str(path))
+
+def test_load_cache_keeps_ids_as_strings(tmp_path):
+    """A missing id must not turn the whole column into floats like 70010000096802.0."""
+    path = tmp_path / "raw_nintendo.csv"
+    path.write_text(
+        "name,nsuid,product_code\nMario Kart World,70010000096802,70010000096802\nNo Id,,\n",
+        encoding="utf-8",
+    )
+
+    df = load_cache(str(path))
+
+    assert df["nsuid"][0] == "70010000096802"
+    assert df["product_code"][0] == "70010000096802"
+    assert pd.isna(df["nsuid"][1])

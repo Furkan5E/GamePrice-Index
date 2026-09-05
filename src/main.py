@@ -34,10 +34,13 @@ def configure_logging():
 NINTENDO_URL = "https://www.nintendo.com/en-gb/Games"
 PLAYSTATION_URL = "https://direct.playstation.com/en-gb/games/"
 
+#ids are digit strings; left to pandas they become floats as soon as one is missing
+ID_COLUMN_TYPES = {"nsuid": "string", "product_code": "string"}
+
 def load_cache(path: str) -> pd.DataFrame:
     """Reads a cached CSV, failing clearly if a previous run left it empty."""
     try:
-        return pd.read_csv(path)
+        return pd.read_csv(path, dtype=ID_COLUMN_TYPES)
     except pd.errors.EmptyDataError as e:
         raise ScrapeError(f"Cached file {path} is empty; run without --cached to rebuild it.") from e
 
