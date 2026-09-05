@@ -34,6 +34,19 @@ def configure_logging():
 NINTENDO_URL = "https://www.nintendo.com/en-gb/Games"
 PLAYSTATION_URL = "https://direct.playstation.com/en-gb/games/"
 
+def load_cache(path: str) -> pd.DataFrame:
+    """Reads a cached CSV, failing clearly if a previous run left it empty."""
+    try:
+        return pd.read_csv(path)
+    except pd.errors.EmptyDataError as e:
+        raise ScrapeError(f"Cached file {path} is empty; run without --cached to rebuild it.") from e
+
+def write_cache(df: pd.DataFrame, path: str):
+    """Writes a cached CSV, never replacing good data with an empty scrape."""
+    if df.empty:
+        raise ScrapeError(f"Refusing to overwrite {path} with an empty dataset.")
+    df.to_csv(path, index=False)
+
 def run_pipeline(use_cache: bool = False):
     os.makedirs("data", exist_ok=True)
     os.makedirs("plots", exist_ok=True)
@@ -44,20 +57,22 @@ def run_pipeline(use_cache: bool = False):
 
     if use_cache and os.path.exists(raw_nintendo_path) and os.path.exists(raw_ps_path):
         logger.info("Loading cached raw data from data/ directory.")
-        df_nintendo_processed = pd.read_csv(raw_nintendo_path)
-        df_ps_processed = pd.read_csv(raw_ps_path)
+        df_nintendo_processed = load_cache(raw_nintendo_path)
+        df_ps_processed = load_cache(raw_ps_path)
     else:
         logger.info("Starting live web scraping...")
         # 1. Scrape Nintendo
         nintendo_base = scrape_nintendo_base(NINTENDO_URL)
         nintendo_prices = scrape_nintendo_prices(NINTENDO_URL)
         df_nintendo_processed = process_nintendo_data(nintendo_base, nintendo_prices)
-        df_nintendo_processed.to_csv(raw_nintendo_path, index=False)
-        
+
         # 2. Scrape PlayStation
         ps_data = scrape_playstation(PLAYSTATION_URL)
         df_ps_processed = process_playstation_data(ps_data)
-        df_ps_processed.to_csv(raw_ps_path, index=False)
+
+        #only touch the cache once every source has succeeded
+        write_cache(df_nintendo_processed, raw_nintendo_path)
+        write_cache(df_ps_processed, raw_ps_path)
 
     # 3. Combine & Compute Metrics
     df_final = combine_and_format_data(df_nintendo_processed, df_ps_processed)
