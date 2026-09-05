@@ -1,6 +1,7 @@
+import pytest
 import requests
 from bs4 import BeautifulSoup
-from src.scraper import parse_nintendo_price, scrape_nintendo_base
+from src.scraper import ScrapeError, parse_nintendo_price, scrape_nintendo_base
 
 NINTENDO_LISTING = """
 <ul>
@@ -68,3 +69,19 @@ def test_scrape_nintendo_base_sends_timeout_and_user_agent(monkeypatch):
 
     assert seen["timeout"] > 0
     assert "User-Agent" in seen["headers"]
+
+def test_scrape_nintendo_base_raises_on_network_error(monkeypatch):
+    """A failed request must stop the pipeline instead of producing an empty dataset."""
+    def fake_get(url, **kwargs):
+        raise requests.ConnectionError("boom")
+
+    monkeypatch.setattr(requests, "get", fake_get)
+
+    with pytest.raises(ScrapeError):
+        scrape_nintendo_base("https://example.test/games")
+
+def test_scrape_nintendo_base_raises_when_no_games_found(monkeypatch):
+    monkeypatch.setattr(requests, "get", lambda *args, **kwargs: _fake_response("<html></html>"))
+
+    with pytest.raises(ScrapeError):
+        scrape_nintendo_base("https://example.test/games")

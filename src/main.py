@@ -1,9 +1,11 @@
 import os
+import sys
 import argparse
 import logging
 import pandas as pd
 
 from src.scraper import (
+    ScrapeError,
     scrape_nintendo_base,
     scrape_nintendo_prices,
     scrape_playstation
@@ -80,4 +82,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     configure_logging()
-    run_pipeline(use_cache=args.cached)
+    try:
+        run_pipeline(use_cache=args.cached)
+    except ScrapeError as e:
+        logger.error(e)
+        sys.exit(1)

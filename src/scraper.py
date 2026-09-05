@@ -11,6 +11,9 @@ from selenium.webdriver.support import expected_conditions as EC
 
 logger = logging.getLogger(__name__)
 
+class ScrapeError(RuntimeError):
+    """Raised when a source cannot be scraped or returns no items."""
+
 REQUEST_TIMEOUT = 30 #seconds
 REQUEST_HEADERS = {
     "User-Agent": (
@@ -67,11 +70,13 @@ def scrape_nintendo_base(url: str) -> List[Dict[str, Any]]:
                 "out_of_stock": None,
                 "source": "Nintendo"
             })
-        logger.info(f"Successfully extracted {len(nintendo_list)} base Nintendo items.")
-        return nintendo_list
     except Exception as e:
-        logger.error(f"Failed to scrape Nintendo base data: {e}")
-        return []
+        raise ScrapeError(f"Failed to scrape Nintendo base data: {e}") from e
+
+    if not nintendo_list:
+        raise ScrapeError(f"No Nintendo games found at {url}; the page layout may have changed.")
+    logger.info(f"Successfully extracted {len(nintendo_list)} base Nintendo items.")
+    return nintendo_list
 
 def parse_nintendo_price(price_container) -> tuple:
     """Returns (price, price_old) from a Nintendo price element.
@@ -119,12 +124,14 @@ def scrape_nintendo_prices(url: str) -> List[Dict[str, Any]]:
                 "price": price,
                 "price_old": price_old
             })
-        logger.info(f"Successfully extracted {len(price_list)} Nintendo price records.")
     except Exception as e:
-        logger.error(f"Failed to scrape Nintendo prices: {e}")
+        raise ScrapeError(f"Failed to scrape Nintendo prices: {e}") from e
     finally:
         driver.quit()
-        
+
+    if not price_list:
+        raise ScrapeError(f"No Nintendo prices found at {url}; the page layout may have changed.")
+    logger.info(f"Successfully extracted {len(price_list)} Nintendo price records.")
     return price_list
 
 def scrape_playstation(url: str) -> List[Dict[str, Any]]:
@@ -189,10 +196,12 @@ def scrape_playstation(url: str) -> List[Dict[str, Any]]:
                 "nsuid": None,
                 "source": "PlayStation"
             })
-        logger.info(f"Successfully extracted {len(ps_list)} PlayStation items.")
     except Exception as e:
-        logger.error(f"Failed to scrape PlayStation data: {e}")
+        raise ScrapeError(f"Failed to scrape PlayStation data: {e}") from e
     finally:
         driver.quit()
-        
+
+    if not ps_list:
+        raise ScrapeError(f"No PlayStation games found at {url}; the page layout may have changed.")
+    logger.info(f"Successfully extracted {len(ps_list)} PlayStation items.")
     return ps_list
