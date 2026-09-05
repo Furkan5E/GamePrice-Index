@@ -86,11 +86,24 @@ def combine_and_format_data(df_nintendo: pd.DataFrame, df_ps: pd.DataFrame) -> p
     logger.info(f"Data processing complete. Final dataset contains {len(df_final)} rows.")
     return df_final
 
-def save_data(df: pd.DataFrame, db_path: str = "data/game_prices.db", csv_path: str = "data/final_prices.csv"):
-    """Saves the final dataframe to both a CSV and an SQLite database."""
-    logger.info(f"Saving data to {csv_path} and {db_path}...")
-    
+def save_data(
+    df: pd.DataFrame,
+    db_path: str = "data/game_prices.db",
+    csv_path: str = "data/data.csv",
+    write_db: bool = True,
+):
+    """Saves the final dataframe to a CSV and, for fresh scrapes, the SQLite history.
+
+    Pass write_db=False when the data was loaded from cache: it was already
+    recorded when it was scraped, and appending it again would log stale prices
+    under a new timestamp.
+    """
+    logger.info(f"Saving data to {csv_path}...")
     df.to_csv(csv_path, index=False)
+
+    if not write_db:
+        logger.info("Skipping database append for cached data.")
+        return
 
     try:
         with sqlite3.connect(db_path) as conn:
@@ -98,6 +111,6 @@ def save_data(df: pd.DataFrame, db_path: str = "data/game_prices.db", csv_path: 
             df_db = df.copy()
             df_db['scrape_timestamp'] = pd.Timestamp.now() 
             df_db.to_sql('prices', conn, if_exists='append', index=False)
-        logger.info("Data successfully saved to database.")
+        logger.info(f"Data successfully saved to database at {db_path}.")
     except Exception as e:
         logger.error(f"Failed to save to database: {e}")

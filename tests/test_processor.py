@@ -1,6 +1,12 @@
+import sqlite3
 import pandas as pd
 import pytest
-from src.processor import clean_price_columns, combine_and_format_data, process_nintendo_data
+from src.processor import (
+    clean_price_columns,
+    combine_and_format_data,
+    process_nintendo_data,
+    save_data
+)
 
 def test_clean_price_columns():
     """Tests that currency symbols and asterisks are stripped and types converted to float."""
@@ -90,3 +96,24 @@ def test_nintendo_rows_without_nsuid_are_dropped():
     assert df["name"].tolist() == ["Mario Kart World"]
     assert df["product_code"].tolist() == ["70010000096802"]
     assert df["price"].tolist() == [66.99]
+
+
+def _row_count(db_path) -> int:
+    conn = sqlite3.connect(db_path)
+    try:
+        return conn.execute("SELECT COUNT(*) FROM prices").fetchone()[0]
+    finally:
+        conn.close()
+
+def test_save_data_skips_database_for_cached_runs(tmp_path):
+    """Regression: --cached runs used to append stale rows under a fresh timestamp."""
+    df = pd.DataFrame({"name": ["Mario Kart World"], "price": [66.99]})
+    db_path = tmp_path / "game_prices.db"
+    csv_path = tmp_path / "data.csv"
+
+    save_data(df, db_path=str(db_path), csv_path=str(csv_path))
+    assert _row_count(db_path) == 1
+
+    save_data(df, db_path=str(db_path), csv_path=str(csv_path), write_db=False)
+    assert _row_count(db_path) == 1
+    assert csv_path.exists()

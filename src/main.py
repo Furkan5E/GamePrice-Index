@@ -58,7 +58,9 @@ def run_pipeline(use_cache: bool = False):
     raw_ps_path = os.path.join("data", "raw_ps.csv")
     final_data_path = os.path.join("data", "data.csv")
 
-    if use_cache and os.path.exists(raw_nintendo_path) and os.path.exists(raw_ps_path):
+    loaded_from_cache = use_cache and os.path.exists(raw_nintendo_path) and os.path.exists(raw_ps_path)
+
+    if loaded_from_cache:
         logger.info("Loading cached raw data from data/ directory.")
         df_nintendo_processed = load_cache(raw_nintendo_path)
         df_ps_processed = load_cache(raw_ps_path)
@@ -81,7 +83,7 @@ def run_pipeline(use_cache: bool = False):
     df_final = combine_and_format_data(df_nintendo_processed, df_ps_processed)
     
     #save to both CSV and DB
-    save_data(df_final, csv_path=final_data_path)
+    save_data(df_final, csv_path=final_data_path, write_db=not loaded_from_cache)
     logger.info(f"Saved master dataset to {final_data_path}")
 
     # 4. Generate Visualizations
