@@ -243,9 +243,13 @@ dependencies = [
     { name = "beautifulsoup4" },
     { name = "matplotlib" },
     { name = "pandas" },
-    { name = "pytest" },
     { name = "requests" },
     { name = "selenium" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "pytest" },
 ]
 
 [package.metadata]
@@ -253,10 +257,12 @@ requires-dist = [
     { name = "beautifulsoup4", specifier = ">=4.15.0" },
     { name = "matplotlib", specifier = ">=3.11.1" },
     { name = "pandas", specifier = ">=3.0.5" },
-    { name = "pytest", specifier = ">=9.1.1" },
     { name = "requests", specifier = ">=2.34.2" },
     { name = "selenium", specifier = ">=4.47.0" },
 ]
+
+[package.metadata.requires-dev]
+dev = [{ name = "pytest", specifier = ">=9.1.1" }]
 
 [[package]]
 name = "h11"
