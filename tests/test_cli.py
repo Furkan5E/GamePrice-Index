@@ -1,6 +1,7 @@
 import pandas as pd
 import pytest
-from gameprice_index.main import load_cache, write_cache
+from gameprice_index import cli
+from gameprice_index.cli import load_cache, write_cache
 from gameprice_index.scraper import ScrapeError
 
 def test_write_cache_refuses_empty_dataset(tmp_path):
@@ -34,3 +35,19 @@ def test_load_cache_keeps_ids_as_strings(tmp_path):
     assert df["nsuid"][0] == "70010000096802"
     assert df["product_code"][0] == "70010000096802"
     assert pd.isna(df["nsuid"][1])
+
+def test_main_returns_error_code_when_scrape_fails(monkeypatch):
+    """A failed source must surface as a non-zero exit code for cron and CI."""
+    def failing_pipeline(use_cache=False):
+        raise ScrapeError("No Nintendo games found")
+
+    monkeypatch.setattr(cli, "run_pipeline", failing_pipeline)
+
+    assert cli.main([]) == 1
+
+def test_main_passes_cached_flag(monkeypatch):
+    seen = {}
+    monkeypatch.setattr(cli, "run_pipeline", lambda use_cache=False: seen.update(use_cache=use_cache))
+
+    assert cli.main(["--cached"]) == 0
+    assert seen == {"use_cache": True}

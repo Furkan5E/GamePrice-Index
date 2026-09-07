@@ -21,4 +21,4 @@ COPY src/ src/
 COPY tests/ tests/
 RUN uv sync --frozen
 
-CMD ["uv", "run", "python", "-m", "gameprice_index.main"]
+CMD ["uv", "run", "gameprice-index"]

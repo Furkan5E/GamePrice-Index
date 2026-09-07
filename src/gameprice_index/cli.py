@@ -92,18 +92,26 @@ def run_pipeline(use_cache: bool = False):
     plot_price_vs_discount(df_final)
     logger.info("Pipeline executed successfully!")
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="GamePrice-Index ETL & Analysis Pipeline")
+def main(argv=None) -> int:
+    """Console entry point; returns the process exit code."""
+    parser = argparse.ArgumentParser(
+        prog="gameprice-index",
+        description="GamePrice-Index ETL & Analysis Pipeline"
+    )
     parser.add_argument(
         "--cached",
         action="store_true",
-        help="Use existing raw CSV files in data/ instead of scraping live sites."
+        help="Use existing processed CSV files in data/ instead of scraping live sites."
     )
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     configure_logging()
     try:
         run_pipeline(use_cache=args.cached)
     except ScrapeError as e:
         logger.error(e)
-        sys.exit(1)
+        return 1
+    return 0
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -12,6 +12,9 @@ dependencies = [
     "selenium>=4.47.0",
 ]
 
+[project.scripts]
+gameprice-index = "gameprice_index.cli:main"
+
 [dependency-groups]
 dev = [
     "pytest>=9.1.1",
