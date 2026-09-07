@@ -1,7 +1,7 @@
 import pytest
 import requests
 from bs4 import BeautifulSoup
-from src.scraper import (
+from gameprice_index.scraper import (
     ScrapeError,
     parse_nintendo_price,
     parse_playstation_tiles,

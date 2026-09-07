@@ -1,7 +1,7 @@
 import sqlite3
 import pandas as pd
 import pytest
-from src.processor import (
+from gameprice_index.processor import (
     clean_price_columns,
     combine_and_format_data,
     process_nintendo_data,

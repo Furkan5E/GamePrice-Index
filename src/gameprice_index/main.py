@@ -4,19 +4,19 @@ import argparse
 import logging
 import pandas as pd
 
-from src.scraper import (
+from gameprice_index.scraper import (
     ScrapeError,
     scrape_nintendo_base,
     scrape_nintendo_prices,
     scrape_playstation
 )
-from src.processor import (
+from gameprice_index.processor import (
     process_nintendo_data,
     process_playstation_data,
     combine_and_format_data,
     save_data
 )
-from src.visualiser import (
+from gameprice_index.visualiser import (
     plot_platform_distribution,
     plot_price_analysis,
     plot_price_vs_discount

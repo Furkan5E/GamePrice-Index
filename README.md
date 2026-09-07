@@ -35,11 +35,11 @@ uv sync
 ```
 Run the live scraping pipeline:
 ```bash
-uv run python -m src.main
+uv run python -m gameprice_index.main
 ```
 Run using cached local datasets:
 ```bash
-uv run python -m src.main --cached
+uv run python -m gameprice_index.main --cached
 ```
 Run the test suite:
 ```bash

@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
-from src.main import load_cache, write_cache
-from src.scraper import ScrapeError
+from gameprice_index.main import load_cache, write_cache
+from gameprice_index.scraper import ScrapeError
 
 def test_write_cache_refuses_empty_dataset(tmp_path):
     """Regression: a failed scrape used to replace good cached data with an empty file."""
