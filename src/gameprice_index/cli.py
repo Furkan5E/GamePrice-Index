@@ -54,16 +54,16 @@ def run_pipeline(use_cache: bool = False):
     os.makedirs("data", exist_ok=True)
     os.makedirs("plots", exist_ok=True)
 
-    raw_nintendo_path = os.path.join("data", "raw_nintendo.csv")
-    raw_ps_path = os.path.join("data", "raw_ps.csv")
+    nintendo_cache_path = os.path.join("data", "processed_nintendo.csv")
+    ps_cache_path = os.path.join("data", "processed_playstation.csv")
     final_data_path = os.path.join("data", "data.csv")
 
-    loaded_from_cache = use_cache and os.path.exists(raw_nintendo_path) and os.path.exists(raw_ps_path)
+    loaded_from_cache = use_cache and os.path.exists(nintendo_cache_path) and os.path.exists(ps_cache_path)
 
     if loaded_from_cache:
-        logger.info("Loading cached raw data from data/ directory.")
-        df_nintendo_processed = load_cache(raw_nintendo_path)
-        df_ps_processed = load_cache(raw_ps_path)
+        logger.info("Loading cached processed data from data/ directory.")
+        df_nintendo_processed = load_cache(nintendo_cache_path)
+        df_ps_processed = load_cache(ps_cache_path)
     else:
         logger.info("Starting live web scraping...")
         # 1. Scrape Nintendo
@@ -76,8 +76,8 @@ def run_pipeline(use_cache: bool = False):
         df_ps_processed = process_playstation_data(ps_data)
 
         #only touch the cache once every source has succeeded
-        write_cache(df_nintendo_processed, raw_nintendo_path)
-        write_cache(df_ps_processed, raw_ps_path)
+        write_cache(df_nintendo_processed, nintendo_cache_path)
+        write_cache(df_ps_processed, ps_cache_path)
 
     # 3. Combine & Compute Metrics
     df_final = combine_and_format_data(df_nintendo_processed, df_ps_processed)
