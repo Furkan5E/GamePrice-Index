@@ -8,6 +8,7 @@
 ![SQLite](https://img.shields.io/badge/SQLite-Database-003B57.svg?logo=sqlite)
 ![License](https://img.shields.io/badge/License-MIT-blue.svg)
 [![Test Suite](https://github.com/Furkan5E/GamePrice-Index/actions/workflows/test.yaml/badge.svg)](https://github.com/Furkan5E/GamePrice-Index/actions/workflows/test.yaml)
+![Coverage](https://raw.githubusercontent.com/Furkan5E/GamePrice-Index/badges/coverage.svg)
 
 An automated ETL (Extract, Transform, Load) and market intelligence pipeline that scrapes, normalises, and analyses dynamic video game pricing across Nintendo eShop and PlayStation Direct platforms.
 

@@ -21,6 +21,7 @@ dev = [
     "pandas-stubs>=2.3",
     "pre-commit>=4.0",
     "pytest>=9.1.1",
+    "pytest-cov>=6.0",
     "ruff>=0.12",
     "types-beautifulsoup4>=4.12",
     "types-requests>=2.32",
@@ -36,6 +37,14 @@ packages = ["src/gameprice_index"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 
+[tool.coverage.run]
+source = ["gameprice_index"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+
 [tool.ruff]
 line-length = 120
 target-version = "py314"
@@ -46,7 +55,7 @@ select = ["E", "F", "W", "I", "B", "UP", "SIM"]
 
 [tool.mypy]
 python_version = "3.14"
-files = ["src"]
+files = ["src", "scripts"]
 check_untyped_defs = true
 warn_unused_ignores = true
 warn_redundant_casts = true
