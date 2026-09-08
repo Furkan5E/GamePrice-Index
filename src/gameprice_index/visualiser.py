@@ -63,7 +63,9 @@ def plot_price_analysis(df: pd.DataFrame, output_dir: str = "plots") -> str:
     plt.subplot(1, 2, 2)
     # one set of bin edges for both sources, otherwise the bar widths are not comparable
     all_prices = pd.concat([ps_df["price"], nt_df["price"]])
-    bins = np.histogram_bin_edges(all_prices, bins=20) if not all_prices.empty else 20
+    bins: int | list[float] = 20
+    if not all_prices.empty:
+        bins = np.histogram_bin_edges(all_prices, bins=20).tolist()
     if not ps_df.empty:
         plt.hist(ps_df["price"], bins=bins, alpha=0.6, label="PlayStation", color="#2980b9", edgecolor="black")
     if not nt_df.empty:

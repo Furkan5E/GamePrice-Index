@@ -3,7 +3,7 @@ import time
 from typing import Any
 
 import requests
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
@@ -58,8 +58,8 @@ def scrape_nintendo_base(url: str) -> list[dict[str, Any]]:
             platform_tag = g.find("p", class_="page-data")
             platform = platform_tag.get_text(strip=True) if platform_tag else None
 
-            link_tag = g.find("a", href=True)
-            url_abs = "https://www.nintendo.co.uk" + link_tag["href"] if link_tag else None
+            link_tag = g.select_one("a[href]")
+            url_abs = f"https://www.nintendo.co.uk{link_tag['href']}" if link_tag else None
 
             nsuid = g.get("data-nsuid")
 
@@ -87,7 +87,7 @@ def scrape_nintendo_base(url: str) -> list[dict[str, Any]]:
     return nintendo_list
 
 
-def parse_nintendo_price(price_container) -> tuple:
+def parse_nintendo_price(price_container: Tag | None) -> tuple[str | None, str | None]:
     """Returns (price, price_old) from a Nintendo price element.
 
     The site renders the regular price in span[data-price] and, when a game is
@@ -125,7 +125,7 @@ def scrape_nintendo_prices(url: str) -> list[dict[str, Any]]:
 
         for g in games:
             nsuid = g.get("data-nsuid")
-            price_container = g.find("p", class_="price-small")
+            price_container = g.select_one("p.price-small")
 
             price, price_old = parse_nintendo_price(price_container)
 

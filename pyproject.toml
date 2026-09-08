@@ -17,8 +17,12 @@ gameprice-index = "gameprice_index.cli:main"
 
 [dependency-groups]
 dev = [
+    "mypy>=1.18",
+    "pandas-stubs>=2.3",
     "pytest>=9.1.1",
     "ruff>=0.12",
+    "types-beautifulsoup4>=4.12",
+    "types-requests>=2.32",
 ]
 
 [build-system]
@@ -38,3 +42,14 @@ src = ["src", "tests"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "SIM"]
+
+[tool.mypy]
+python_version = "3.14"
+files = ["src"]
+check_untyped_defs = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+
+[[tool.mypy.overrides]]
+module = ["matplotlib.*", "selenium.*"]
+ignore_missing_imports = true

@@ -22,7 +22,7 @@ from gameprice_index.visualiser import plot_platform_distribution, plot_price_an
 logger = logging.getLogger(__name__)
 
 
-def configure_logging():
+def configure_logging() -> None:
     """Sets up logging once for the whole pipeline; modules only create loggers."""
     logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 
@@ -42,14 +42,14 @@ def load_cache(path: str) -> pd.DataFrame:
         raise ScrapeError(f"Cached file {path} is empty; run without --cached to rebuild it.") from e
 
 
-def write_cache(df: pd.DataFrame, path: str):
+def write_cache(df: pd.DataFrame, path: str) -> None:
     """Writes a cached CSV, never replacing good data with an empty scrape."""
     if df.empty:
         raise ScrapeError(f"Refusing to overwrite {path} with an empty dataset.")
     df.to_csv(path, index=False)
 
 
-def run_pipeline(use_cache: bool = False):
+def run_pipeline(use_cache: bool = False) -> None:
     os.makedirs("data", exist_ok=True)
     os.makedirs("plots", exist_ok=True)
 
