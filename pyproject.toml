@@ -18,6 +18,7 @@ gameprice-index = "gameprice_index.cli:main"
 [dependency-groups]
 dev = [
     "pytest>=9.1.1",
+    "ruff>=0.12",
 ]
 
 [build-system]
@@ -29,3 +30,11 @@ packages = ["src/gameprice_index"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py314"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM"]

@@ -1,11 +1,12 @@
 import pytest
 import requests
 from bs4 import BeautifulSoup
+
 from gameprice_index.scraper import (
     ScrapeError,
     parse_nintendo_price,
     parse_playstation_tiles,
-    scrape_nintendo_base
+    scrape_nintendo_base,
 )
 
 NINTENDO_LISTING = """
@@ -21,6 +22,7 @@ NINTENDO_LISTING = """
 </ul>
 """
 
+
 def _fake_response(html: str) -> requests.Response:
     """Builds a response the way the site sends it: utf-8 bytes, no charset header."""
     response = requests.Response()
@@ -29,16 +31,18 @@ def _fake_response(html: str) -> requests.Response:
     response.encoding = "ISO-8859-1"
     return response
 
+
 def _price_container(html: str):
     return BeautifulSoup(html, "html.parser").find("p", class_="price-small")
+
 
 def test_parse_nintendo_price_regular():
     """A game that is not on sale has a price and no old price."""
     container = _price_container(
-        '<p class="price-small"><span data-price="">£41.99</span>'
-        '<span class="discount" data-discount=""></span></p>'
+        '<p class="price-small"><span data-price="">£41.99</span><span class="discount" data-discount=""></span></p>'
     )
     assert parse_nintendo_price(container) == ("£41.99", None)
+
 
 def test_parse_nintendo_price_on_sale():
     """The discount span holds the sale price, data-price the original one."""
@@ -48,8 +52,10 @@ def test_parse_nintendo_price_on_sale():
     )
     assert parse_nintendo_price(container) == ("£7.64", "£8.99")
 
+
 def test_parse_nintendo_price_missing():
     assert parse_nintendo_price(None) == (None, None)
+
 
 def test_scrape_nintendo_base_decodes_utf8(monkeypatch):
     """Regression: names with non-ascii punctuation used to come back as mojibake."""
@@ -60,6 +66,7 @@ def test_scrape_nintendo_base_decodes_utf8(monkeypatch):
     assert len(games) == 1
     assert games[0]["name"] == "Emoji Killer – Casino Massacre"
     assert games[0]["platform"] == "Nintendo Switch"
+
 
 def test_scrape_nintendo_base_sends_timeout_and_user_agent(monkeypatch):
     """A request without a timeout can hang the whole pipeline."""
@@ -75,8 +82,10 @@ def test_scrape_nintendo_base_sends_timeout_and_user_agent(monkeypatch):
     assert seen["timeout"] > 0
     assert "User-Agent" in seen["headers"]
 
+
 def test_scrape_nintendo_base_raises_on_network_error(monkeypatch):
     """A failed request must stop the pipeline instead of producing an empty dataset."""
+
     def fake_get(url, **kwargs):
         raise requests.ConnectionError("boom")
 
@@ -85,11 +94,13 @@ def test_scrape_nintendo_base_raises_on_network_error(monkeypatch):
     with pytest.raises(ScrapeError):
         scrape_nintendo_base("https://example.test/games")
 
+
 def test_scrape_nintendo_base_raises_when_no_games_found(monkeypatch):
     monkeypatch.setattr(requests, "get", lambda *args, **kwargs: _fake_response("<html></html>"))
 
     with pytest.raises(ScrapeError):
         scrape_nintendo_base("https://example.test/games")
+
 
 PLAYSTATION_LISTING = """
 <div class="products-list-section">
@@ -116,6 +127,7 @@ PLAYSTATION_LISTING = """
   </div>
 </div>
 """
+
 
 def test_parse_playstation_tiles():
     tiles = parse_playstation_tiles(PLAYSTATION_LISTING)
