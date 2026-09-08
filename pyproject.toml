@@ -19,6 +19,7 @@ gameprice-index = "gameprice_index.cli:main"
 dev = [
     "mypy>=1.18",
     "pandas-stubs>=2.3",
+    "pre-commit>=4.0",
     "pytest>=9.1.1",
     "ruff>=0.12",
     "types-beautifulsoup4>=4.12",
