@@ -10,22 +10,13 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
+from gameprice_index import config
+
 logger = logging.getLogger(__name__)
 
 
 class ScrapeError(RuntimeError):
     """Raised when a source cannot be scraped or returns no items."""
-
-
-MAX_PLAYSTATION_PAGES = 50  # safety stop for the pagination loop
-PLAYSTATION_NEXT_BUTTON = "button.desktop-pagination__button.right-chevron-blue"
-REQUEST_TIMEOUT = 30  # seconds
-REQUEST_HEADERS = {
-    "User-Agent": (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
-    ),
-    "Accept-Language": "en-GB,en;q=0.9",
-}
 
 
 def setup_driver() -> webdriver.Chrome:
@@ -39,45 +30,47 @@ def setup_driver() -> webdriver.Chrome:
     return webdriver.Chrome(options=options)
 
 
+def _text(tag: Tag | None) -> str | None:
+    return tag.get_text(strip=True) if tag else None
+
+
+def parse_nintendo_listing(html: str) -> list[dict[str, Any]]:
+    """Extracts the base game records from the Nintendo listing page."""
+    selectors = config.NINTENDO_SELECTORS
+    soup = BeautifulSoup(html, "html.parser")
+
+    nintendo_list = []
+    for g in soup.select(selectors["tile"]):
+        link_tag = g.select_one(selectors["link"])
+        url_abs = f"{config.NINTENDO_LINK_PREFIX}{link_tag['href']}" if link_tag else None
+
+        nintendo_list.append(
+            {
+                "name": _text(g.select_one(selectors["name"])),
+                "platform": _text(g.select_one(selectors["platform"])),
+                "url": url_abs,
+                "nsuid": g.get("data-nsuid"),
+                "price": None,
+                "price_old": None,
+                "badge": None,
+                "date_range": None,
+                "product_code": None,
+                "out_of_stock": None,
+                "source": "Nintendo",
+            }
+        )
+    return nintendo_list
+
+
 def scrape_nintendo_base(url: str) -> list[dict[str, Any]]:
     """Scrapes base game data from Nintendo using requests."""
     logger.info(f"Scraping Nintendo base data from: {url}")
     try:
-        response = requests.get(url, headers=REQUEST_HEADERS, timeout=REQUEST_TIMEOUT)
+        response = requests.get(url, headers=config.REQUEST_HEADERS, timeout=config.REQUEST_TIMEOUT)
         response.raise_for_status()
         # the page is utf-8 but sends no charset header, so requests guesses latin-1
         response.encoding = "utf-8"
-        soup = BeautifulSoup(response.text, "html.parser")
-        games = soup.select("li.page-list-group-item[data-nsuid]")
-
-        nintendo_list = []
-        for g in games:
-            name_tag = g.find("p", class_="page-title")
-            name = name_tag.get_text(strip=True) if name_tag else None
-
-            platform_tag = g.find("p", class_="page-data")
-            platform = platform_tag.get_text(strip=True) if platform_tag else None
-
-            link_tag = g.select_one("a[href]")
-            url_abs = f"https://www.nintendo.co.uk{link_tag['href']}" if link_tag else None
-
-            nsuid = g.get("data-nsuid")
-
-            nintendo_list.append(
-                {
-                    "name": name,
-                    "platform": platform,
-                    "url": url_abs,
-                    "nsuid": nsuid,
-                    "price": None,
-                    "price_old": None,
-                    "badge": None,
-                    "date_range": None,
-                    "product_code": None,
-                    "out_of_stock": None,
-                    "source": "Nintendo",
-                }
-            )
+        nintendo_list = parse_nintendo_listing(response.text)
     except Exception as e:
         raise ScrapeError(f"Failed to scrape Nintendo base data: {e}") from e
 
@@ -96,10 +89,10 @@ def parse_nintendo_price(price_container: Tag | None) -> tuple[str | None, str |
     if not price_container:
         return None, None
 
-    regular_tag = price_container.find("span", {"data-price": True})
+    regular_tag = price_container.select_one(config.NINTENDO_SELECTORS["regular_price"])
     regular = regular_tag.get_text(strip=True).replace("*", "") if regular_tag else None
 
-    sale_tag = price_container.find("span", class_="discount")
+    sale_tag = price_container.select_one(config.NINTENDO_SELECTORS["sale_price"])
     sale = sale_tag.get_text(strip=True).replace("*", "") if sale_tag else None
 
     if sale:
@@ -107,29 +100,34 @@ def parse_nintendo_price(price_container: Tag | None) -> tuple[str | None, str |
     return regular or None, None
 
 
+def parse_nintendo_prices(html: str) -> list[dict[str, Any]]:
+    """Extracts the per-nsuid prices from the rendered Nintendo listing page."""
+    selectors = config.NINTENDO_SELECTORS
+    soup = BeautifulSoup(html, "html.parser")
+
+    price_list = []
+    for g in soup.select(selectors["tile"]):
+        price, price_old = parse_nintendo_price(g.select_one(selectors["price_container"]))
+        price_list.append({"nsuid": g.get("data-nsuid"), "price": price, "price_old": price_old})
+    return price_list
+
+
 def scrape_nintendo_prices(url: str) -> list[dict[str, Any]]:
     """Scrapes dynamic pricing data from Nintendo using Selenium."""
     logger.info(f"Scraping Nintendo pricing data via Selenium from: {url}")
+    selectors = config.NINTENDO_SELECTORS
     driver = setup_driver()
-    price_list = []
 
     try:
         driver.get(url)
         WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, "p.price-small span[data-price]"))
+            EC.presence_of_element_located(
+                (By.CSS_SELECTOR, f"{selectors['price_container']} {selectors['regular_price']}")
+            )
         )
         time.sleep(4)  # small delay
 
-        soup = BeautifulSoup(driver.page_source, "html.parser")
-        games = soup.select("li.page-list-group-item[data-nsuid]")
-
-        for g in games:
-            nsuid = g.get("data-nsuid")
-            price_container = g.select_one("p.price-small")
-
-            price, price_old = parse_nintendo_price(price_container)
-
-            price_list.append({"nsuid": nsuid, "price": price, "price_old": price_old})
+        price_list = parse_nintendo_prices(driver.page_source)
     except Exception as e:
         raise ScrapeError(f"Failed to scrape Nintendo prices: {e}") from e
     finally:
@@ -143,42 +141,25 @@ def scrape_nintendo_prices(url: str) -> list[dict[str, Any]]:
 
 def parse_playstation_tiles(html: str) -> list[dict[str, Any]]:
     """Extracts every product tile from one page of the PlayStation listing."""
+    selectors = config.PLAYSTATION_SELECTORS
     soup = BeautifulSoup(html, "html.parser")
-    games = soup.select(".products-list-section .product-tile")
 
     ps_list = []
-    for g in games:
-        name_tag = g.select_one("p.product-card-details__name")
-        name = name_tag.text.strip() if name_tag else None
-
-        link_tag = g.select_one(".product-card-image .product-tile__full-width a")
-        url_abs = link_tag["href"] if link_tag else None
-
-        price_tags = g.select("div.product-card-details__price .text-product-price span.price-whole-text")
-        price_now = price_tags[0].text.strip() if len(price_tags) >= 1 else None
-        price_old = price_tags[1].text.strip() if len(price_tags) >= 2 else None
-
-        badge_tag = g.select_one("div.badge .badge-label")
-        badge = badge_tag.text.strip() if badge_tag else None
-
-        date_tag = g.select_one("div.product-card_price .date-wrapper")
-        date_range = date_tag.text.strip() if date_tag else None
-
-        out_of_stock = g.select_one("p.out-stock-wrpr") is not None
-
-        btn = g.select_one("button[data-product-code]")
-        product_code = btn["data-product-code"] if btn else None
+    for g in soup.select(selectors["tile"]):
+        link_tag = g.select_one(selectors["link"])
+        price_tags = g.select(selectors["prices"])
+        btn = g.select_one(selectors["product_code"])
 
         ps_list.append(
             {
-                "name": name,
-                "price": price_now,
-                "price_old": price_old,
-                "badge": badge,
-                "date_range": date_range,
-                "url": url_abs,
-                "product_code": product_code,
-                "out_of_stock": out_of_stock,
+                "name": _text(g.select_one(selectors["name"])),
+                "price": price_tags[0].text.strip() if len(price_tags) >= 1 else None,
+                "price_old": price_tags[1].text.strip() if len(price_tags) >= 2 else None,
+                "badge": _text(g.select_one(selectors["badge"])),
+                "date_range": _text(g.select_one(selectors["date_range"])),
+                "url": link_tag["href"] if link_tag else None,
+                "product_code": btn["data-product-code"] if btn else None,
+                "out_of_stock": g.select_one(selectors["out_of_stock"]) is not None,
                 "platform": "PS5",
                 "nsuid": None,
                 "source": "PlayStation",
@@ -190,15 +171,18 @@ def parse_playstation_tiles(html: str) -> list[dict[str, Any]]:
 def scrape_playstation(url: str) -> list[dict[str, Any]]:
     """Scrapes PlayStation games and prices from every listing page using Selenium."""
     logger.info(f"Scraping PlayStation data via Selenium from: {url}")
+    selectors = config.PLAYSTATION_SELECTORS
     driver = setup_driver()
-    ps_list = []
+    ps_list: list[dict[str, Any]] = []
     seen = set()
 
     try:
         driver.get(url)
 
-        for page in range(1, MAX_PLAYSTATION_PAGES + 1):
-            WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".product-tile")))
+        for page in range(1, config.PLAYSTATION_MAX_PAGES + 1):
+            WebDriverWait(driver, 10).until(
+                EC.presence_of_all_elements_located((By.CSS_SELECTOR, selectors["any_tile"]))
+            )
             time.sleep(2)
 
             # collect this page before moving on, skipping tiles already seen
@@ -211,7 +195,7 @@ def scrape_playstation(url: str) -> list[dict[str, Any]]:
             ps_list.extend(new_items)
             logger.info(f"PlayStation page {page}: {len(new_items)} new items.")
 
-            next_btns = driver.find_elements(By.CSS_SELECTOR, PLAYSTATION_NEXT_BUTTON)
+            next_btns = driver.find_elements(By.CSS_SELECTOR, selectors["next_button"])
             if not new_items or not next_btns or not next_btns[0].is_enabled():
                 break
 

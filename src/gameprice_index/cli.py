@@ -5,6 +5,7 @@ import sys
 
 import pandas as pd
 
+from gameprice_index import config
 from gameprice_index.processor import (
     combine_and_format_data,
     process_nintendo_data,
@@ -27,9 +28,6 @@ def configure_logging() -> None:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 
 
-NINTENDO_URL = "https://www.nintendo.com/en-gb/Games"
-PLAYSTATION_URL = "https://direct.playstation.com/en-gb/games/"
-
 # ids are digit strings; left to pandas they become floats as soon as one is missing
 ID_COLUMN_TYPES = {"nsuid": "string", "product_code": "string"}
 
@@ -50,12 +48,13 @@ def write_cache(df: pd.DataFrame, path: str) -> None:
 
 
 def run_pipeline(use_cache: bool = False) -> None:
-    os.makedirs("data", exist_ok=True)
-    os.makedirs("plots", exist_ok=True)
+    os.makedirs(config.DATA_DIR, exist_ok=True)
+    os.makedirs(config.PLOTS_DIR, exist_ok=True)
 
-    nintendo_cache_path = os.path.join("data", "processed_nintendo.csv")
-    ps_cache_path = os.path.join("data", "processed_playstation.csv")
-    final_data_path = os.path.join("data", "data.csv")
+    nintendo_cache_path = os.path.join(config.DATA_DIR, config.CACHE_NAMES["nintendo"])
+    ps_cache_path = os.path.join(config.DATA_DIR, config.CACHE_NAMES["playstation"])
+    final_data_path = os.path.join(config.DATA_DIR, config.FINAL_CSV_NAME)
+    db_path = os.path.join(config.DATA_DIR, config.DATABASE_NAME)
 
     loaded_from_cache = use_cache and os.path.exists(nintendo_cache_path) and os.path.exists(ps_cache_path)
 
@@ -66,12 +65,12 @@ def run_pipeline(use_cache: bool = False) -> None:
     else:
         logger.info("Starting live web scraping...")
         # 1. Scrape Nintendo
-        nintendo_base = scrape_nintendo_base(NINTENDO_URL)
-        nintendo_prices = scrape_nintendo_prices(NINTENDO_URL)
+        nintendo_base = scrape_nintendo_base(config.NINTENDO_URL)
+        nintendo_prices = scrape_nintendo_prices(config.NINTENDO_URL)
         df_nintendo_processed = process_nintendo_data(nintendo_base, nintendo_prices)
 
         # 2. Scrape PlayStation
-        ps_data = scrape_playstation(PLAYSTATION_URL)
+        ps_data = scrape_playstation(config.PLAYSTATION_URL)
         df_ps_processed = process_playstation_data(ps_data)
 
         # only touch the cache once every source has succeeded
@@ -82,13 +81,13 @@ def run_pipeline(use_cache: bool = False) -> None:
     df_final = combine_and_format_data(df_nintendo_processed, df_ps_processed)
 
     # save to both CSV and DB
-    save_data(df_final, csv_path=final_data_path, write_db=not loaded_from_cache)
+    save_data(df_final, db_path=db_path, csv_path=final_data_path, write_db=not loaded_from_cache)
     logger.info(f"Saved master dataset to {final_data_path}")
 
     # 4. Generate Visualizations
-    plot_platform_distribution(df_final)
-    plot_price_analysis(df_final)
-    plot_price_vs_discount(df_final)
+    plot_platform_distribution(df_final, output_dir=config.PLOTS_DIR)
+    plot_price_analysis(df_final, output_dir=config.PLOTS_DIR)
+    plot_price_vs_discount(df_final, output_dir=config.PLOTS_DIR)
     logger.info("Pipeline executed successfully!")
 
 
