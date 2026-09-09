@@ -2,6 +2,7 @@ import argparse
 import logging
 import os
 import sys
+from collections.abc import Sequence
 
 import pandas as pd
 
@@ -22,6 +23,8 @@ from gameprice_index.visualiser import plot_platform_distribution, plot_price_an
 
 logger = logging.getLogger(__name__)
 
+SOURCES = ("nintendo", "playstation")
+
 
 def configure_logging() -> None:
     """Sets up logging once for the whole pipeline; modules only create loggers."""
@@ -33,9 +36,11 @@ ID_COLUMN_TYPES = {"nsuid": "string", "product_code": "string"}
 
 
 def load_cache(path: str) -> pd.DataFrame:
-    """Reads a cached CSV, failing clearly if a previous run left it empty."""
+    """Reads a cached CSV, failing clearly if it is missing or a previous run left it empty."""
     try:
         return pd.read_csv(path, dtype=ID_COLUMN_TYPES)
+    except FileNotFoundError as e:
+        raise ScrapeError(f"No cached file at {path}; run without --cached to create it.") from e
     except pd.errors.EmptyDataError as e:
         raise ScrapeError(f"Cached file {path} is empty; run without --cached to rebuild it.") from e
 
@@ -47,63 +52,92 @@ def write_cache(df: pd.DataFrame, path: str) -> None:
     df.to_csv(path, index=False)
 
 
-def run_pipeline(use_cache: bool = False) -> None:
-    os.makedirs(config.DATA_DIR, exist_ok=True)
-    os.makedirs(config.PLOTS_DIR, exist_ok=True)
+def scrape_source(source: str) -> pd.DataFrame:
+    """Scrapes one storefront and returns its processed dataframe."""
+    if source == "nintendo":
+        nintendo_base = scrape_nintendo_base(config.NINTENDO_URL)
+        nintendo_prices = scrape_nintendo_prices(config.NINTENDO_URL)
+        return process_nintendo_data(nintendo_base, nintendo_prices)
+    if source == "playstation":
+        return process_playstation_data(scrape_playstation(config.PLAYSTATION_URL))
+    raise ValueError(f"Unknown source: {source}")
 
-    nintendo_cache_path = os.path.join(config.DATA_DIR, config.CACHE_NAMES["nintendo"])
-    ps_cache_path = os.path.join(config.DATA_DIR, config.CACHE_NAMES["playstation"])
+
+def run_pipeline(
+    use_cache: bool = False,
+    sources: Sequence[str] = SOURCES,
+    make_plots: bool = True,
+) -> None:
+    os.makedirs(config.DATA_DIR, exist_ok=True)
+
+    cache_paths = {source: os.path.join(config.DATA_DIR, config.CACHE_NAMES[source]) for source in sources}
     final_data_path = os.path.join(config.DATA_DIR, config.FINAL_CSV_NAME)
     db_path = os.path.join(config.DATA_DIR, config.DATABASE_NAME)
 
-    loaded_from_cache = use_cache and os.path.exists(nintendo_cache_path) and os.path.exists(ps_cache_path)
-
-    if loaded_from_cache:
+    if use_cache:
         logger.info("Loading cached processed data from data/ directory.")
-        df_nintendo_processed = load_cache(nintendo_cache_path)
-        df_ps_processed = load_cache(ps_cache_path)
+        frames = {source: load_cache(cache_paths[source]) for source in sources}
     else:
-        logger.info("Starting live web scraping...")
-        # 1. Scrape Nintendo
-        nintendo_base = scrape_nintendo_base(config.NINTENDO_URL)
-        nintendo_prices = scrape_nintendo_prices(config.NINTENDO_URL)
-        df_nintendo_processed = process_nintendo_data(nintendo_base, nintendo_prices)
+        logger.info(f"Starting live web scraping for: {', '.join(sources)}")
+        frames = {source: scrape_source(source) for source in sources}
 
-        # 2. Scrape PlayStation
-        ps_data = scrape_playstation(config.PLAYSTATION_URL)
-        df_ps_processed = process_playstation_data(ps_data)
+        # only touch the cache once every requested source has succeeded
+        for source in sources:
+            write_cache(frames[source], cache_paths[source])
 
-        # only touch the cache once every source has succeeded
-        write_cache(df_nintendo_processed, nintendo_cache_path)
-        write_cache(df_ps_processed, ps_cache_path)
-
-    # 3. Combine & Compute Metrics
-    df_final = combine_and_format_data(df_nintendo_processed, df_ps_processed)
+    # Combine & Compute Metrics
+    df_final = combine_and_format_data(
+        frames.get("nintendo", pd.DataFrame()),
+        frames.get("playstation", pd.DataFrame()),
+    )
 
     # save to both CSV and DB
-    save_data(df_final, db_path=db_path, csv_path=final_data_path, write_db=not loaded_from_cache)
+    save_data(df_final, db_path=db_path, csv_path=final_data_path, write_db=not use_cache)
     logger.info(f"Saved master dataset to {final_data_path}")
 
-    # 4. Generate Visualizations
-    plot_platform_distribution(df_final, output_dir=config.PLOTS_DIR)
-    plot_price_analysis(df_final, output_dir=config.PLOTS_DIR)
-    plot_price_vs_discount(df_final, output_dir=config.PLOTS_DIR)
+    # Generate Visualizations
+    if make_plots:
+        plot_platform_distribution(df_final, output_dir=config.PLOTS_DIR)
+        plot_price_analysis(df_final, output_dir=config.PLOTS_DIR)
+        plot_price_vs_discount(df_final, output_dir=config.PLOTS_DIR)
+    else:
+        logger.info("Skipping plots.")
     logger.info("Pipeline executed successfully!")
 
 
-def main(argv=None) -> int:
-    """Console entry point; returns the process exit code."""
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="gameprice-index", description="GamePrice-Index ETL & Analysis Pipeline")
     parser.add_argument(
         "--cached",
         action="store_true",
         help="Use existing processed CSV files in data/ instead of scraping live sites.",
     )
-    args = parser.parse_args(argv)
+    parser.add_argument(
+        "--source",
+        action="append",
+        choices=SOURCES,
+        dest="sources",
+        help="Storefront to include; repeat for several. Defaults to all of them.",
+    )
+    parser.add_argument(
+        "--no-plots",
+        action="store_true",
+        help="Skip generating the plots.",
+    )
+    return parser
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    """Console entry point; returns the process exit code."""
+    args = build_parser().parse_args(argv)
 
     configure_logging()
     try:
-        run_pipeline(use_cache=args.cached)
+        run_pipeline(
+            use_cache=args.cached,
+            sources=tuple(args.sources or SOURCES),
+            make_plots=not args.no_plots,
+        )
     except ScrapeError as e:
         logger.error(e)
         return 1
