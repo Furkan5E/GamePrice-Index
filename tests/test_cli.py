@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from gameprice_index import cli, config
+from gameprice_index import cli
 from gameprice_index.cli import load_cache, write_cache
 from gameprice_index.scraper import ScrapeError
 
@@ -62,15 +62,29 @@ def test_main_defaults(monkeypatch):
     monkeypatch.setattr(cli, "run_pipeline", lambda **kwargs: seen.update(kwargs))
 
     assert cli.main([]) == 0
-    assert seen == {"use_cache": False, "sources": ("nintendo", "playstation"), "make_plots": True}
+    assert seen == {
+        "use_cache": False,
+        "sources": ("nintendo", "playstation"),
+        "make_plots": True,
+        "output_dir": ".",
+        "db_path": None,
+    }
 
 
 def test_main_passes_options(monkeypatch):
     seen = {}
     monkeypatch.setattr(cli, "run_pipeline", lambda **kwargs: seen.update(kwargs))
 
-    assert cli.main(["--cached", "--source", "nintendo", "--no-plots"]) == 0
-    assert seen == {"use_cache": True, "sources": ("nintendo",), "make_plots": False}
+    args = ["--cached", "--source", "nintendo", "--no-plots", "--output-dir", "out", "--db", "prices.db"]
+
+    assert cli.main(args) == 0
+    assert seen == {
+        "use_cache": True,
+        "sources": ("nintendo",),
+        "make_plots": False,
+        "output_dir": "out",
+        "db_path": "prices.db",
+    }
 
 
 def test_main_rejects_unknown_source():
@@ -85,19 +99,30 @@ NINTENDO_CACHE = (
 )
 
 
-def test_cached_single_source_run_without_plots(tmp_path, monkeypatch):
-    """--cached --source nintendo --no-plots only needs the Nintendo cache and writes no plots."""
-    data_dir = tmp_path / "data"
-    plots_dir = tmp_path / "plots"
-    data_dir.mkdir()
+def _seed_nintendo_cache(output_dir):
+    data_dir = output_dir / "data"
+    data_dir.mkdir(parents=True)
     (data_dir / "processed_nintendo.csv").write_text(NINTENDO_CACHE, encoding="utf-8")
-    monkeypatch.setattr(config, "DATA_DIR", str(data_dir))
-    monkeypatch.setattr(config, "PLOTS_DIR", str(plots_dir))
+    return data_dir
 
-    assert cli.main(["--cached", "--source", "nintendo", "--no-plots"]) == 0
+
+def test_cached_single_source_run_without_plots(tmp_path):
+    """--cached --source nintendo --no-plots only needs the Nintendo cache and writes no plots."""
+    data_dir = _seed_nintendo_cache(tmp_path)
+
+    assert cli.main(["--cached", "--source", "nintendo", "--no-plots", "--output-dir", str(tmp_path)]) == 0
 
     df = pd.read_csv(data_dir / "data.csv")
     assert df["source"].unique().tolist() == ["Nintendo"]
     assert df["discount_amount"].dropna().tolist() == [pytest.approx(1.35)]
-    assert not plots_dir.exists()
+    assert not (tmp_path / "plots").exists()
     assert not (data_dir / "game_prices.db").exists()
+
+
+def test_cached_run_writes_plots_under_output_dir(tmp_path):
+    _seed_nintendo_cache(tmp_path)
+
+    assert cli.main(["--cached", "--source", "nintendo", "--output-dir", str(tmp_path)]) == 0
+
+    plots = sorted(p.name for p in (tmp_path / "plots").iterdir())
+    assert plots == ["platform_distribution.png", "price_analysis.png", "price_vs_discount.png"]

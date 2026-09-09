@@ -67,15 +67,19 @@ def run_pipeline(
     use_cache: bool = False,
     sources: Sequence[str] = SOURCES,
     make_plots: bool = True,
+    output_dir: str = ".",
+    db_path: str | None = None,
 ) -> None:
-    os.makedirs(config.DATA_DIR, exist_ok=True)
+    data_dir = os.path.join(output_dir, config.DATA_DIR)
+    plots_dir = os.path.join(output_dir, config.PLOTS_DIR)
+    os.makedirs(data_dir, exist_ok=True)
 
-    cache_paths = {source: os.path.join(config.DATA_DIR, config.CACHE_NAMES[source]) for source in sources}
-    final_data_path = os.path.join(config.DATA_DIR, config.FINAL_CSV_NAME)
-    db_path = os.path.join(config.DATA_DIR, config.DATABASE_NAME)
+    cache_paths = {source: os.path.join(data_dir, config.CACHE_NAMES[source]) for source in sources}
+    final_data_path = os.path.join(data_dir, config.FINAL_CSV_NAME)
+    db_path = db_path or os.path.join(data_dir, config.DATABASE_NAME)
 
     if use_cache:
-        logger.info("Loading cached processed data from data/ directory.")
+        logger.info(f"Loading cached processed data from {data_dir}")
         frames = {source: load_cache(cache_paths[source]) for source in sources}
     else:
         logger.info(f"Starting live web scraping for: {', '.join(sources)}")
@@ -97,9 +101,9 @@ def run_pipeline(
 
     # Generate Visualizations
     if make_plots:
-        plot_platform_distribution(df_final, output_dir=config.PLOTS_DIR)
-        plot_price_analysis(df_final, output_dir=config.PLOTS_DIR)
-        plot_price_vs_discount(df_final, output_dir=config.PLOTS_DIR)
+        plot_platform_distribution(df_final, output_dir=plots_dir)
+        plot_price_analysis(df_final, output_dir=plots_dir)
+        plot_price_vs_discount(df_final, output_dir=plots_dir)
     else:
         logger.info("Skipping plots.")
     logger.info("Pipeline executed successfully!")
@@ -124,6 +128,18 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Skip generating the plots.",
     )
+    parser.add_argument(
+        "--output-dir",
+        default=".",
+        metavar="DIR",
+        help="Directory that holds the data/ and plots/ folders. Defaults to the current directory.",
+    )
+    parser.add_argument(
+        "--db",
+        default=None,
+        metavar="PATH",
+        help="SQLite database to record prices in. Defaults to data/game_prices.db under the output directory.",
+    )
     return parser
 
 
@@ -137,6 +153,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             use_cache=args.cached,
             sources=tuple(args.sources or SOURCES),
             make_plots=not args.no_plots,
+            output_dir=args.output_dir,
+            db_path=args.db,
         )
     except ScrapeError as e:
         logger.error(e)
