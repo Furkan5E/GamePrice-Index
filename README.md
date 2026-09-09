@@ -42,9 +42,25 @@ Run using cached local datasets:
 ```bash
 uv run gameprice-index --cached
 ```
+Command line options:
+
+| Option | Description |
+| --- | --- |
+| `--cached` | Reuse the processed CSVs in `data/` instead of scraping. |
+| `--source NAME` | Only include one storefront (`nintendo`, `playstation`); repeat for several. |
+| `--no-plots` | Skip generating the plots. |
+| `--output-dir DIR` | Directory that holds the `data/` and `plots/` folders. |
+| `--db PATH` | SQLite database to record prices in. |
+
 Run the test suite:
 ```bash
-uv run python -m pytest
+uv run pytest
+```
+Lint, format and type check (also available as pre-commit hooks via `uv run pre-commit install`):
+```bash
+uv run ruff check .
+uv run ruff format .
+uv run mypy
 ```
 ---
 ## Docker
