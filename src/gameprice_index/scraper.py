@@ -1,5 +1,4 @@
 import logging
-import time
 from typing import Any
 
 import requests
@@ -120,12 +119,13 @@ def scrape_nintendo_prices(url: str) -> list[dict[str, Any]]:
 
     try:
         driver.get(url)
-        WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located(
-                (By.CSS_SELECTOR, f"{selectors['price_container']} {selectors['regular_price']}")
-            )
-        )
-        time.sleep(4)  # small delay
+        price_selector = f"{selectors['price_container']} {selectors['regular_price']}"
+
+        # the price spans exist in the static HTML; wait until the page script has filled them in
+        def prices_rendered(d: webdriver.Chrome) -> bool:
+            return any(span.text.strip() for span in d.find_elements(By.CSS_SELECTOR, price_selector))
+
+        WebDriverWait(driver, config.SELENIUM_WAIT).until(prices_rendered)
 
         price_list = parse_nintendo_prices(driver.page_source)
     except Exception as e:
@@ -179,11 +179,10 @@ def scrape_playstation(url: str) -> list[dict[str, Any]]:
     try:
         driver.get(url)
 
+        wait = WebDriverWait(driver, config.SELENIUM_WAIT)
+
         for page in range(1, config.PLAYSTATION_MAX_PAGES + 1):
-            WebDriverWait(driver, 10).until(
-                EC.presence_of_all_elements_located((By.CSS_SELECTOR, selectors["any_tile"]))
-            )
-            time.sleep(2)
+            wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, selectors["any_tile"])))
 
             # collect this page before moving on, skipping tiles already seen
             new_items = []
@@ -199,8 +198,10 @@ def scrape_playstation(url: str) -> list[dict[str, Any]]:
             if not new_items or not next_btns or not next_btns[0].is_enabled():
                 break
 
+            # the listing re-renders on page change, so the old first tile going stale marks the swap
+            first_tile = driver.find_element(By.CSS_SELECTOR, selectors["any_tile"])
             driver.execute_script("arguments[0].click();", next_btns[0])
-            time.sleep(4)  # Polite delay
+            wait.until(EC.staleness_of(first_tile))
     except Exception as e:
         raise ScrapeError(f"Failed to scrape PlayStation data: {e}") from e
     finally:

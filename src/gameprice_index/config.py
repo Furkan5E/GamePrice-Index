@@ -13,6 +13,9 @@ REQUEST_HEADERS = {
     "Accept-Language": "en-GB,en;q=0.9",
 }
 
+# --- Selenium ---
+SELENIUM_WAIT = 15  # seconds to wait for dynamic content before giving up
+
 # --- Nintendo ---
 NINTENDO_URL = "https://www.nintendo.com/en-gb/Games"
 NINTENDO_LINK_PREFIX = "https://www.nintendo.co.uk"
