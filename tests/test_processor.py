@@ -6,6 +6,7 @@ from gameprice_index.processor import (
     clean_price_columns,
     combine_and_format_data,
     process_nintendo_data,
+    process_playstation_data,
     save_data,
 )
 
@@ -122,3 +123,82 @@ def test_save_data_skips_database_for_cached_runs(tmp_path):
     save_data(df, db_path=str(db_path), csv_path=str(csv_path), write_db=False)
     assert _row_count(db_path) == 1
     assert csv_path.exists()
+
+
+def _nintendo_base(**overrides):
+    row = {
+        "name": "Mario Kart World",
+        "platform": "  Nintendo Switch 2 ",
+        "url": "https://example.test/mk",
+        "nsuid": "70010000096802",
+        "price": None,
+        "price_old": None,
+        "badge": None,
+        "date_range": None,
+        "product_code": None,
+        "out_of_stock": None,
+        "source": "Nintendo",
+    }
+    row.update(overrides)
+    return row
+
+
+def test_process_nintendo_data_merges_prices_by_nsuid():
+    base = [_nintendo_base(), _nintendo_base(name="Kero Kero Cowboy", nsuid="70010000126803")]
+    prices = [
+        {"nsuid": "70010000126803", "price": "£7.64", "price_old": "£8.99"},
+        {"nsuid": "70010000096802", "price": "£66.99*", "price_old": None},
+    ]
+
+    df = process_nintendo_data(base, prices)
+
+    assert df["name"].tolist() == ["Mario Kart World", "Kero Kero Cowboy"]
+    assert df["price"].tolist() == [66.99, 7.64]
+    assert pd.isna(df["price_old"][0])
+    assert df["price_old"][1] == 8.99
+    assert df["platform"][0] == "Nintendo Switch 2"
+    assert "price_new" not in df.columns
+
+
+def test_process_nintendo_data_uses_first_nsuid_as_product_code():
+    """Multi-edition games carry several nsuids; the first is the base game."""
+    base = [_nintendo_base(nsuid="70010000115568|70050000069174")]
+    prices = [{"nsuid": "70010000115568|70050000069174", "price": "£16.99", "price_old": None}]
+
+    df = process_nintendo_data(base, prices)
+
+    assert df["nsuid"].tolist() == ["70010000115568"]
+    assert df["product_code"].tolist() == ["70010000115568"]
+    assert df["price"].tolist() == [16.99]
+
+
+def test_process_nintendo_data_leaves_unpriced_games_empty():
+    base = [_nintendo_base(), _nintendo_base(name="Unpriced", nsuid="70010000000001")]
+    prices = [{"nsuid": "70010000096802", "price": "£66.99", "price_old": None}]
+
+    df = process_nintendo_data(base, prices)
+
+    assert df["price"][0] == 66.99
+    assert pd.isna(df["price"][1])
+
+
+def test_process_nintendo_data_without_price_records():
+    df = process_nintendo_data([_nintendo_base()], [])
+
+    assert len(df) == 1
+    assert pd.isna(df["price"][0])
+    assert df["product_code"][0] == "70010000096802"
+
+
+def test_process_nintendo_data_with_no_games():
+    assert process_nintendo_data([], []).empty
+
+
+def test_process_playstation_data_cleans_prices():
+    ps = [{"name": "Astro Bot - PS5", "price": "£39.99", "price_old": "£59.99", "source": "PlayStation"}]
+
+    df = process_playstation_data(ps)
+
+    assert df["price"].tolist() == [39.99]
+    assert df["price_old"].tolist() == [59.99]
+    assert process_playstation_data([]).empty
