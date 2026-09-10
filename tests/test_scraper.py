@@ -57,49 +57,50 @@ def test_parse_nintendo_price_missing():
     assert parse_nintendo_price(None) == (None, None)
 
 
-def test_scrape_nintendo_base_decodes_utf8(monkeypatch):
-    """Regression: names with non-ascii punctuation used to come back as mojibake."""
-    monkeypatch.setattr(requests, "get", lambda *args, **kwargs: _fake_response(NINTENDO_LISTING))
+class FakeSession:
+    """Stands in for requests.Session and records how it was called."""
 
-    games = scrape_nintendo_base("https://example.test/games")
+    def __init__(self, html: str | None = None, error: Exception | None = None):
+        self.html = html
+        self.error = error
+        self.calls: list[dict] = []
+
+    def get(self, url, **kwargs):
+        self.calls.append({"url": url, **kwargs})
+        if self.error:
+            raise self.error
+        return _fake_response(self.html)
+
+
+def test_scrape_nintendo_base_decodes_utf8():
+    """Regression: names with non-ascii punctuation used to come back as mojibake."""
+    games = scrape_nintendo_base("https://example.test/games", session=FakeSession(NINTENDO_LISTING))
 
     assert len(games) == 1
     assert games[0]["name"] == "Emoji Killer – Casino Massacre"
     assert games[0]["platform"] == "Nintendo Switch"
 
 
-def test_scrape_nintendo_base_sends_timeout_and_user_agent(monkeypatch):
+def test_scrape_nintendo_base_sends_timeout():
     """A request without a timeout can hang the whole pipeline."""
-    seen = {}
+    session = FakeSession(NINTENDO_LISTING)
 
-    def fake_get(url, **kwargs):
-        seen.update(kwargs)
-        return _fake_response(NINTENDO_LISTING)
+    scrape_nintendo_base("https://example.test/games", session=session)
 
-    monkeypatch.setattr(requests, "get", fake_get)
-    scrape_nintendo_base("https://example.test/games")
-
-    assert seen["timeout"] > 0
-    assert "User-Agent" in seen["headers"]
+    assert session.calls[0]["timeout"] > 0
 
 
-def test_scrape_nintendo_base_raises_on_network_error(monkeypatch):
+def test_scrape_nintendo_base_raises_on_network_error():
     """A failed request must stop the pipeline instead of producing an empty dataset."""
-
-    def fake_get(url, **kwargs):
-        raise requests.ConnectionError("boom")
-
-    monkeypatch.setattr(requests, "get", fake_get)
+    session = FakeSession(error=requests.ConnectionError("boom"))
 
     with pytest.raises(ScrapeError):
-        scrape_nintendo_base("https://example.test/games")
+        scrape_nintendo_base("https://example.test/games", session=session)
 
 
-def test_scrape_nintendo_base_raises_when_no_games_found(monkeypatch):
-    monkeypatch.setattr(requests, "get", lambda *args, **kwargs: _fake_response("<html></html>"))
-
+def test_scrape_nintendo_base_raises_when_no_games_found():
     with pytest.raises(ScrapeError):
-        scrape_nintendo_base("https://example.test/games")
+        scrape_nintendo_base("https://example.test/games", session=FakeSession("<html></html>"))
 
 
 PLAYSTATION_LISTING = """

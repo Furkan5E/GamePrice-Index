@@ -10,6 +10,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 from gameprice_index import config
+from gameprice_index.http_client import fetch
 
 logger = logging.getLogger(__name__)
 
@@ -61,12 +62,11 @@ def parse_nintendo_listing(html: str) -> list[dict[str, Any]]:
     return nintendo_list
 
 
-def scrape_nintendo_base(url: str) -> list[dict[str, Any]]:
+def scrape_nintendo_base(url: str, session: requests.Session | None = None) -> list[dict[str, Any]]:
     """Scrapes base game data from Nintendo using requests."""
     logger.info(f"Scraping Nintendo base data from: {url}")
     try:
-        response = requests.get(url, headers=config.REQUEST_HEADERS, timeout=config.REQUEST_TIMEOUT)
-        response.raise_for_status()
+        response = fetch(url, session=session)
         # the page is utf-8 but sends no charset header, so requests guesses latin-1
         response.encoding = "utf-8"
         nintendo_list = parse_nintendo_listing(response.text)

@@ -12,6 +12,9 @@ REQUEST_HEADERS = {
     ),
     "Accept-Language": "en-GB,en;q=0.9",
 }
+REQUEST_RETRIES = 3
+REQUEST_BACKOFF = 1.0  # seconds; doubles after every failed attempt
+REQUEST_RETRY_STATUSES = (429, 500, 502, 503, 504)
 
 # --- Selenium ---
 SELENIUM_WAIT = 15  # seconds to wait for dynamic content before giving up
