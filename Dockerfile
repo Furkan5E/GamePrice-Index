@@ -5,7 +5,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     chromium-driver \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+COPY --from=ghcr.io/astral-sh/uv:0.12.13 /uv /uvx /bin/
 
 # use the image's interpreter rather than letting uv download a second one
 ENV UV_PYTHON_DOWNLOADS=never
@@ -21,11 +21,13 @@ WORKDIR /app
 
 # install dependencies first so this layer is cached until the lockfile changes
 COPY --chown=app:app pyproject.toml uv.lock ./
-RUN uv sync --frozen --no-install-project
+RUN uv sync --frozen --no-dev --no-install-project
 
+# only the package itself goes into the image; tests and dev tools stay out
 COPY --chown=app:app README.md ./
 COPY --chown=app:app src/ src/
-COPY --chown=app:app tests/ tests/
-RUN uv sync --frozen
+RUN uv sync --frozen --no-dev
 
-CMD ["uv", "run", "gameprice-index"]
+# call the installed script directly so the container never re-syncs at start-up
+ENV PATH="/app/.venv/bin:$PATH"
+ENTRYPOINT ["gameprice-index"]

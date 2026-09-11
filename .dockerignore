@@ -4,3 +4,10 @@ data/
 plots/
 __pycache__/
 .pytest_cache/
+tests/
+scripts/
+.github/
+.mypy_cache/
+.ruff_cache/
+*.md
+!README.md
