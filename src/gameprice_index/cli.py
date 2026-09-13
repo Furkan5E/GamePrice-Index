@@ -6,12 +6,11 @@ from collections.abc import Sequence
 
 import pandas as pd
 
-from gameprice_index import config
+from gameprice_index import config, storage
 from gameprice_index.processor import (
     combine_and_format_data,
     process_nintendo_data,
     process_playstation_data,
-    save_data,
 )
 from gameprice_index.scraper import (
     ScrapeError,
@@ -95,9 +94,15 @@ def run_pipeline(
         frames.get("playstation", pd.DataFrame()),
     )
 
-    # save to both CSV and DB
-    save_data(df_final, db_path=db_path, csv_path=final_data_path, write_db=not use_cache)
+    df_final.to_csv(final_data_path, index=False)
     logger.info(f"Saved master dataset to {final_data_path}")
+
+    # cached data was already recorded when it was scraped, so only fresh scrapes go into the history
+    if use_cache:
+        logger.info("Skipping the price history for cached data.")
+    else:
+        with storage.open_db(db_path) as conn:
+            storage.record_prices(conn, df_final)
 
     # Generate Visualizations
     if make_plots:
