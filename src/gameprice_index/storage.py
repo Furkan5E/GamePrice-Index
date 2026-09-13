@@ -213,3 +213,96 @@ def migrate_legacy(conn: sqlite3.Connection) -> int:
     conn.commit()
     logger.info(f"Migrated {migrated} rows from the old prices table.")
     return migrated
+
+
+# --- Reading the history ---
+
+LATEST_PRICES = """
+WITH ranked AS (
+    SELECT p.*, ROW_NUMBER() OVER (PARTITION BY p.game_id ORDER BY p.scrape_date DESC) AS recency
+    FROM prices p
+)
+SELECT g.id AS game_id, g.source, g.product_code, g.name, g.platform, g.url,
+       r.scrape_date, r.price, r.price_old, r.discount_amount, r.badge, r.out_of_stock
+FROM ranked r
+JOIN games g ON g.id = r.game_id
+WHERE r.recency = 1
+ORDER BY g.source, g.name
+"""
+
+PRICE_HISTORY = """
+SELECT g.source, g.product_code, g.name, p.scrape_date, p.price, p.price_old, p.discount_amount
+FROM prices p
+JOIN games g ON g.id = p.game_id
+WHERE g.product_code = :product_code AND (:source IS NULL OR g.source = :source)
+ORDER BY g.source, p.scrape_date
+"""
+
+PRICE_DROPS = """
+WITH ranked AS (
+    SELECT p.game_id, p.scrape_date, p.price,
+           LAG(p.price) OVER (PARTITION BY p.game_id ORDER BY p.scrape_date) AS previous_price,
+           LAG(p.scrape_date) OVER (PARTITION BY p.game_id ORDER BY p.scrape_date) AS previous_date,
+           ROW_NUMBER() OVER (PARTITION BY p.game_id ORDER BY p.scrape_date DESC) AS recency
+    FROM prices p
+    WHERE p.price IS NOT NULL
+)
+SELECT g.source, g.product_code, g.name, g.platform, g.url,
+       r.previous_date, r.previous_price, r.scrape_date, r.price,
+       ROUND(r.previous_price - r.price, 2) AS drop_amount,
+       ROUND(100.0 * (r.previous_price - r.price) / r.previous_price, 1) AS drop_pct
+FROM ranked r
+JOIN games g ON g.id = r.game_id
+WHERE r.recency = 1 AND r.previous_price > r.price AND (r.previous_price - r.price) >= :min_drop
+ORDER BY drop_pct DESC, g.name
+"""
+
+LOWEST_PRICES = """
+WITH ranked AS (
+    SELECT p.game_id, p.scrape_date, p.price,
+           ROW_NUMBER() OVER (PARTITION BY p.game_id ORDER BY p.price, p.scrape_date) AS cheapest
+    FROM prices p
+    WHERE p.price IS NOT NULL
+)
+SELECT g.source, g.product_code, g.name, r.price AS lowest_price, r.scrape_date AS lowest_date
+FROM ranked r
+JOIN games g ON g.id = r.game_id
+WHERE r.cheapest = 1
+ORDER BY g.source, g.name
+"""
+
+
+def _query(conn: sqlite3.Connection, sql: str, params: dict[str, object] | None = None) -> pd.DataFrame:
+    """Runs a SELECT and returns the result as a dataframe, keeping the column names when it is empty."""
+    cursor = conn.execute(sql, params or {})
+    columns = [column[0] for column in cursor.description]
+    return pd.DataFrame([tuple(row) for row in cursor.fetchall()], columns=columns)
+
+
+def latest_prices(conn: sqlite3.Connection) -> pd.DataFrame:
+    """Returns the most recent price recorded for every game."""
+    return _query(conn, LATEST_PRICES)
+
+
+def price_history(conn: sqlite3.Connection, product_code: str, source: str | None = None) -> pd.DataFrame:
+    """Returns every recorded price for one product, oldest first."""
+    return _query(conn, PRICE_HISTORY, {"product_code": product_code, "source": source})
+
+
+def price_drops(conn: sqlite3.Connection, min_drop: float = 0.01) -> pd.DataFrame:
+    """Returns games whose latest price is below the one recorded before it, biggest cut first."""
+    return _query(conn, PRICE_DROPS, {"min_drop": min_drop})
+
+
+def lowest_prices(conn: sqlite3.Connection) -> pd.DataFrame:
+    """Returns the lowest price ever recorded for every game and the first day it was seen."""
+    return _query(conn, LOWEST_PRICES)
+
+
+def current_deals(conn: sqlite3.Connection, limit: int | None = None) -> pd.DataFrame:
+    """Returns games that are on sale right now, deepest discount first."""
+    latest = latest_prices(conn)
+    deals = latest[latest["price_old"].notna() & (latest["price_old"] > latest["price"])].copy()
+    deals["discount_pct"] = (100 * (deals["price_old"] - deals["price"]) / deals["price_old"]).round(1)
+    deals = deals.sort_values(["discount_pct", "name"], ascending=[False, True]).reset_index(drop=True)
+    return deals.head(limit) if limit else deals

@@ -198,3 +198,64 @@ def test_legacy_migration_repairs_swapped_sale_prices(tmp_path):
         assert row["product_code"] == "70010000126803"
         assert (row["price"], row["price_old"]) == (7.64, 8.99)
         assert row["discount_amount"] == pytest.approx(1.35)
+
+
+@pytest.fixture
+def history(conn):
+    """Three days of prices: Astro Bot is cut on day two, Mario Kart World on day three."""
+    storage.record_prices(conn, _frame(), DAY_ONE)
+    storage.record_prices(conn, _frame(price=[66.99, 29.99], price_old=[float("nan"), 59.99]), DAY_TWO)
+    storage.record_prices(conn, _frame(price=[49.99, 34.99], price_old=[66.99, 59.99]), date(2026, 9, 3))
+    return conn
+
+
+def test_latest_prices_returns_one_row_per_game(history):
+    latest = storage.latest_prices(history)
+
+    assert latest["name"].tolist() == ["Mario Kart World", "Astro Bot - PS5"]
+    assert latest["scrape_date"].unique().tolist() == ["2026-09-03"]
+    assert latest["price"].tolist() == [49.99, 34.99]
+
+
+def test_price_history_is_ordered_by_date(history):
+    astro = storage.price_history(history, "1000044444-GB")
+
+    assert astro["scrape_date"].tolist() == ["2026-09-01", "2026-09-02", "2026-09-03"]
+    assert astro["price"].tolist() == [39.99, 29.99, 34.99]
+    assert storage.price_history(history, "1000044444-GB", source="Nintendo").empty
+    assert storage.price_history(history, "unknown").empty
+
+
+def test_price_drops_compares_the_last_two_scrapes(history):
+    """Astro Bot went back up on day three, so only Mario Kart World counts as a drop."""
+    drops = storage.price_drops(history)
+
+    assert drops["name"].tolist() == ["Mario Kart World"]
+    assert drops["previous_price"][0] == 66.99
+    assert drops["price"][0] == 49.99
+    assert drops["drop_amount"][0] == 17.0
+    assert drops["drop_pct"][0] == 25.4
+    assert storage.price_drops(history, min_drop=20).empty
+
+
+def test_lowest_prices_finds_the_cheapest_day(history):
+    lowest = storage.lowest_prices(history).set_index("name")
+
+    assert lowest.loc["Astro Bot - PS5", "lowest_price"] == 29.99
+    assert lowest.loc["Astro Bot - PS5", "lowest_date"] == "2026-09-02"
+    assert lowest.loc["Mario Kart World", "lowest_price"] == 49.99
+
+
+def test_current_deals_ranks_by_discount(history):
+    deals = storage.current_deals(history)
+
+    assert deals["name"].tolist() == ["Astro Bot - PS5", "Mario Kart World"]
+    assert deals["discount_pct"].tolist() == [41.7, 25.4]
+    assert len(storage.current_deals(history, limit=1)) == 1
+
+
+def test_queries_on_an_empty_database(conn):
+    assert storage.latest_prices(conn).empty
+    assert storage.price_drops(conn).empty
+    assert storage.lowest_prices(conn).empty
+    assert storage.current_deals(conn).empty
