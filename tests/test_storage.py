@@ -134,15 +134,67 @@ def test_duplicate_price_row_is_rejected_by_the_schema(conn):
         )
 
 
-def test_legacy_flat_table_is_set_aside(tmp_path):
-    """Databases written by early versions must still open."""
+LEGACY_COLUMNS = "name, price, price_old, product_code, platform, url, badge, out_of_stock, source, scrape_timestamp"
+
+
+def _legacy_db(tmp_path, rows) -> str:
     db_path = str(tmp_path / "old.db")
     legacy = sqlite3.connect(db_path)
-    legacy.execute("CREATE TABLE prices (name TEXT, price REAL, source TEXT, scrape_timestamp TEXT)")
-    legacy.execute("INSERT INTO prices VALUES ('Mario Kart World', 66.99, 'Nintendo', '2026-08-21 10:00:00')")
+    legacy.execute(
+        "CREATE TABLE prices (name TEXT, price REAL, price_old REAL, product_code TEXT, platform TEXT, "
+        "url TEXT, badge TEXT, out_of_stock INTEGER, source TEXT, scrape_timestamp TIMESTAMP)"
+    )
+    legacy.executemany(f"INSERT INTO prices ({LEGACY_COLUMNS}) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", rows)
     legacy.commit()
     legacy.close()
+    return db_path
+
+
+def test_legacy_rows_are_migrated(tmp_path):
+    """Databases written by early versions must open with their history intact."""
+    mario = ("Mario Kart World", 66.99, None, "70010000096802", "Nintendo Switch 2", "u", None, None, "Nintendo")
+    db_path = _legacy_db(
+        tmp_path,
+        [
+            (*mario, "2026-08-21 10:00:00"),
+            (*mario, "2026-08-21 18:30:00"),  # a second run on the same day
+            (*mario, "2026-08-22 09:00:00"),
+            ("No Code", 4.99, None, None, "Nintendo Switch", "u", None, None, "Nintendo", "2026-08-21 10:00:00"),
+        ],
+    )
 
     with storage.open_db(db_path) as conn:
-        assert _count(conn, storage.LEGACY_TABLE) == 1
+        tables = {row["name"] for row in conn.execute("SELECT name FROM sqlite_master WHERE type = 'table'")}
+        dates = [row["scrape_date"] for row in conn.execute("SELECT scrape_date FROM prices ORDER BY scrape_date")]
+
+        assert storage.LEGACY_TABLE not in tables
+        assert _count(conn, "games") == 1
+        assert dates == ["2026-08-21", "2026-08-22"]
         assert storage.record_prices(conn, _frame(), DAY_ONE) == 2
+
+
+def test_legacy_migration_repairs_swapped_sale_prices(tmp_path):
+    db_path = _legacy_db(
+        tmp_path,
+        [
+            (
+                "Kero Kero Cowboy",
+                8.99,
+                7.64,
+                "70010000126803.0",
+                "Nintendo Switch",
+                "u",
+                None,
+                None,
+                "Nintendo",
+                "2026-08-21 10:00:00",
+            )
+        ],
+    )
+
+    with storage.open_db(db_path) as conn:
+        row = conn.execute("SELECT g.product_code, p.* FROM prices p JOIN games g ON g.id = p.game_id").fetchone()
+
+        assert row["product_code"] == "70010000126803"
+        assert (row["price"], row["price_old"]) == (7.64, 8.99)
+        assert row["discount_amount"] == pytest.approx(1.35)

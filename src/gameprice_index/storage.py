@@ -86,11 +86,12 @@ def _set_aside_legacy_table(conn: sqlite3.Connection) -> None:
 
 
 def init_schema(conn: sqlite3.Connection) -> None:
-    """Creates the tables if they are missing."""
+    """Creates the tables if they are missing and brings old data across."""
     _set_aside_legacy_table(conn)
     conn.executescript(SCHEMA)
     conn.execute(f"PRAGMA user_version = {SCHEMA_VERSION}")
     conn.commit()
+    migrate_legacy(conn)
 
 
 @contextmanager
@@ -174,3 +175,41 @@ def record_prices(conn: sqlite3.Connection, df: pd.DataFrame, scrape_date: date 
         logger.warning(f"Skipped {skipped} rows without a product code or name.")
     logger.info(f"Recorded {written} prices for {day}.")
     return written
+
+
+def migrate_legacy(conn: sqlite3.Connection) -> int:
+    """Moves rows from the old flat table into the new schema and returns how many were kept.
+
+    The old table logged every run, including cached ones, so a day can hold
+    many copies of a game; only the last scrape of each day survives.
+    """
+    exists = conn.execute("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?", (LEGACY_TABLE,)).fetchone()
+    if not exists:
+        return 0
+
+    legacy = pd.read_sql_query(f"SELECT * FROM {LEGACY_TABLE}", conn)
+    migrated = 0
+    if not legacy.empty:
+        legacy["scrape_timestamp"] = pd.to_datetime(legacy["scrape_timestamp"], errors="coerce")
+        legacy = legacy.dropna(subset=["scrape_timestamp", "product_code"])
+        # cached runs wrote numeric ids as floats, e.g. "70010000096802.0"
+        legacy["product_code"] = legacy["product_code"].astype(str).str.replace(r"\.0$", "", regex=True)
+        legacy["scrape_date"] = legacy["scrape_timestamp"].dt.date
+
+        # old Nintendo rows stored the sale price and the original price the wrong way round
+        prices = legacy[["price", "price_old"]].apply(pd.to_numeric, errors="coerce")
+        swapped = prices["price_old"] < prices["price"]
+        legacy["price"] = prices["price"].where(~swapped, prices["price_old"])
+        legacy["price_old"] = prices["price_old"].where(~swapped, prices["price"])
+        legacy["discount_amount"] = legacy["price_old"] - legacy["price"]
+
+        legacy = legacy.sort_values("scrape_timestamp").drop_duplicates(
+            subset=["source", "product_code", "scrape_date"], keep="last"
+        )
+        for day, rows in legacy.groupby("scrape_date"):
+            migrated += record_prices(conn, rows, scrape_date=day)  # type: ignore[arg-type]
+
+    conn.execute(f"DROP TABLE {LEGACY_TABLE}")
+    conn.commit()
+    logger.info(f"Migrated {migrated} rows from the old prices table.")
+    return migrated
