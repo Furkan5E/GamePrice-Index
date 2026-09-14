@@ -1,9 +1,28 @@
+"""Turns raw scraper records into one clean, comparable dataset."""
+
 import logging
+from collections.abc import Iterable
 from typing import Any
 
 import pandas as pd
 
+from gameprice_index.scrapers.base import RECORD_FIELDS
+
 logger = logging.getLogger(__name__)
+
+# column order of the final dataset
+COLUMNS = [
+    "source",
+    "platform",
+    "product_code",
+    "name",
+    "price",
+    "price_old",
+    "discount_amount",
+    "badge",
+    "out_of_stock",
+    "url",
+]
 
 
 def clean_price_columns(df: pd.DataFrame, price_cols: tuple = ("price", "price_old")) -> pd.DataFrame:
@@ -11,85 +30,54 @@ def clean_price_columns(df: pd.DataFrame, price_cols: tuple = ("price", "price_o
     for col in price_cols:
         if col in df.columns:
             df[col] = (
-                df[col].astype(str).str.replace("£", "", regex=False).str.replace("*", "", regex=False).str.strip()
+                df[col]
+                .astype(str)
+                .str.replace("£", "", regex=False)
+                .str.replace("*", "", regex=False)
+                .str.replace(",", "", regex=False)
+                .str.strip()
             )
             df[col] = pd.to_numeric(df[col], errors="coerce")
     return df
 
 
-def process_nintendo_data(base_data: list[dict[str, Any]], price_data: list[dict[str, Any]]) -> pd.DataFrame:
-    """Merges and cleans Nintendo base and dynamic pricing data."""
-    logger.info("Processing Nintendo data.")
-    df_base = pd.DataFrame(base_data)
-    df_prices = pd.DataFrame(price_data)
-
-    if df_base.empty:
-        logger.warning("Nintendo base data is empty.")
-        return df_base
-
-    # listing tiles without an nsuid have no price record to join to
-    has_nsuid = df_base["nsuid"].notna() & (df_base["nsuid"].astype(str).str.strip() != "")
-    if not has_nsuid.all():
-        logger.warning(f"Dropping {(~has_nsuid).sum()} Nintendo rows without an nsuid.")
-        df_base = df_base[has_nsuid].reset_index(drop=True)
-
-    if not df_prices.empty:
-        df_nintendo = df_base.merge(df_prices, on="nsuid", how="left", suffixes=("", "_new"))
-
-        for col in ["price", "price_old"]:
-            df_nintendo[col] = df_nintendo[col].fillna(df_nintendo[f"{col}_new"])
-            df_nintendo[col] = df_nintendo[col].replace("", pd.NA)
-            df_nintendo[col] = df_nintendo[col].fillna(df_nintendo[f"{col}_new"])
-
-        df_nintendo.drop(columns=["price_new", "price_old_new"], inplace=True, errors="ignore")
-    else:
-        df_nintendo = df_base
-
-    df_nintendo["nsuid"] = df_nintendo["nsuid"].astype(str).str.split("|").str[0]
-    df_nintendo["product_code"] = df_nintendo["nsuid"]
-    df_nintendo["platform"] = df_nintendo["platform"].astype(str).str.strip()
-
-    df_nintendo = clean_price_columns(df_nintendo)
-    return df_nintendo
+def add_discount(df: pd.DataFrame) -> pd.DataFrame:
+    """Computes the discount, treating an old price that is not higher as no discount at all."""
+    on_sale = df["price_old"].notna() & df["price"].notna() & (df["price_old"] > df["price"])
+    df["price_old"] = df["price_old"].where(on_sale)
+    df["discount_amount"] = (df["price_old"] - df["price"]).round(2)
+    return df
 
 
-def process_playstation_data(ps_data: list[dict[str, Any]]) -> pd.DataFrame:
-    """Cleans and standardizes PlayStation data."""
-    logger.info("Processing PlayStation data.")
-    df_ps = pd.DataFrame(ps_data)
+def build_frame(records: list[dict[str, Any]]) -> pd.DataFrame:
+    """Cleans one source's records into a dataframe with the final columns."""
+    df = pd.DataFrame(records, columns=list(RECORD_FIELDS))
+    if df.empty:
+        return pd.DataFrame(columns=COLUMNS)
 
-    if df_ps.empty:
-        logger.warning("PlayStation data is empty.")
-        return df_ps
+    for col in ("name", "platform", "product_code"):
+        df[col] = df[col].astype("string").str.strip()
 
-    df_ps = clean_price_columns(df_ps)
-    return df_ps
+    # a product that cannot be identified cannot be tracked over time
+    identified = df["product_code"].notna() & (df["product_code"] != "") & df["name"].notna()
+    if not identified.all():
+        logger.warning(f"Dropping {(~identified).sum()} rows without a product code or name.")
+    df = df[identified].drop_duplicates(subset=["source", "product_code"]).reset_index(drop=True)
+
+    # a nullable boolean keeps "unknown" distinct from False and survives a CSV round trip
+    df["out_of_stock"] = df["out_of_stock"].astype("boolean")
+
+    df = clean_price_columns(df)
+    df = add_discount(df)
+    return df[COLUMNS]
 
 
-def combine_and_format_data(df_nintendo: pd.DataFrame, df_ps: pd.DataFrame) -> pd.DataFrame:
-    """Combines platform data and computes final metrics."""
-    logger.info("Combining Nintendo and PlayStation datasets.")
+def combine_frames(frames: Iterable[pd.DataFrame]) -> pd.DataFrame:
+    """Stacks the per-source dataframes into the final dataset."""
+    frames = [frame[COLUMNS] for frame in frames if not frame.empty]
+    if not frames:
+        return pd.DataFrame(columns=COLUMNS)
 
-    common_cols = [
-        "name",
-        "price",
-        "price_old",
-        "badge",
-        "date_range",
-        "url",
-        "product_code",
-        "out_of_stock",
-        "platform",
-        "nsuid",
-        "source",
-    ]
-
-    df_n_final = df_nintendo[common_cols] if not df_nintendo.empty else pd.DataFrame(columns=common_cols)
-    df_p_final = df_ps[common_cols] if not df_ps.empty else pd.DataFrame(columns=common_cols)
-
-    df_final = pd.concat([df_p_final, df_n_final], ignore_index=True)
-
-    df_final["discount_amount"] = df_final["price_old"] - df_final["price"]
-
+    df_final = pd.concat(frames, ignore_index=True)
     logger.info(f"Data processing complete. Final dataset contains {len(df_final)} rows.")
     return df_final

@@ -6,29 +6,34 @@ import pandas as pd
 import pytest
 
 from gameprice_index import cli
-from gameprice_index.scraper import parse_nintendo_listing, parse_nintendo_prices, parse_playstation_tiles
+from gameprice_index.scrapers.nintendo import NintendoScraper, parse_nintendo_prices
+from gameprice_index.scrapers.playstation import PlayStationScraper, parse_playstation_tiles
+from helpers import FakeSession
 
 
 @pytest.fixture
 def offline_scrapers(monkeypatch, load_fixture):
-    """Makes every scraper answer from the saved fixtures and counts the calls."""
+    """Makes every scraper answer from the saved fixtures and counts the scrapes."""
     calls = {"nintendo": 0, "playstation": 0}
+    rendered = load_fixture("nintendo_listing_rendered.html")
 
-    def nintendo_base(url):
+    def nintendo_records(self):
         calls["nintendo"] += 1
-        return parse_nintendo_listing(load_fixture("nintendo_listing_rendered.html"))
+        self.session = FakeSession({"nintendo.com": rendered})
+        self.fetch_prices = lambda: parse_nintendo_prices(rendered)
+        return NINTENDO_FETCH(self)
 
-    def nintendo_prices(url):
-        return parse_nintendo_prices(load_fixture("nintendo_listing_rendered.html"))
-
-    def playstation(url):
+    def playstation_records(self):
         calls["playstation"] += 1
-        return parse_playstation_tiles(load_fixture("playstation_direct_listing.html"))
+        tiles = parse_playstation_tiles(load_fixture("playstation_direct_listing.html"))
+        return [self.record(platform="PS5", **tile) for tile in tiles]
 
-    monkeypatch.setattr(cli, "scrape_nintendo_base", nintendo_base)
-    monkeypatch.setattr(cli, "scrape_nintendo_prices", nintendo_prices)
-    monkeypatch.setattr(cli, "scrape_playstation", playstation)
+    monkeypatch.setattr(NintendoScraper, "fetch_records", nintendo_records)
+    monkeypatch.setattr(PlayStationScraper, "fetch_records", playstation_records)
     return calls
+
+
+NINTENDO_FETCH = NintendoScraper.fetch_records
 
 
 def _db_rows(db_path) -> int:
@@ -53,7 +58,9 @@ def test_live_run_writes_dataset_cache_and_database(tmp_path, offline_scrapers):
 
     wonder = df[df["name"].str.startswith("Super Mario Bros. Wonder")].iloc[0]
     assert wonder["product_code"] == "70010000115568"
+    assert wonder["price"] == 16.99
     assert (df["discount_amount"].dropna() > 0).all()
+    assert df["discount_amount"].notna().sum() == 2
 
 
 def test_cached_run_reproduces_the_live_run(tmp_path, offline_scrapers):
@@ -71,3 +78,15 @@ def test_cached_run_reproduces_the_live_run(tmp_path, offline_scrapers):
     assert data_csv.read_text(encoding="utf-8") == live_csv
     assert _db_rows(db_path) == live_rows
     assert offline_scrapers == {"nintendo": 1, "playstation": 1}
+
+
+def test_failed_source_leaves_existing_cache_alone(tmp_path, offline_scrapers, monkeypatch):
+    """Regression: one failing source used to overwrite the other sources' good cache."""
+    args = ["--output-dir", str(tmp_path), "--no-plots"]
+    assert cli.main(args) == 0
+    before = (tmp_path / "data" / "processed_nintendo.csv").read_text(encoding="utf-8")
+
+    monkeypatch.setattr(PlayStationScraper, "fetch_records", lambda self: [])
+
+    assert cli.main(args) == 1
+    assert (tmp_path / "data" / "processed_nintendo.csv").read_text(encoding="utf-8") == before

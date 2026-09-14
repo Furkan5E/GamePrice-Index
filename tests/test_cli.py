@@ -3,7 +3,7 @@ import pytest
 
 from gameprice_index import cli
 from gameprice_index.cli import load_cache, write_cache
-from gameprice_index.scraper import ScrapeError
+from gameprice_index.scrapers import ScrapeError
 
 
 def test_write_cache_refuses_empty_dataset(tmp_path):
@@ -34,16 +34,12 @@ def test_load_cache_reports_missing_file(tmp_path):
 def test_load_cache_keeps_ids_as_strings(tmp_path):
     """A missing id must not turn the whole column into floats like 70010000096802.0."""
     path = tmp_path / "processed_nintendo.csv"
-    path.write_text(
-        "name,nsuid,product_code\nMario Kart World,70010000096802,70010000096802\nNo Id,,\n",
-        encoding="utf-8",
-    )
+    path.write_text("name,product_code\nMario Kart World,70010000096802\nNo Id,\n", encoding="utf-8")
 
     df = load_cache(str(path))
 
-    assert df["nsuid"][0] == "70010000096802"
     assert df["product_code"][0] == "70010000096802"
-    assert pd.isna(df["nsuid"][1])
+    assert pd.isna(df["product_code"][1])
 
 
 def test_main_returns_error_code_when_scrape_fails(monkeypatch):
@@ -64,7 +60,7 @@ def test_main_defaults(monkeypatch):
     assert cli.main([]) == 0
     assert seen == {
         "use_cache": False,
-        "sources": ("nintendo", "playstation"),
+        "sources": cli.SOURCES,
         "make_plots": True,
         "output_dir": ".",
         "db_path": None,
@@ -93,9 +89,9 @@ def test_main_rejects_unknown_source():
 
 
 NINTENDO_CACHE = (
-    "name,platform,url,nsuid,price,price_old,badge,date_range,product_code,out_of_stock,source\n"
-    "Mario Kart World,Nintendo Switch 2,https://example.test/mk,70010000096802,66.99,,,,70010000096802,,Nintendo\n"
-    "Kero Kero Cowboy,Nintendo Switch,https://example.test/kk,70010000126803,7.64,8.99,,,70010000126803,,Nintendo\n"
+    "source,platform,product_code,name,price,price_old,discount_amount,badge,out_of_stock,url\n"
+    "Nintendo,Nintendo Switch 2,70010000096802,Mario Kart World,66.99,,,,,https://example.test/mk\n"
+    "Nintendo,Nintendo Switch,70010000126803,Kero Kero Cowboy,7.64,8.99,1.35,,,https://example.test/kk\n"
 )
 
 

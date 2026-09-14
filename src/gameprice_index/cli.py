@@ -7,22 +7,13 @@ from collections.abc import Sequence
 import pandas as pd
 
 from gameprice_index import config, storage
-from gameprice_index.processor import (
-    combine_and_format_data,
-    process_nintendo_data,
-    process_playstation_data,
-)
-from gameprice_index.scraper import (
-    ScrapeError,
-    scrape_nintendo_base,
-    scrape_nintendo_prices,
-    scrape_playstation,
-)
+from gameprice_index.processor import build_frame, combine_frames
+from gameprice_index.scrapers import SCRAPERS, ScrapeError, get_scraper
 from gameprice_index.visualiser import plot_platform_distribution, plot_price_analysis, plot_price_vs_discount
 
 logger = logging.getLogger(__name__)
 
-SOURCES = ("nintendo", "playstation")
+SOURCES = tuple(SCRAPERS)
 
 
 def configure_logging() -> None:
@@ -30,14 +21,19 @@ def configure_logging() -> None:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 
 
-# ids are digit strings; left to pandas they become floats as soon as one is missing
-ID_COLUMN_TYPES = {"nsuid": "string", "product_code": "string"}
+# left to pandas, digit-only ids become floats and a column of unknown stock levels becomes NaN
+CACHE_COLUMN_TYPES = {"product_code": "string", "out_of_stock": "boolean"}
+
+
+def cache_path(data_dir: str, source: str) -> str:
+    """Returns where the processed data of one source is cached."""
+    return os.path.join(data_dir, f"processed_{source}.csv")
 
 
 def load_cache(path: str) -> pd.DataFrame:
     """Reads a cached CSV, failing clearly if it is missing or a previous run left it empty."""
     try:
-        return pd.read_csv(path, dtype=ID_COLUMN_TYPES)
+        return pd.read_csv(path, dtype=CACHE_COLUMN_TYPES)
     except FileNotFoundError as e:
         raise ScrapeError(f"No cached file at {path}; run without --cached to create it.") from e
     except pd.errors.EmptyDataError as e:
@@ -53,13 +49,8 @@ def write_cache(df: pd.DataFrame, path: str) -> None:
 
 def scrape_source(source: str) -> pd.DataFrame:
     """Scrapes one storefront and returns its processed dataframe."""
-    if source == "nintendo":
-        nintendo_base = scrape_nintendo_base(config.NINTENDO_URL)
-        nintendo_prices = scrape_nintendo_prices(config.NINTENDO_URL)
-        return process_nintendo_data(nintendo_base, nintendo_prices)
-    if source == "playstation":
-        return process_playstation_data(scrape_playstation(config.PLAYSTATION_URL))
-    raise ValueError(f"Unknown source: {source}")
+    scraper = get_scraper(source)()
+    return build_frame(scraper.scrape())
 
 
 def run_pipeline(
@@ -73,27 +64,21 @@ def run_pipeline(
     plots_dir = os.path.join(output_dir, config.PLOTS_DIR)
     os.makedirs(data_dir, exist_ok=True)
 
-    cache_paths = {source: os.path.join(data_dir, config.CACHE_NAMES[source]) for source in sources}
     final_data_path = os.path.join(data_dir, config.FINAL_CSV_NAME)
     db_path = db_path or os.path.join(data_dir, config.DATABASE_NAME)
 
     if use_cache:
         logger.info(f"Loading cached processed data from {data_dir}")
-        frames = {source: load_cache(cache_paths[source]) for source in sources}
+        frames = {source: load_cache(cache_path(data_dir, source)) for source in sources}
     else:
         logger.info(f"Starting live web scraping for: {', '.join(sources)}")
         frames = {source: scrape_source(source) for source in sources}
 
         # only touch the cache once every requested source has succeeded
         for source in sources:
-            write_cache(frames[source], cache_paths[source])
+            write_cache(frames[source], cache_path(data_dir, source))
 
-    # Combine & Compute Metrics
-    df_final = combine_and_format_data(
-        frames.get("nintendo", pd.DataFrame()),
-        frames.get("playstation", pd.DataFrame()),
-    )
-
+    df_final = combine_frames(frames.values())
     df_final.to_csv(final_data_path, index=False)
     logger.info(f"Saved master dataset to {final_data_path}")
 
@@ -104,7 +89,6 @@ def run_pipeline(
         with storage.open_db(db_path) as conn:
             storage.record_prices(conn, df_final)
 
-    # Generate Visualizations
     if make_plots:
         plot_platform_distribution(df_final, output_dir=plots_dir)
         plot_price_analysis(df_final, output_dir=plots_dir)

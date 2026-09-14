@@ -42,7 +42,6 @@ PLAYSTATION_SELECTORS = {
     "link": ".product-card-image .product-tile__full-width a",
     "prices": "div.product-card-details__price .text-product-price span.price-whole-text",
     "badge": "div.badge .badge-label",
-    "date_range": "div.product-card_price .date-wrapper",
     "out_of_stock": "p.out-stock-wrpr",
     "product_code": "button[data-product-code]",
     "next_button": "button.desktop-pagination__button.right-chevron-blue",
@@ -53,7 +52,3 @@ DATA_DIR = "data"
 PLOTS_DIR = "plots"
 FINAL_CSV_NAME = "data.csv"
 DATABASE_NAME = "game_prices.db"
-CACHE_NAMES = {
-    "nintendo": "processed_nintendo.csv",
-    "playstation": "processed_playstation.csv",
-}
