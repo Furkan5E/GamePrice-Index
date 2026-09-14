@@ -89,9 +89,9 @@ def test_main_rejects_unknown_source():
 
 
 NINTENDO_CACHE = (
-    "source,platform,product_code,name,price,price_old,discount_amount,badge,out_of_stock,url\n"
-    "Nintendo,Nintendo Switch 2,70010000096802,Mario Kart World,66.99,,,,,https://example.test/mk\n"
-    "Nintendo,Nintendo Switch,70010000126803,Kero Kero Cowboy,7.64,8.99,1.35,,,https://example.test/kk\n"
+    "source,platform,product_code,name,price,price_old,discount_amount,discount_pct,badge,out_of_stock,url\n"
+    "Nintendo,Nintendo Switch 2,70010000096802,Mario Kart World,66.99,,,,,,https://example.test/mk\n"
+    "Nintendo,Nintendo Switch,70010000126803,Kero Kero Cowboy,7.64,8.99,1.35,15.0,,,https://example.test/kk\n"
 )
 
 

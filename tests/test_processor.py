@@ -51,6 +51,7 @@ def test_build_frame_computes_discount():
     df = build_frame([_record(price="£7.64", price_old="£8.99")])
 
     assert df["discount_amount"].tolist() == [1.35]
+    assert df["discount_pct"].tolist() == [15.0]
 
 
 def test_build_frame_ignores_old_price_that_is_not_higher():
@@ -64,6 +65,7 @@ def test_build_frame_ignores_old_price_that_is_not_higher():
 
     assert df["price_old"].isna().all()
     assert df["discount_amount"].isna().all()
+    assert df["discount_pct"].isna().all()
 
 
 def test_build_frame_strips_whitespace():

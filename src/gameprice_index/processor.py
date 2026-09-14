@@ -19,6 +19,7 @@ COLUMNS = [
     "price",
     "price_old",
     "discount_amount",
+    "discount_pct",
     "badge",
     "out_of_stock",
     "url",
@@ -46,6 +47,8 @@ def add_discount(df: pd.DataFrame) -> pd.DataFrame:
     on_sale = df["price_old"].notna() & df["price"].notna() & (df["price_old"] > df["price"])
     df["price_old"] = df["price_old"].where(on_sale)
     df["discount_amount"] = (df["price_old"] - df["price"]).round(2)
+    # a percentage makes a £5 cut on a £10 game comparable with a £5 cut on a £70 one
+    df["discount_pct"] = (100 * df["discount_amount"] / df["price_old"]).round(1)
     return df
 
 
