@@ -1,0 +1,77 @@
+{
+ "personalized": false,
+ "country": "GB",
+ "prices": [
+  {
+   "title_id": 70010000130793,
+   "sales_status": "preorder",
+   "is_download_ready": false,
+   "regular_price": {
+    "amount": "£49.99",
+    "currency": "GBP",
+    "raw_value": "49.99"
+   }
+  },
+  {
+   "title_id": 70010000125146,
+   "sales_status": "preorder",
+   "is_download_ready": false,
+   "regular_price": {
+    "amount": "£41.99",
+    "currency": "GBP",
+    "raw_value": "41.99"
+   }
+  },
+  {
+   "title_id": 70010000119401,
+   "sales_status": "preorder",
+   "is_download_ready": false,
+   "regular_price": {
+    "amount": "£29.99",
+    "currency": "GBP",
+    "raw_value": "29.99"
+   }
+  },
+  {
+   "title_id": 70010000003621,
+   "sales_status": "onsale",
+   "regular_price": {
+    "amount": "£24.99",
+    "currency": "GBP",
+    "raw_value": "24.99"
+   },
+   "discount_price": {
+    "amount": "£3.74",
+    "currency": "GBP",
+    "raw_value": "3.74",
+    "start_datetime": "2026-10-02T13:00:00Z",
+    "end_datetime": "2026-10-30T23:59:59Z"
+   }
+  },
+  {
+   "title_id": 70070000019472,
+   "sales_status": "onsale",
+   "regular_price": {
+    "amount": "£59.99",
+    "currency": "GBP",
+    "raw_value": "59.99"
+   },
+   "discount_price": {
+    "amount": "£5.99",
+    "currency": "GBP",
+    "raw_value": "5.99",
+    "start_datetime": "2026-09-23T13:00:00Z",
+    "end_datetime": "2026-10-14T22:59:59Z"
+   }
+  },
+  {
+   "title_id": 70010000096800,
+   "sales_status": "onsale",
+   "regular_price": {
+    "amount": "£0.00",
+    "currency": "GBP",
+    "raw_value": "0"
+   }
+  }
+ ]
+}

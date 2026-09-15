@@ -49,7 +49,7 @@ def write_cache(df: pd.DataFrame, path: str) -> None:
 
 def scrape_source(source: str) -> pd.DataFrame:
     """Scrapes one storefront and returns its processed dataframe."""
-    scraper = get_scraper(source)()
+    scraper = get_scraper(source)(limit=config.DEFAULT_LIMIT)
     return build_frame(scraper.scrape())
 
 

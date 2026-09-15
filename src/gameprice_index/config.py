@@ -1,7 +1,7 @@
-"""Site URLs, CSS selectors and file locations used by the pipeline.
+"""Site URLs, API parameters, CSS selectors and file locations used by the pipeline.
 
 Everything that changes when a storefront is redesigned lives here, so a
-broken selector is a one-line fix rather than a hunt through the scrapers.
+broken endpoint or selector is a one-line fix rather than a hunt through the scrapers.
 """
 
 # --- HTTP ---
@@ -15,22 +15,22 @@ REQUEST_HEADERS = {
 REQUEST_RETRIES = 3
 REQUEST_BACKOFF = 1.0  # seconds; doubles after every failed attempt
 REQUEST_RETRY_STATUSES = (429, 500, 502, 503, 504)
+REQUEST_DELAY = 0.25  # seconds between requests to the same site
+
+# --- Scraping ---
+DEFAULT_LIMIT = 1000  # products per storefront unless --limit says otherwise
 
 # --- Selenium ---
 SELENIUM_WAIT = 15  # seconds to wait for dynamic content before giving up
 
 # --- Nintendo ---
-NINTENDO_URL = "https://www.nintendo.com/en-gb/Games"
-NINTENDO_LINK_PREFIX = "https://www.nintendo.co.uk"
-NINTENDO_SELECTORS = {
-    "tile": "li.page-list-group-item[data-nsuid]",
-    "name": "p.page-title",
-    "platform": "p.page-data",
-    "link": "a[href]",
-    "price_container": "p.price-small",
-    "regular_price": "span[data-price]",
-    "sale_price": "span.discount",
-}
+# the eShop site is a front end over a public Solr search index of the whole catalogue
+NINTENDO_SEARCH_URL = "https://searching.nintendo-europe.com/en/select"
+NINTENDO_SEARCH_FILTER = "type:GAME AND system_type:nintendoswitch* AND nsuid_txt:*"
+NINTENDO_SEARCH_FIELDS = "title,url,nsuid_txt,system_names_txt,price_regular_f,price_lowest_f,price_has_discount_b"
+NINTENDO_SEARCH_SORT = "popularity asc"  # most popular first, so a limited run keeps the games people buy
+NINTENDO_PAGE_SIZE = 500
+NINTENDO_LINK_PREFIX = "https://www.nintendo.com"
 
 # --- PlayStation Direct ---
 PLAYSTATION_URL = "https://direct.playstation.com/en-gb/games/"

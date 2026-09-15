@@ -1,39 +1,34 @@
-"""End-to-end pipeline runs with the network replaced by saved pages."""
+"""End-to-end pipeline runs with the network replaced by saved responses."""
 
+import json
 import sqlite3
 
 import pandas as pd
 import pytest
 
 from gameprice_index import cli
-from gameprice_index.scrapers.nintendo import NintendoScraper, parse_nintendo_prices
+from gameprice_index.scrapers.nintendo import NintendoScraper
 from gameprice_index.scrapers.playstation import PlayStationScraper, parse_playstation_tiles
-from helpers import FakeSession
 
 
 @pytest.fixture
 def offline_scrapers(monkeypatch, load_fixture):
     """Makes every scraper answer from the saved fixtures and counts the scrapes."""
     calls = {"nintendo": 0, "playstation": 0}
-    rendered = load_fixture("nintendo_listing_rendered.html")
 
-    def nintendo_records(self):
+    def nintendo_catalogue(self):
         calls["nintendo"] += 1
-        self.session = FakeSession({"nintendo.com": rendered})
-        self.fetch_prices = lambda: parse_nintendo_prices(rendered)
-        return NINTENDO_FETCH(self)
+        pages = [json.loads(load_fixture(f"nintendo_search_page{n}.json")) for n in (1, 2)]
+        return [doc for page in pages for doc in page["response"]["docs"]]
 
     def playstation_records(self):
         calls["playstation"] += 1
         tiles = parse_playstation_tiles(load_fixture("playstation_direct_listing.html"))
         return [self.record(platform="PS5", **tile) for tile in tiles]
 
-    monkeypatch.setattr(NintendoScraper, "fetch_records", nintendo_records)
+    monkeypatch.setattr(NintendoScraper, "fetch_catalogue", nintendo_catalogue)
     monkeypatch.setattr(PlayStationScraper, "fetch_records", playstation_records)
     return calls
-
-
-NINTENDO_FETCH = NintendoScraper.fetch_records
 
 
 def _db_rows(db_path) -> int:
@@ -51,14 +46,13 @@ def test_live_run_writes_dataset_cache_and_database(tmp_path, offline_scrapers):
     df = pd.read_csv(data_dir / "data.csv", dtype={"product_code": "string"})
 
     assert sorted(df["source"].unique()) == ["Nintendo", "PlayStation"]
-    assert len(df) == 9
+    assert len(df) == 10
     assert (data_dir / "processed_nintendo.csv").exists()
     assert (data_dir / "processed_playstation.csv").exists()
-    assert _db_rows(data_dir / "game_prices.db") == 9
+    assert _db_rows(data_dir / "game_prices.db") == 10
 
-    wonder = df[df["name"].str.startswith("Super Mario Bros. Wonder")].iloc[0]
-    assert wonder["product_code"] == "70010000115568"
-    assert wonder["price"] == 16.99
+    hogwarts = df[df["name"] == "Hogwarts Legacy"].iloc[0]
+    assert hogwarts["product_code"] == "70010000062277"
     assert (df["discount_amount"].dropna() > 0).all()
     assert df["discount_amount"].notna().sum() == 2
 

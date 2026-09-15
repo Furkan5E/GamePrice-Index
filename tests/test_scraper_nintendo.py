@@ -1,155 +1,149 @@
+import json
+
 import pytest
 import requests
-from bs4 import BeautifulSoup
 
+from gameprice_index import config
 from gameprice_index.scrapers import ScrapeError
-from gameprice_index.scrapers.nintendo import (
-    NintendoScraper,
-    parse_nintendo_listing,
-    parse_nintendo_price,
-    parse_nintendo_prices,
-)
+from gameprice_index.scrapers.nintendo import NintendoScraper, index_price, pick_nsuid
 from helpers import FakeSession
 
 
-def _price_container(html: str):
-    return BeautifulSoup(html, "html.parser").find("p", class_="price-small")
-
-
-def test_parse_nintendo_price_regular():
-    """A game that is not on sale has a price and no old price."""
-    container = _price_container(
-        '<p class="price-small"><span data-price="">£41.99</span><span class="discount" data-discount=""></span></p>'
-    )
-    assert parse_nintendo_price(container) == ("£41.99", None)
-
-
-def test_parse_nintendo_price_on_sale():
-    """The discount span holds the sale price, data-price the original one."""
-    container = _price_container(
-        '<p class="price-small"><span class="original-price" data-price="">£8.99</span>'
-        '<span class="discount" data-discount="">£7.64*</span></p>'
-    )
-    assert parse_nintendo_price(container) == ("£7.64", "£8.99")
-
-
-def test_parse_nintendo_price_missing():
-    assert parse_nintendo_price(None) == (None, None)
-
-
-def test_parse_nintendo_listing(load_fixture):
-    games = parse_nintendo_listing(load_fixture("nintendo_listing.html"))
-
-    assert len(games) == 5
-    assert games[0] == {
-        "name": "Star Fox",
-        "platform": "Nintendo Switch 2",
-        "url": "https://www.nintendo.co.uk/en-gb/Games/Nintendo-Switch-2-games/Star-Fox-3094728.html",
-        "nsuid": "70010000123168",
-    }
-
-
-def test_parse_nintendo_listing_keeps_multi_edition_nsuids(load_fixture):
-    """Games sold in several editions list every nsuid, separated by a pipe."""
-    games = parse_nintendo_listing(load_fixture("nintendo_listing.html"))
-
-    assert games[1]["nsuid"] == "70010000115568|70050000069174"
-    assert games[1]["name"].startswith("Super Mario Bros. Wonder – Nintendo Switch 2 Edition")
-
-
-def test_parse_nintendo_prices(load_fixture):
-    prices = parse_nintendo_prices(load_fixture("nintendo_listing_rendered.html"))
-
-    assert prices["70010000123168"] == ("£41.99", None)
-    assert all(price for price, _ in prices.values())
-
-
-def test_parse_nintendo_prices_on_sale(load_fixture):
-    """Regression: the sale price is the current price and the struck-through one is the old price."""
-    prices = parse_nintendo_prices(load_fixture("nintendo_listing_rendered.html"))
-    on_sale = {nsuid: price for nsuid, price in prices.items() if price[1]}
-
-    assert on_sale == {
-        "70010000101676|70070000031399": ("£40.29", "£64.99"),
-        "70010000126200": ("£2.99", "£5.39"),
-    }
+@pytest.fixture
+def search_pages(load_fixture):
+    """Two saved pages of the search index: four games, then two."""
+    return [json.loads(load_fixture(f"nintendo_search_page{n}.json")) for n in (1, 2)]
 
 
 @pytest.fixture
-def scraper(load_fixture, monkeypatch):
-    """A Nintendo scraper whose listing and rendered prices both come from saved pages."""
-    session = FakeSession({"nintendo.com": load_fixture("nintendo_listing_rendered.html")}, encoding="ISO-8859-1")
-    scraper = NintendoScraper(session=session)
-    monkeypatch.setattr(
-        scraper, "fetch_prices", lambda: parse_nintendo_prices(load_fixture("nintendo_listing_rendered.html"))
+def session(search_pages, monkeypatch):
+    """Serves the saved search pages according to the `start` offset that was asked for."""
+    monkeypatch.setattr(config, "NINTENDO_PAGE_SIZE", 4)
+
+    def search(url, params=None, **kwargs):
+        return search_pages[0] if params["start"] == 0 else search_pages[1]
+
+    return FakeSession({"searching.nintendo-europe.com": search})
+
+
+def test_pick_nsuid_prefers_the_base_game():
+    """Multi-edition listings carry several ids; the 7001 one is the game itself."""
+    assert pick_nsuid(["70070000019472", "70010000062277"]) == "70010000062277"
+    assert pick_nsuid(["70070000019472"]) == "70070000019472"
+    assert pick_nsuid([]) is None
+
+
+def test_index_price_regular():
+    assert index_price({"price_regular_f": 49.99, "price_lowest_f": 49.99, "price_has_discount_b": False}) == (
+        49.99,
+        None,
     )
-    return scraper
 
 
-def test_scrape_joins_listing_and_prices(scraper):
-    records = scraper.scrape()
+def test_index_price_on_sale():
+    """Regression: the sale price is the current price and the regular price is the old one."""
+    doc = {"price_regular_f": 24.99, "price_lowest_f": 3.74, "price_has_discount_b": True}
 
-    assert len(records) == 5
-    assert records[0]["source"] == "Nintendo"
-    assert records[0]["name"] == "Star Fox"
-    assert records[0]["platform"] == "Nintendo Switch 2"
-    assert records[0]["product_code"] == "70010000123168"
-    assert (records[0]["price"], records[0]["price_old"]) == ("£41.99", None)
+    assert index_price(doc) == (3.74, 24.99)
 
 
-def test_scrape_uses_first_nsuid_as_product_code(scraper):
-    """Multi-edition games carry several nsuids; the first is the base game."""
-    wonder = scraper.scrape()[1]
-
-    assert wonder["product_code"] == "70010000115568"
-    assert wonder["price"] == "£16.99"
+def test_index_price_missing():
+    assert index_price({}) == (None, None)
 
 
-def test_scrape_decodes_utf8(scraper):
-    """Regression: the page sends no charset, and names used to come back as mojibake."""
-    wonder = scraper.scrape()[1]
-
-    assert "Wonder – Nintendo Switch 2 Edition" in wonder["name"]
+def test_index_price_treats_minus_one_as_unpriced():
+    """The index marks unreleased games with a price of -1, which must not reach the dataset."""
+    assert index_price({"price_regular_f": -1.0, "price_lowest_f": -1.0}) == (None, None)
 
 
-def test_scrape_sends_a_timeout(scraper):
+def test_scrape_pages_through_the_whole_catalogue(session):
+    records = NintendoScraper(session=session).scrape()
+
+    assert len(records) == 6
+    assert [call["params"]["start"] for call in session.calls] == [0, 4]
+    assert records[0] == {
+        "source": "Nintendo",
+        "platform": "Nintendo Switch 2",
+        "product_code": "70010000130793",
+        "name": "The Legend of Zelda: Ocarina of Time",
+        "price": 49.99,
+        "price_old": None,
+        "badge": None,
+        "out_of_stock": None,
+        "url": "https://www.nintendo.com/en-gb/Games/Nintendo-Switch-2-games/The-Legend-of-Zelda-Ocarina-of-Time-3115664.html",
+    }
+
+
+def test_scrape_reads_sale_prices(session):
+    street_fighter = NintendoScraper(session=session).scrape()[3]
+
+    assert street_fighter["name"] == "Street Fighter™ 30th Anniversary Collection"
+    assert (street_fighter["price"], street_fighter["price_old"]) == (3.74, 24.99)
+
+
+def test_scrape_uses_the_base_game_id(session):
+    hogwarts = NintendoScraper(session=session).scrape()[4]
+
+    assert hogwarts["name"] == "Hogwarts Legacy"
+    assert hogwarts["product_code"] == "70010000062277"
+
+
+def test_scrape_keeps_free_games(session):
+    free = NintendoScraper(session=session).scrape()[5]
+
+    assert free["price"] == 0
+    assert free["price_old"] is None
+
+
+def test_scrape_stops_paging_at_the_limit(session):
+    records = NintendoScraper(session=session, limit=3).scrape()
+
+    assert len(records) == 3
+    assert len(session.calls) == 1
+
+
+def test_scrape_sends_a_timeout_and_the_search_filter(session):
     """A request without a timeout can hang the whole pipeline."""
-    scraper.scrape()
+    NintendoScraper(session=session, limit=1).scrape()
+    call = session.calls[0]
 
-    assert scraper.session.calls[0]["timeout"] > 0
+    assert call["timeout"] > 0
+    assert call["params"]["fq"] == config.NINTENDO_SEARCH_FILTER
+    assert call["params"]["sort"] == "popularity asc"
 
 
-def test_scrape_skips_tiles_without_nsuid(monkeypatch):
-    """Regression: tiles with no nsuid used to end up with the literal id 'None'."""
-    html = """
-    <li class="page-list-group-item" data-nsuid="70010000096802"><p class="page-title">Mario Kart World</p></li>
-    <li class="page-list-group-item" data-nsuid=""><p class="page-title">Farm 2+</p></li>
-    """
-    scraper = NintendoScraper(session=FakeSession({"nintendo.com": html}))
-    monkeypatch.setattr(scraper, "fetch_prices", lambda: {"70010000096802": ("£66.99", None)})
+def test_scrape_skips_entries_without_an_id_or_title():
+    """Regression: entries with no id used to end up with the literal id 'None'."""
+    docs = [
+        {"title": "Mario Kart World", "nsuid_txt": ["70010000096802"], "price_regular_f": 66.99},
+        {"title": "Farm 2+"},
+        {"title": "  ", "nsuid_txt": ["70010000000001"]},
+    ]
+    session = FakeSession({"searching": {"response": {"numFound": 3, "docs": docs}}})
 
-    records = scraper.scrape()
+    records = NintendoScraper(session=session).scrape()
 
     assert [record["name"] for record in records] == ["Mario Kart World"]
-    assert records[0]["price"] == "£66.99"
-
-
-def test_scrape_leaves_unpriced_games_empty(monkeypatch, load_fixture):
-    scraper = NintendoScraper(session=FakeSession({"nintendo.com": load_fixture("nintendo_listing.html")}))
-    monkeypatch.setattr(scraper, "fetch_prices", lambda: {})
-
-    assert all(record["price"] is None for record in scraper.scrape())
+    assert records[0]["price"] == 66.99
+    assert records[0]["url"] is None
 
 
 def test_scrape_raises_on_network_error():
-    scraper = NintendoScraper(session=FakeSession({"nintendo.com": requests.ConnectionError("boom")}))
+    session = FakeSession({"searching": requests.ConnectionError("boom")})
 
     with pytest.raises(ScrapeError, match="Failed to scrape Nintendo"):
-        scraper.scrape()
+        NintendoScraper(session=session).scrape()
 
 
-def test_scrape_raises_when_no_games_found():
-    scraper = NintendoScraper(session=FakeSession({"nintendo.com": "<html></html>"}))
+def test_scrape_raises_when_the_index_is_empty():
+    session = FakeSession({"searching": {"response": {"numFound": 0, "docs": []}}})
 
     with pytest.raises(ScrapeError, match="No Nintendo games found"):
-        scraper.scrape()
+        NintendoScraper(session=session).scrape()
+
+
+def test_scrape_raises_on_error_status():
+    session = FakeSession({})  # every URL answers 404
+
+    with pytest.raises(ScrapeError, match="404"):
+        NintendoScraper(session=session).scrape()

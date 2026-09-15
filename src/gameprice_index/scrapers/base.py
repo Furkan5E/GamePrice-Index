@@ -1,10 +1,14 @@
 """The contract every storefront scraper follows."""
 
 import logging
+import time
 from abc import ABC, abstractmethod
 from typing import Any, ClassVar
 
 import requests
+
+from gameprice_index import config
+from gameprice_index.http_client import build_session, fetch
 
 logger = logging.getLogger(__name__)
 
@@ -44,6 +48,20 @@ class Scraper(ABC):
     @abstractmethod
     def fetch_records(self) -> list[dict[str, Any]]:
         """Returns one record per product, built with `self.record`."""
+
+    def get_json(self, url: str, **kwargs: Any) -> Any:
+        """GETs a JSON document through the shared retrying session, pausing briefly afterwards."""
+        if self.session is None:
+            self.session = build_session()
+
+        response = fetch(url, session=self.session, **kwargs)
+        if config.REQUEST_DELAY:
+            time.sleep(config.REQUEST_DELAY)
+        return response.json()
+
+    def has_enough(self, records: list[dict[str, Any]]) -> bool:
+        """True once the limit is reached, so paging can stop early."""
+        return self.limit is not None and len(records) >= self.limit
 
     def record(self, **fields: Any) -> dict[str, Any]:
         """Builds a record with every expected key, filling the ones a source does not provide."""

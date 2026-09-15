@@ -2,6 +2,8 @@ from pathlib import Path
 
 import pytest
 
+from gameprice_index import config
+
 FIXTURES = Path(__file__).parent / "fixtures"
 
 
@@ -13,3 +15,9 @@ def load_fixture():
         return (FIXTURES / name).read_text(encoding="utf-8")
 
     return _load
+
+
+@pytest.fixture(autouse=True)
+def no_request_delay(monkeypatch):
+    """Tests never hit a real site, so there is nobody to be polite to."""
+    monkeypatch.setattr(config, "REQUEST_DELAY", 0)
