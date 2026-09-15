@@ -90,3 +90,10 @@ def test_failed_source_leaves_existing_cache_alone(tmp_path, offline_scrapers, m
 
     assert cli.main(args) == 1
     assert (tmp_path / "data" / "processed_nintendo.csv").read_text(encoding="utf-8") == before
+
+
+def test_limit_caps_every_source(tmp_path, offline_scrapers):
+    assert cli.main(["--output-dir", str(tmp_path), "--no-plots", "--limit", "2"]) == 0
+
+    df = pd.read_csv(tmp_path / "data" / "data.csv")
+    assert df["source"].value_counts().to_dict() == {"Nintendo": 2, "PlayStation": 2}

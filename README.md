@@ -51,6 +51,7 @@ Command line options:
 | `--no-plots` | Skip generating the plots. |
 | `--output-dir DIR` | Directory that holds the `data/` and `plots/` folders. |
 | `--db PATH` | SQLite database to record prices in. |
+| `--limit N` | Most products to take from each storefront (default 1000, `0` for everything). |
 
 Run the test suite:
 ```bash

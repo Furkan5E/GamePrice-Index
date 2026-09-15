@@ -47,9 +47,9 @@ def write_cache(df: pd.DataFrame, path: str) -> None:
     df.to_csv(path, index=False)
 
 
-def scrape_source(source: str) -> pd.DataFrame:
+def scrape_source(source: str, limit: int | None = config.DEFAULT_LIMIT) -> pd.DataFrame:
     """Scrapes one storefront and returns its processed dataframe."""
-    scraper = get_scraper(source)(limit=config.DEFAULT_LIMIT)
+    scraper = get_scraper(source)(limit=limit)
     return build_frame(scraper.scrape())
 
 
@@ -59,6 +59,7 @@ def run_pipeline(
     make_plots: bool = True,
     output_dir: str = ".",
     db_path: str | None = None,
+    limit: int | None = config.DEFAULT_LIMIT,
 ) -> None:
     data_dir = os.path.join(output_dir, config.DATA_DIR)
     plots_dir = os.path.join(output_dir, config.PLOTS_DIR)
@@ -72,7 +73,7 @@ def run_pipeline(
         frames = {source: load_cache(cache_path(data_dir, source)) for source in sources}
     else:
         logger.info(f"Starting live web scraping for: {', '.join(sources)}")
-        frames = {source: scrape_source(source) for source in sources}
+        frames = {source: scrape_source(source, limit=limit) for source in sources}
 
         # only touch the cache once every requested source has succeeded
         for source in sources:
@@ -96,6 +97,13 @@ def run_pipeline(
     else:
         logger.info("Skipping plots.")
     logger.info("Pipeline executed successfully!")
+
+
+def non_negative_int(value: str) -> int:
+    number = int(value)
+    if number < 0:
+        raise argparse.ArgumentTypeError("must be 0 or more")
+    return number
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -129,6 +137,13 @@ def build_parser() -> argparse.ArgumentParser:
         metavar="PATH",
         help="SQLite database to record prices in. Defaults to data/game_prices.db under the output directory.",
     )
+    parser.add_argument(
+        "--limit",
+        type=non_negative_int,
+        default=config.DEFAULT_LIMIT,
+        metavar="N",
+        help=f"Most products to take from each storefront; 0 means everything. Defaults to {config.DEFAULT_LIMIT}.",
+    )
     return parser
 
 
@@ -144,6 +159,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             make_plots=not args.no_plots,
             output_dir=args.output_dir,
             db_path=args.db,
+            limit=args.limit or None,
         )
     except ScrapeError as e:
         logger.error(e)

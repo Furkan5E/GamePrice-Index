@@ -64,6 +64,7 @@ def test_main_defaults(monkeypatch):
         "make_plots": True,
         "output_dir": ".",
         "db_path": None,
+        "limit": 1000,
     }
 
 
@@ -72,6 +73,7 @@ def test_main_passes_options(monkeypatch):
     monkeypatch.setattr(cli, "run_pipeline", lambda **kwargs: seen.update(kwargs))
 
     args = ["--cached", "--source", "nintendo", "--no-plots", "--output-dir", "out", "--db", "prices.db"]
+    args += ["--limit", "25"]
 
     assert cli.main(args) == 0
     assert seen == {
@@ -80,7 +82,21 @@ def test_main_passes_options(monkeypatch):
         "make_plots": False,
         "output_dir": "out",
         "db_path": "prices.db",
+        "limit": 25,
     }
+
+
+def test_limit_zero_means_everything(monkeypatch):
+    seen = {}
+    monkeypatch.setattr(cli, "run_pipeline", lambda **kwargs: seen.update(kwargs))
+
+    assert cli.main(["--limit", "0"]) == 0
+    assert seen["limit"] is None
+
+
+def test_main_rejects_negative_limit():
+    with pytest.raises(SystemExit):
+        cli.main(["--limit", "-5"])
 
 
 def test_main_rejects_unknown_source():
