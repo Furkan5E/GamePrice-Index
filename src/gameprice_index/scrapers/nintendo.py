@@ -1,4 +1,4 @@
-"""Nintendo eShop (UK): the whole Switch catalogue from the site's own search index."""
+"""Nintendo eShop (UK): the Switch catalogue from the site's search index, priced by the eShop price service."""
 
 import logging
 from typing import Any
@@ -33,6 +33,19 @@ def index_price(doc: dict[str, Any]) -> tuple[float | None, float | None]:
     return regular if regular is not None else lowest, None
 
 
+def parse_price_entry(entry: dict[str, Any]) -> tuple[float, float | None, str | None] | None:
+    """Returns (price, price_old, badge) from one price service entry, or None if it has no price."""
+    regular = (entry.get("regular_price") or {}).get("raw_value")
+    if regular is None:
+        return None  # sales_status is "not_found" or "unreleased"
+
+    badge = "PRE-ORDER" if entry.get("sales_status") == "preorder" else None
+    discount = (entry.get("discount_price") or {}).get("raw_value")
+    if discount is not None:
+        return float(discount), float(regular), badge
+    return float(regular), None, badge
+
+
 class NintendoScraper(Scraper):
     name = "nintendo"
     source = "Nintendo"
@@ -59,15 +72,43 @@ class NintendoScraper(Scraper):
             if not page["docs"] or len(docs) >= page["numFound"] or self.has_enough(docs):
                 return docs
 
+    def fetch_prices(self, nsuids: list[str]) -> dict[str, tuple[float, float | None, str | None]]:
+        """Looks up current prices in batches and maps each priced nsuid to (price, price_old, badge)."""
+        prices = {}
+        for start in range(0, len(nsuids), config.NINTENDO_PRICE_BATCH):
+            batch = nsuids[start : start + config.NINTENDO_PRICE_BATCH]
+            payload = self.get_json(
+                config.NINTENDO_PRICE_URL,
+                params={"country": config.NINTENDO_PRICE_COUNTRY, "lang": "en", "ids": ",".join(batch)},
+            )
+            for entry in payload.get("prices", []):
+                parsed = parse_price_entry(entry)
+                if parsed:
+                    prices[str(entry["title_id"])] = parsed
+
+        logger.info(f"Nintendo prices: {len(prices)} of {len(nsuids)} games priced.")
+        return prices
+
     def fetch_records(self) -> list[dict[str, Any]]:
+        docs = self.fetch_catalogue()
+        if self.limit is not None:
+            docs = docs[: self.limit]  # no point pricing games that will be cut off anyway
+
+        nsuids = [nsuid for doc in docs if (nsuid := pick_nsuid(doc.get("nsuid_txt") or []))]
+        prices = self.fetch_prices(nsuids)
+
         records = []
-        for doc in self.fetch_catalogue():
+        for doc in docs:
             nsuid = pick_nsuid(doc.get("nsuid_txt") or [])
             title = (doc.get("title") or "").strip()
             if not nsuid or not title:
                 continue
 
+            # fall back to the index when the price service does not know the game
             price, price_old = index_price(doc)
+            badge = None
+            if nsuid in prices:
+                price, price_old, badge = prices[nsuid]
             platforms = doc.get("system_names_txt") or []
             records.append(
                 self.record(
@@ -77,6 +118,7 @@ class NintendoScraper(Scraper):
                     product_code=nsuid,
                     price=price,
                     price_old=price_old,
+                    badge=badge,
                 )
             )
         return records

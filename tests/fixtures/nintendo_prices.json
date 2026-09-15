@@ -49,19 +49,12 @@
    }
   },
   {
-   "title_id": 70070000019472,
+   "title_id": 70010000062277,
    "sales_status": "onsale",
    "regular_price": {
-    "amount": "£59.99",
+    "amount": "£49.99",
     "currency": "GBP",
-    "raw_value": "59.99"
-   },
-   "discount_price": {
-    "amount": "£5.99",
-    "currency": "GBP",
-    "raw_value": "5.99",
-    "start_datetime": "2026-09-23T13:00:00Z",
-    "end_datetime": "2026-10-14T22:59:59Z"
+    "raw_value": "49.99"
    }
   },
   {

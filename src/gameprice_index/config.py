@@ -31,6 +31,10 @@ NINTENDO_SEARCH_FIELDS = "title,url,nsuid_txt,system_names_txt,price_regular_f,p
 NINTENDO_SEARCH_SORT = "popularity asc"  # most popular first, so a limited run keeps the games people buy
 NINTENDO_PAGE_SIZE = 500
 NINTENDO_LINK_PREFIX = "https://www.nintendo.com"
+# the index can lag behind the shop, so current prices come from the eShop price service
+NINTENDO_PRICE_URL = "https://api.ec.nintendo.com/v1/price"
+NINTENDO_PRICE_COUNTRY = "GB"
+NINTENDO_PRICE_BATCH = 50  # the service rejects requests for more ids than this
 
 # --- PlayStation Direct ---
 PLAYSTATION_URL = "https://direct.playstation.com/en-gb/games/"

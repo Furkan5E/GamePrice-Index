@@ -7,7 +7,7 @@ import pandas as pd
 import pytest
 
 from gameprice_index import cli
-from gameprice_index.scrapers.nintendo import NintendoScraper
+from gameprice_index.scrapers.nintendo import NintendoScraper, parse_price_entry
 from gameprice_index.scrapers.playstation import PlayStationScraper, parse_playstation_tiles
 
 
@@ -21,12 +21,17 @@ def offline_scrapers(monkeypatch, load_fixture):
         pages = [json.loads(load_fixture(f"nintendo_search_page{n}.json")) for n in (1, 2)]
         return [doc for page in pages for doc in page["response"]["docs"]]
 
+    def nintendo_prices(self, nsuids):
+        entries = json.loads(load_fixture("nintendo_prices.json"))["prices"]
+        return {str(entry["title_id"]): parse_price_entry(entry) for entry in entries}
+
     def playstation_records(self):
         calls["playstation"] += 1
         tiles = parse_playstation_tiles(load_fixture("playstation_direct_listing.html"))
         return [self.record(platform="PS5", **tile) for tile in tiles]
 
     monkeypatch.setattr(NintendoScraper, "fetch_catalogue", nintendo_catalogue)
+    monkeypatch.setattr(NintendoScraper, "fetch_prices", nintendo_prices)
     monkeypatch.setattr(PlayStationScraper, "fetch_records", playstation_records)
     return calls
 
@@ -54,7 +59,8 @@ def test_live_run_writes_dataset_cache_and_database(tmp_path, offline_scrapers):
     hogwarts = df[df["name"] == "Hogwarts Legacy"].iloc[0]
     assert hogwarts["product_code"] == "70010000062277"
     assert (df["discount_amount"].dropna() > 0).all()
-    assert df["discount_amount"].notna().sum() == 2
+    assert df["discount_amount"].notna().sum() == 1
+    assert df[df["name"] == "Minecraft"]["badge"].tolist() == ["PRE-ORDER"]
 
 
 def test_cached_run_reproduces_the_live_run(tmp_path, offline_scrapers):
