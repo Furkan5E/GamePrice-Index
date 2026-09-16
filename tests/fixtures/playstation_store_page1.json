@@ -1,0 +1,117 @@
+{
+ "data": {
+  "categoryGridRetrieve": {
+   "__typename": "CategoryGrid",
+   "pageInfo": {
+    "isLast": false,
+    "offset": 0,
+    "size": 3,
+    "totalCount": 5
+   },
+   "products": [
+    {
+     "__typename": "Product",
+     "id": "UP8737-PPSA28416_00-SWGALACTICRACER1",
+     "localizedStoreDisplayClassification": "Full Game",
+     "media": [],
+     "name": "STAR WARS: Galactic Racer™",
+     "npTitleId": "PPSA28416_00",
+     "platforms": [
+      "PS5"
+     ],
+     "price": {
+      "__typename": "SkuPrice",
+      "basePrice": "£49.99",
+      "discountText": null,
+      "discountedPrice": "£49.99",
+      "isExclusive": false,
+      "isFree": false,
+      "isTiedToSubscription": false,
+      "serviceBranding": [
+       "NONE"
+      ],
+      "upsellServiceBranding": [
+       "NONE"
+      ],
+      "upsellText": null
+     },
+     "skus": [
+      {
+       "__typename": "Sku",
+       "type": "STANDARD"
+      }
+     ],
+     "storeDisplayClassification": "FULL_GAME"
+    },
+    {
+     "__typename": "Product",
+     "id": "EP6853-PPSA25642_00-0082868685413873",
+     "localizedStoreDisplayClassification": "Full Game",
+     "media": [],
+     "name": "Clive Barker's Hellraiser: Revival",
+     "npTitleId": "PPSA25642_00",
+     "platforms": [
+      "PS5"
+     ],
+     "price": {
+      "__typename": "SkuPrice",
+      "basePrice": "£34.99",
+      "discountText": null,
+      "discountedPrice": "£34.99",
+      "isExclusive": false,
+      "isFree": false,
+      "isTiedToSubscription": false,
+      "serviceBranding": [
+       "NONE"
+      ],
+      "upsellServiceBranding": [
+       "NONE"
+      ],
+      "upsellText": null
+     },
+     "skus": [
+      {
+       "__typename": "Sku",
+       "type": "STANDARD"
+      }
+     ],
+     "storeDisplayClassification": "FULL_GAME"
+    },
+    {
+     "__typename": "Product",
+     "id": "UP9000-PPSA03671_00-MARVELSWOLVERINE",
+     "localizedStoreDisplayClassification": "Full Game",
+     "media": [],
+     "name": "Marvel’s Wolverine",
+     "npTitleId": "PPSA03671_00",
+     "platforms": [
+      "PS5"
+     ],
+     "price": {
+      "__typename": "SkuPrice",
+      "basePrice": "£69.99",
+      "discountText": null,
+      "discountedPrice": "£69.99",
+      "isExclusive": false,
+      "isFree": false,
+      "isTiedToSubscription": false,
+      "serviceBranding": [
+       "NONE"
+      ],
+      "upsellServiceBranding": [
+       "NONE"
+      ],
+      "upsellText": null
+     },
+     "skus": [
+      {
+       "__typename": "Sku",
+       "type": "STANDARD"
+      }
+     ],
+     "storeDisplayClassification": "FULL_GAME"
+    }
+   ]
+  }
+ }
+}

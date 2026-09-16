@@ -1,0 +1,83 @@
+{
+ "data": {
+  "categoryGridRetrieve": {
+   "__typename": "CategoryGrid",
+   "pageInfo": {
+    "isLast": true,
+    "offset": 3,
+    "size": 3,
+    "totalCount": 5
+   },
+   "products": [
+    {
+     "__typename": "Product",
+     "id": "EP3969-PPSA11386_00-007FIRSTLIGHT000",
+     "localizedStoreDisplayClassification": "Full Game",
+     "media": [],
+     "name": "007 First Light",
+     "npTitleId": "PPSA11386_00",
+     "platforms": [
+      "PS5"
+     ],
+     "price": {
+      "__typename": "SkuPrice",
+      "basePrice": "£59.99",
+      "discountText": "-30%",
+      "discountedPrice": "£41.99",
+      "isExclusive": false,
+      "isFree": false,
+      "isTiedToSubscription": false,
+      "serviceBranding": [
+       "NONE"
+      ],
+      "upsellServiceBranding": [
+       "NONE"
+      ],
+      "upsellText": null
+     },
+     "skus": [
+      {
+       "__typename": "Sku",
+       "type": "STANDARD"
+      }
+     ],
+     "storeDisplayClassification": "FULL_GAME"
+    },
+    {
+     "__typename": "Product",
+     "id": "UP1001-PPSA35889_00-NBA2K27000000000",
+     "localizedStoreDisplayClassification": "Full Game",
+     "media": [],
+     "name": "NBA 2K27",
+     "npTitleId": "PPSA35889_00",
+     "platforms": [
+      "PS5"
+     ],
+     "price": {
+      "__typename": "SkuPrice",
+      "basePrice": "£69.99",
+      "discountText": "-30%",
+      "discountedPrice": "£48.99",
+      "isExclusive": false,
+      "isFree": false,
+      "isTiedToSubscription": false,
+      "serviceBranding": [
+       "NONE"
+      ],
+      "upsellServiceBranding": [
+       "NONE"
+      ],
+      "upsellText": null
+     },
+     "skus": [
+      {
+       "__typename": "Sku",
+       "type": "STANDARD"
+      }
+     ],
+     "storeDisplayClassification": "FULL_GAME"
+    }
+   ]
+  }
+ }
+}

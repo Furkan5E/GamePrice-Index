@@ -42,6 +42,18 @@ PLAYSTATION_DIRECT_LINK_PREFIX = "https://direct.playstation.com"
 PLAYSTATION_DIRECT_PAGE_SIZE = 48
 PLAYSTATION_DIRECT_MAX_PAGES = 50  # safety stop for the pagination loop
 
+# --- PlayStation Store ---
+# the web store talks to a GraphQL service that only accepts queries it knows by hash;
+# if Sony ships a new store build the hash below is the thing to update
+PLAYSTATION_STORE_API_URL = "https://web.np.playstation.com/api/graphql/v1/op"
+PLAYSTATION_STORE_QUERY_HASH = "4ce7d410a4db2c8b635a48c1dcec375906ff63b19dadd87e073f8fd0c0481d35"
+PLAYSTATION_STORE_CATEGORY_ID = "4cbf39e2-5749-4970-ba81-93a489e4570c"  # "PS5 games"
+PLAYSTATION_STORE_FILTERS = ("storeDisplayClassification:FULL_GAME",)  # no bundles, editions or add-ons
+PLAYSTATION_STORE_SORT = "sales30"  # best sellers of the last 30 days first
+PLAYSTATION_STORE_LOCALE = "en-GB"
+PLAYSTATION_STORE_PAGE_SIZE = 100
+PLAYSTATION_STORE_LINK_PREFIX = "https://store.playstation.com/en-gb/product/"
+
 # --- Output locations ---
 DATA_DIR = "data"
 PLOTS_DIR = "plots"

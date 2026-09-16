@@ -3,11 +3,13 @@
 from gameprice_index.scrapers.base import RECORD_FIELDS, ScrapeError, Scraper
 from gameprice_index.scrapers.nintendo import NintendoScraper
 from gameprice_index.scrapers.playstation_direct import PlayStationDirectScraper
+from gameprice_index.scrapers.playstation_store import PlayStationStoreScraper
 
 SCRAPERS: dict[str, type[Scraper]] = {
     scraper.name: scraper
     for scraper in (
         NintendoScraper,
+        PlayStationStoreScraper,
         PlayStationDirectScraper,
     )
 }
