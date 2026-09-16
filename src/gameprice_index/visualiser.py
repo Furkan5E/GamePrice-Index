@@ -1,135 +1,166 @@
+"""Static plots comparing prices and discounts across storefronts."""
+
 import logging
 import os
+from typing import Any
+
+import matplotlib
+
+matplotlib.use("Agg")  # render to files; no display is needed
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from matplotlib.axes import Axes
 
 logger = logging.getLogger(__name__)
 
+# one fixed colour per storefront, so a source looks the same in every plot and every run
+SOURCE_COLOURS = {
+    "Nintendo": "#2a78d6",
+    "PlayStation Store": "#eb6834",
+    "PlayStation Direct": "#1baf7a",
+    "PlayStation": "#1baf7a",
+    "Steam": "#eda100",
+    "Xbox": "#e87ba4",
+}
+FALLBACK_COLOUR = "#6250d6"
+
+SURFACE = "#fcfcfb"
+INK = "#1f1f1e"
+MUTED = "#6b6a63"
+GRID = "#e4e3dd"
+
+PRICE_CEILING_QUANTILE = 0.98  # collector's editions would otherwise flatten every chart
+
+
+def colour_for(source: str) -> str:
+    return SOURCE_COLOURS.get(source, FALLBACK_COLOUR)
+
+
+def sources_in(df: pd.DataFrame) -> list[str]:
+    """Sources present in the data, in the fixed colour order first."""
+    present = set(df["source"].dropna().unique())
+    known = [source for source in SOURCE_COLOURS if source in present]
+    return known + sorted(present - set(known))
+
+
+def _style(ax: Axes, title: str, xlabel: str, ylabel: str) -> None:
+    ax.set_facecolor(SURFACE)
+    ax.set_title(title, fontsize=13, fontweight="bold", color=INK, loc="left", pad=12)
+    ax.set_xlabel(xlabel, fontsize=11, color=MUTED)
+    ax.set_ylabel(ylabel, fontsize=11, color=MUTED)
+    ax.grid(True, color=GRID, linewidth=0.8)
+    ax.set_axisbelow(True)
+    ax.tick_params(colors=MUTED, length=0)
+    for side in ("top", "right"):
+        ax.spines[side].set_visible(False)
+    for side in ("left", "bottom"):
+        ax.spines[side].set_color(GRID)
+
+
+def _legend(ax: Axes, **kwargs: Any) -> None:
+    if ax.get_legend_handles_labels()[0]:
+        ax.legend(frameon=False, labelcolor=INK, fontsize=10, **kwargs)
+
+
+def _save(fig: plt.Figure, output_dir: str, filename: str) -> str:
+    os.makedirs(output_dir, exist_ok=True)
+    output_path = os.path.join(output_dir, filename)
+    fig.patch.set_facecolor(SURFACE)
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=200)
+    plt.close(fig)
+    logger.info(f"Saved plot to {output_path}")
+    return output_path
+
 
 def plot_platform_distribution(df: pd.DataFrame, output_dir: str = "plots") -> str:
-    """Generates and saves a bar chart of game counts per platform."""
-    os.makedirs(output_dir, exist_ok=True)
-    output_path = os.path.join(output_dir, "platform_distribution.png")
+    """Bar chart of how many games each platform contributes, coloured by storefront."""
+    counts = df.groupby(["source", "platform"]).size().reset_index(name="games").sort_values("games")
 
-    logger.info("Generating platform distribution plot.")
-    plt.figure(figsize=(8, 5))
+    fig, ax = plt.subplots(figsize=(9, max(3.5, 0.5 * len(counts) + 1.5)))
+    labelled = set()
+    for _, row in counts.iterrows():
+        label = row["source"] if row["source"] not in labelled else None
+        labelled.add(row["source"])
+        bar = ax.barh(row["platform"], row["games"], color=colour_for(row["source"]), height=0.6, label=label)
+        ax.bar_label(bar, padding=4, color=INK, fontsize=10)
 
-    platform_counts = df["platform"].value_counts()
-    platform_counts.plot(kind="bar", color="#3498db", edgecolor="black")
-
-    plt.title("Number of Games per Platform", fontsize=14, fontweight="bold")
-    plt.xlabel("Platform", fontsize=12)
-    plt.ylabel("Count of Games", fontsize=12)
-    plt.xticks(rotation=45, ha="right")
-    plt.tight_layout()
-
-    plt.savefig(output_path, dpi=300)
-    plt.close()
-    logger.info(f"Saved platform distribution plot to {output_path}")
-    return output_path
+    _style(ax, "Games per platform", "Number of games", "")
+    ax.grid(axis="y", visible=False)
+    ax.margins(x=0.1)
+    _legend(ax, loc="lower right")
+    return _save(fig, output_dir, "platform_distribution.png")
 
 
 def plot_price_analysis(df: pd.DataFrame, output_dir: str = "plots") -> str:
-    """Generates the 2-subplot comparison: Ranked Price Index and Price Distribution."""
-    os.makedirs(output_dir, exist_ok=True)
-    output_path = os.path.join(output_dir, "price_analysis.png")
+    """Two views of how prices are spread per storefront: by percentile and as a distribution."""
+    priced = df.dropna(subset=["price"])
+    fig, (ax_rank, ax_hist) = plt.subplots(1, 2, figsize=(14, 5.5))
 
-    logger.info("Generating ranked price and distribution analysis plot.")
+    ceiling = float(priced["price"].quantile(PRICE_CEILING_QUANTILE)) if not priced.empty else 1.0
+    ceiling = max(ceiling, 1.0)
+    # one set of bin edges for every source, otherwise the bars are not comparable
+    bins = np.linspace(0, ceiling, 26)
 
-    ps_df = df[df["source"] == "PlayStation"].dropna(subset=["price"]).sort_values("price").reset_index(drop=True)
-    nt_df = df[df["source"] == "Nintendo"].dropna(subset=["price"]).sort_values("price").reset_index(drop=True)
+    for source in sources_in(priced):
+        prices = priced.loc[priced["source"] == source, "price"].sort_values().to_numpy()
+        colour = colour_for(source)
+        label = f"{source} ({len(prices):,})"
 
-    ps_df["price_rank"] = ps_df.index
-    nt_df["price_rank"] = nt_df.index
+        # percentiles put catalogues of very different sizes on the same x axis
+        percentiles = np.linspace(0, 100, len(prices)) if len(prices) > 1 else np.array([50.0])
+        ax_rank.plot(
+            percentiles, prices, color=colour, linewidth=2, label=label, marker="o" if len(prices) < 30 else ""
+        )
 
-    plt.figure(figsize=(14, 6))
+        share = np.histogram(np.clip(prices, 0, ceiling), bins=bins)[0] / len(prices) * 100
+        ax_hist.stairs(share, bins, color=colour, linewidth=2, label=label)
 
-    # Subplot 1: Ranked Price Index Scatter
-    plt.subplot(1, 2, 1)
-    if not ps_df.empty:
-        plt.scatter(ps_df["price_rank"], ps_df["price"], label="PlayStation", alpha=0.75, color="#2980b9", s=40)
-    if not nt_df.empty:
-        plt.scatter(nt_df["price_rank"], nt_df["price"], label="Nintendo", alpha=0.75, color="#e74c3c", s=40)
+    _style(
+        ax_rank, "Price at each percentile of the catalogue", "Percentile of games (cheapest to dearest)", "Price (£)"
+    )
+    ax_rank.set_ylim(0, ceiling * 1.05)
+    _legend(ax_rank, loc="upper left")
 
-    plt.title("Game Prices by Ranked Index (PS vs Nintendo)", fontsize=13, fontweight="bold")
-    plt.xlabel("Price Rank (Low to High)", fontsize=11)
-    plt.ylabel("Price (£)", fontsize=11)
-    plt.grid(True, linestyle="--", alpha=0.5)
-    plt.legend()
-
-    # Subplot 2: Price Distribution Histogram
-    plt.subplot(1, 2, 2)
-    # one set of bin edges for both sources, otherwise the bar widths are not comparable
-    all_prices = pd.concat([ps_df["price"], nt_df["price"]])
-    bins: int | list[float] = 20
-    if not all_prices.empty:
-        bins = np.histogram_bin_edges(all_prices, bins=20).tolist()
-    if not ps_df.empty:
-        plt.hist(ps_df["price"], bins=bins, alpha=0.6, label="PlayStation", color="#2980b9", edgecolor="black")
-    if not nt_df.empty:
-        plt.hist(nt_df["price"], bins=bins, alpha=0.6, label="Nintendo", color="#e74c3c", edgecolor="black")
-
-    plt.title("Price Distribution Comparison", fontsize=13, fontweight="bold")
-    plt.xlabel("Price (£)", fontsize=11)
-    plt.ylabel("Frequency", fontsize=11)
-    plt.grid(True, linestyle="--", alpha=0.5)
-    plt.legend()
-
-    plt.tight_layout()
-    plt.savefig(output_path, dpi=300)
-    plt.close()
-    logger.info(f"Saved price analysis plot to {output_path}")
-    return output_path
+    _style(ax_hist, "Share of games in each price band", "Price (£)", "Share of the storefront's games (%)")
+    _legend(ax_hist, loc="upper right")
+    top_share = 100 - PRICE_CEILING_QUANTILE * 100
+    fig.text(
+        0.99,
+        0.01,
+        f"Prices above £{ceiling:,.0f} (the top {top_share:.0f}%) are off the scale or counted in the last band.",
+        ha="right",
+        fontsize=9,
+        color=MUTED,
+    )
+    return _save(fig, output_dir, "price_analysis.png")
 
 
 def plot_price_vs_discount(df: pd.DataFrame, output_dir: str = "plots") -> str:
-    """Generates and saves a scatter plot of Price vs. Discount Amount for discounted games."""
-    os.makedirs(output_dir, exist_ok=True)
-    output_path = os.path.join(output_dir, "price_vs_discount.png")
+    """Scatter of regular price against discount depth for every game currently on sale."""
+    deals = df.dropna(subset=["price_old", "discount_pct"])
+    fig, ax = plt.subplots(figsize=(9, 5.5))
 
-    logger.info("Generating price vs. discount scatter plot.")
-
-    # Filter rows that have both a price and a discount
-    discounted_df = df.dropna(subset=["price", "discount_amount"]).copy()
-
-    ps_deals = discounted_df[discounted_df["source"] == "PlayStation"]
-    nt_deals = discounted_df[discounted_df["source"] == "Nintendo"]
-
-    plt.figure(figsize=(9, 5.5))
-
-    if not ps_deals.empty:
-        plt.scatter(
-            ps_deals["price"],
-            ps_deals["discount_amount"],
-            c="#2980b9",
-            label="PlayStation",
-            alpha=0.75,
-            edgecolors="black",
-            linewidths=0.5,
-            s=60,
-        )
-    if not nt_deals.empty:
-        plt.scatter(
-            nt_deals["price"],
-            nt_deals["discount_amount"],
-            c="#e74c3c",
-            label="Nintendo",
-            alpha=0.75,
-            edgecolors="black",
-            linewidths=0.5,
-            s=60,
+    for source in sources_in(deals):
+        rows = deals[deals["source"] == source]
+        ax.scatter(
+            rows["price_old"],
+            rows["discount_pct"],
+            color=colour_for(source),
+            label=f"{source} ({len(rows):,})",
+            alpha=0.6,
+            edgecolors=SURFACE,
+            linewidths=0.6,
+            s=36,
         )
 
-    plt.title("Price vs Discount Amount (On-Sale Titles)", fontsize=13, fontweight="bold")
-    plt.xlabel("Current Price (£)", fontsize=11)
-    plt.ylabel("Discount Amount (£)", fontsize=11)
-    plt.grid(True, linestyle="--", alpha=0.5)
-    plt.legend()
-    plt.tight_layout()
-
-    plt.savefig(output_path, dpi=300)
-    plt.close()
-    logger.info(f"Saved price vs discount plot to {output_path}")
-    return output_path
+    _style(ax, "Discount depth of on-sale games", "Regular price (£)", "Discount (%)")
+    ax.set_ylim(0, 100)
+    if not deals.empty:
+        ax.set_xlim(0, float(deals["price_old"].quantile(PRICE_CEILING_QUANTILE)) * 1.05)
+    else:
+        ax.text(0.5, 0.5, "No games on sale", transform=ax.transAxes, ha="center", color=MUTED)
+    _legend(ax, loc="lower right")
+    return _save(fig, output_dir, "price_vs_discount.png")
