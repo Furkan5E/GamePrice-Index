@@ -59,7 +59,7 @@ def test_scrape_raises_when_nothing_is_found():
 
 def test_registry_lookup():
     assert get_scraper("nintendo").source == "Nintendo"
-    assert set(SCRAPERS) >= {"nintendo", "playstation"}
+    assert set(SCRAPERS) >= {"nintendo", "playstation-direct"}
 
     with pytest.raises(ValueError, match="Unknown source 'sega'"):
         get_scraper("sega")

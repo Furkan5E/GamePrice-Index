@@ -7,33 +7,38 @@ import pandas as pd
 import pytest
 
 from gameprice_index import cli
-from gameprice_index.scrapers.nintendo import NintendoScraper, parse_price_entry
-from gameprice_index.scrapers.playstation import PlayStationScraper, parse_playstation_tiles
+from gameprice_index.scrapers import SCRAPERS, Scraper
+from helpers import FakeSession
 
 
 @pytest.fixture
-def offline_scrapers(monkeypatch, load_fixture):
-    """Makes every scraper answer from the saved fixtures and counts the scrapes."""
-    calls = {"nintendo": 0, "playstation": 0}
+def offline(monkeypatch, load_fixture):
+    """Gives every scraper a session that answers from the saved fixtures and records all requests."""
+    search = [json.loads(load_fixture(f"nintendo_search_page{n}.json")) for n in (1, 2)]
 
-    def nintendo_catalogue(self):
-        calls["nintendo"] += 1
-        pages = [json.loads(load_fixture(f"nintendo_search_page{n}.json")) for n in (1, 2)]
-        return [doc for page in pages for doc in page["response"]["docs"]]
+    def nintendo_search(url, params=None, **kwargs):
+        docs = [doc for page in search for doc in page["response"]["docs"]]
+        return {"response": {"numFound": len(docs), "docs": docs[params["start"] :]}}
 
-    def nintendo_prices(self, nsuids):
-        entries = json.loads(load_fixture("nintendo_prices.json"))["prices"]
-        return {str(entry["title_id"]): parse_price_entry(entry) for entry in entries}
+    session = FakeSession(
+        {
+            "searching.nintendo-europe.com": nintendo_search,
+            "api.ec.nintendo.com": json.loads(load_fixture("nintendo_prices.json")),
+            "api.direct.playstation.com": json.loads(load_fixture("playstation_direct_products.json")),
+        }
+    )
 
-    def playstation_records(self):
-        calls["playstation"] += 1
-        tiles = parse_playstation_tiles(load_fixture("playstation_direct_listing.html"))
-        return [self.record(platform="PS5", **tile) for tile in tiles]
+    original_init = Scraper.__init__
 
-    monkeypatch.setattr(NintendoScraper, "fetch_catalogue", nintendo_catalogue)
-    monkeypatch.setattr(NintendoScraper, "fetch_prices", nintendo_prices)
-    monkeypatch.setattr(PlayStationScraper, "fetch_records", playstation_records)
-    return calls
+    def init_with_fake_session(self, session_=None, limit=None, **kwargs):
+        original_init(self, session=session, limit=limit)
+
+    monkeypatch.setattr(Scraper, "__init__", init_with_fake_session)
+    return session
+
+
+SOURCES = ["nintendo", "playstation-direct"]
+SOURCE_ARGS = [arg for source in SOURCES for arg in ("--source", source)]
 
 
 def _db_rows(db_path) -> int:
@@ -44,16 +49,20 @@ def _db_rows(db_path) -> int:
         conn.close()
 
 
-def test_live_run_writes_dataset_cache_and_database(tmp_path, offline_scrapers):
-    assert cli.main(["--output-dir", str(tmp_path), "--no-plots"]) == 0
+def test_fixture_sources_are_registered():
+    assert set(SOURCES) <= set(SCRAPERS)
+
+
+def test_live_run_writes_dataset_cache_and_database(tmp_path, offline):
+    assert cli.main([*SOURCE_ARGS, "--output-dir", str(tmp_path), "--no-plots"]) == 0
 
     data_dir = tmp_path / "data"
     df = pd.read_csv(data_dir / "data.csv", dtype={"product_code": "string"})
 
-    assert sorted(df["source"].unique()) == ["Nintendo", "PlayStation"]
+    assert sorted(df["source"].unique()) == ["Nintendo", "PlayStation Direct"]
     assert len(df) == 10
     assert (data_dir / "processed_nintendo.csv").exists()
-    assert (data_dir / "processed_playstation.csv").exists()
+    assert (data_dir / "processed_playstation-direct.csv").exists()
     assert _db_rows(data_dir / "game_prices.db") == 10
 
     hogwarts = df[df["name"] == "Hogwarts Legacy"].iloc[0]
@@ -63,37 +72,38 @@ def test_live_run_writes_dataset_cache_and_database(tmp_path, offline_scrapers):
     assert df[df["name"] == "Minecraft"]["badge"].tolist() == ["PRE-ORDER"]
 
 
-def test_cached_run_reproduces_the_live_run(tmp_path, offline_scrapers):
+def test_cached_run_reproduces_the_live_run(tmp_path, offline):
     """A --cached run must rebuild exactly the same dataset without scraping or logging history."""
-    args = ["--output-dir", str(tmp_path), "--no-plots"]
+    args = [*SOURCE_ARGS, "--output-dir", str(tmp_path), "--no-plots"]
     data_csv = tmp_path / "data" / "data.csv"
     db_path = tmp_path / "data" / "game_prices.db"
 
     assert cli.main(args) == 0
     live_csv = data_csv.read_text(encoding="utf-8")
     live_rows = _db_rows(db_path)
+    requests_made = len(offline.calls)
 
     assert cli.main([*args, "--cached"]) == 0
 
     assert data_csv.read_text(encoding="utf-8") == live_csv
     assert _db_rows(db_path) == live_rows
-    assert offline_scrapers == {"nintendo": 1, "playstation": 1}
+    assert len(offline.calls) == requests_made
 
 
-def test_failed_source_leaves_existing_cache_alone(tmp_path, offline_scrapers, monkeypatch):
+def test_failed_source_leaves_existing_cache_alone(tmp_path, offline):
     """Regression: one failing source used to overwrite the other sources' good cache."""
-    args = ["--output-dir", str(tmp_path), "--no-plots"]
+    args = [*SOURCE_ARGS, "--output-dir", str(tmp_path), "--no-plots"]
     assert cli.main(args) == 0
     before = (tmp_path / "data" / "processed_nintendo.csv").read_text(encoding="utf-8")
 
-    monkeypatch.setattr(PlayStationScraper, "fetch_records", lambda self: [])
+    offline.routes["api.direct.playstation.com"] = {"products": []}
 
     assert cli.main(args) == 1
     assert (tmp_path / "data" / "processed_nintendo.csv").read_text(encoding="utf-8") == before
 
 
-def test_limit_caps_every_source(tmp_path, offline_scrapers):
-    assert cli.main(["--output-dir", str(tmp_path), "--no-plots", "--limit", "2"]) == 0
+def test_limit_caps_every_source(tmp_path, offline):
+    assert cli.main([*SOURCE_ARGS, "--output-dir", str(tmp_path), "--no-plots", "--limit", "2"]) == 0
 
     df = pd.read_csv(tmp_path / "data" / "data.csv")
-    assert df["source"].value_counts().to_dict() == {"Nintendo": 2, "PlayStation": 2}
+    assert df["source"].value_counts().to_dict() == {"Nintendo": 2, "PlayStation Direct": 2}

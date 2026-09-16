@@ -1,0 +1,102 @@
+{
+ "products": [
+  {
+   "code": "1000057436-GB",
+   "name": "Marvel’s Wolverine - PS5\t",
+   "url": "/en-gb/buy-games/marvels-wolverine-ps5",
+   "purchasable": true,
+   "stock": {
+    "stockLevelStatus": "inStock",
+    "isProductLowStock": false
+   },
+   "price": {
+    "currencyIso": "GBP",
+    "value": 69.99,
+    "priceType": "BUY",
+    "formattedValue": "£69.99",
+    "currencySymbol": "£",
+    "basePrice": "69",
+    "decimalPrice": "99"
+   },
+   "preOrderProduct": false,
+   "digitalProduct": false,
+   "streetDate": "2026-09-14T23:01:00.000Z"
+  },
+  {
+   "code": "1000049375-GB",
+   "name": "Ghost of Yotei™ - Collector’s Edition - PS5",
+   "url": "/en-gb/buy-games/ghost-of-yotei-collectors-edition-ps5",
+   "purchasable": true,
+   "stock": {
+    "stockLevelStatus": "inStock",
+    "isProductLowStock": false
+   },
+   "price": {
+    "currencyIso": "GBP",
+    "value": 204.99,
+    "priceType": "BUY",
+    "formattedValue": "£204.99",
+    "currencySymbol": "£",
+    "basePrice": "204",
+    "decimalPrice": "99"
+   },
+   "preOrderProduct": false,
+   "merchandisingBadge": "EXCLUSIVE",
+   "digitalProduct": false,
+   "streetDate": "2025-10-01T23:01:00.000Z"
+  },
+  {
+   "code": "1000048721-GB",
+   "name": "DEATH STRANDING 2: ON THE BEACH - Collector’s Edition - PS5",
+   "url": "/en-gb/buy-games/death-stranding-2-on-the-beach-collectors-edition-ps5",
+   "purchasable": true,
+   "stock": {
+    "stockLevelStatus": "inStock",
+    "isProductLowStock": false
+   },
+   "price": {
+    "currencyIso": "GBP",
+    "value": 219.99,
+    "priceType": "BUY",
+    "formattedValue": "£219.99",
+    "currencySymbol": "£",
+    "basePrice": "219",
+    "decimalPrice": "99"
+   },
+   "preOrderProduct": false,
+   "merchandisingBadge": "EXCLUSIVE",
+   "digitalProduct": false,
+   "streetDate": "2025-06-23T23:01:00.000Z"
+  },
+  {
+   "code": "1000039370-GB",
+   "name": "Marvel's Spider-Man 2 Collector's Edition – PS5",
+   "url": "/en-gb/buy-games/marvels-spider-man-2-collectors-edition-ps5",
+   "purchasable": true,
+   "stock": {
+    "stockLevelStatus": "inStock",
+    "isProductLowStock": false
+   },
+   "price": {
+    "currencyIso": "GBP",
+    "value": 219.99,
+    "priceType": "BUY",
+    "formattedValue": "£219.99",
+    "currencySymbol": "£",
+    "basePrice": "219",
+    "decimalPrice": "99"
+   },
+   "preOrderProduct": false,
+   "merchandisingBadge": "EXCLUSIVE",
+   "digitalProduct": false,
+   "streetDate": "2023-10-19T23:01:00.000Z"
+  }
+ ],
+ "pagination": {
+  "pageSize": 24,
+  "currentPage": 0,
+  "sort": "onlineDate-desc",
+  "totalPages": 1,
+  "totalResults": 4
+ }
+}

@@ -9,7 +9,6 @@ dependencies = [
     "matplotlib>=3.11.1",
     "pandas>=3.0.5",
     "requests>=2.34.2",
-    "selenium>=4.47.0",
 ]
 
 [project.scripts]
@@ -61,5 +60,5 @@ warn_unused_ignores = true
 warn_redundant_casts = true
 
 [[tool.mypy.overrides]]
-module = ["matplotlib.*", "selenium.*"]
+module = ["matplotlib.*"]
 ignore_missing_imports = true

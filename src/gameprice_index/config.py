@@ -1,7 +1,7 @@
-"""Site URLs, API parameters, CSS selectors and file locations used by the pipeline.
+"""Site URLs, API parameters and file locations used by the pipeline.
 
 Everything that changes when a storefront is redesigned lives here, so a
-broken endpoint or selector is a one-line fix rather than a hunt through the scrapers.
+broken endpoint is a one-line fix rather than a hunt through the scrapers.
 """
 
 # --- HTTP ---
@@ -20,9 +20,6 @@ REQUEST_DELAY = 0.25  # seconds between requests to the same site
 # --- Scraping ---
 DEFAULT_LIMIT = 1000  # products per storefront unless --limit says otherwise
 
-# --- Selenium ---
-SELENIUM_WAIT = 15  # seconds to wait for dynamic content before giving up
-
 # --- Nintendo ---
 # the eShop site is a front end over a public Solr search index of the whole catalogue
 NINTENDO_SEARCH_URL = "https://searching.nintendo-europe.com/en/select"
@@ -37,19 +34,13 @@ NINTENDO_PRICE_COUNTRY = "GB"
 NINTENDO_PRICE_BATCH = 50  # the service rejects requests for more ids than this
 
 # --- PlayStation Direct ---
-PLAYSTATION_URL = "https://direct.playstation.com/en-gb/games/"
-PLAYSTATION_MAX_PAGES = 50  # safety stop for the pagination loop
-PLAYSTATION_SELECTORS = {
-    "tile": ".products-list-section .product-tile",
-    "any_tile": ".product-tile",
-    "name": "p.product-card-details__name",
-    "link": ".product-card-image .product-tile__full-width a",
-    "prices": "div.product-card-details__price .text-product-price span.price-whole-text",
-    "badge": "div.badge .badge-label",
-    "out_of_stock": "p.out-stock-wrpr",
-    "product_code": "button[data-product-code]",
-    "next_button": "button.desktop-pagination__button.right-chevron-blue",
-}
+# the shop front end reads its catalogue from this JSON service
+PLAYSTATION_DIRECT_API_URL = (
+    "https://api.direct.playstation.com/commercewebservices/ps-direct-gb/products/category/GAMES"
+)
+PLAYSTATION_DIRECT_LINK_PREFIX = "https://direct.playstation.com"
+PLAYSTATION_DIRECT_PAGE_SIZE = 48
+PLAYSTATION_DIRECT_MAX_PAGES = 50  # safety stop for the pagination loop
 
 # --- Output locations ---
 DATA_DIR = "data"
