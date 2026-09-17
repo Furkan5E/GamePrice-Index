@@ -85,3 +85,19 @@ def test_fetch_applies_default_timeout():
     fetch("https://example.test", session=FakeSession())
 
     assert seen["timeout"] == config.REQUEST_TIMEOUT
+
+
+def test_fetch_can_post():
+    seen = {}
+
+    class FakeSession:
+        def post(self, url, **kwargs):
+            seen.update(kwargs)
+            response = requests.Response()
+            response.status_code = 200
+            return response
+
+    fetch("https://example.test", session=FakeSession(), method="POST", json={"a": 1})
+
+    assert seen["json"] == {"a": 1}
+    assert seen["timeout"] == config.REQUEST_TIMEOUT

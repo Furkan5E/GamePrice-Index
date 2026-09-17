@@ -28,7 +28,8 @@ def build_session(
         status=retries,
         backoff_factor=backoff_factor,
         status_forcelist=config.REQUEST_RETRY_STATUSES,
-        allowed_methods=frozenset({"GET", "HEAD"}),
+        # every POST this project sends is a read-only catalogue query, so repeating one is safe
+        allowed_methods=frozenset({"GET", "HEAD", "POST"}),
         respect_retry_after_header=True,
         raise_on_status=False,
     )
@@ -41,11 +42,17 @@ def build_session(
     return session
 
 
-def fetch(url: str, session: requests.Session | None = None, **kwargs: Any) -> requests.Response:
-    """GETs a URL with the default timeout and raises for any error status."""
+def fetch(
+    url: str,
+    session: requests.Session | None = None,
+    method: str = "GET",
+    **kwargs: Any,
+) -> requests.Response:
+    """Requests a URL with the default timeout and raises for any error status."""
     session = session or build_session()
     kwargs.setdefault("timeout", config.REQUEST_TIMEOUT)
 
-    response = session.get(url, **kwargs)
+    send = session.post if method.upper() == "POST" else session.get
+    response = send(url, **kwargs)
     response.raise_for_status()
     return response

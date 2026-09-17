@@ -62,6 +62,16 @@ STEAM_CATEGORY_GAMES = 998  # games only: no DLC, software or soundtracks
 STEAM_FILTER = "topsellers"
 STEAM_PAGE_SIZE = 100
 
+# --- Xbox ---
+# xbox.com/games/browse pages through this service with a continuation token
+XBOX_BROWSE_URL = "https://emerald.xboxservices.com/xboxcomfd/browse"
+XBOX_CHANNEL_KEY = "BROWSE_CHANNELID=_FILTERS="
+XBOX_FILTERS = "e30="  # base64 of "{}": no filters, the default "most popular" order
+XBOX_LOCALE = "en-GB"
+XBOX_MARKET = "GB"
+XBOX_MAX_PAGES = 400  # 25 games a page; a safety stop for the token loop
+XBOX_LINK_PREFIX = "https://www.xbox.com/en-GB/games/store/_/"
+
 # --- Output locations ---
 DATA_DIR = "data"
 PLOTS_DIR = "plots"

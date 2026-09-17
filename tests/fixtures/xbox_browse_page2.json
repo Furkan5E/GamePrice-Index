@@ -1,0 +1,57 @@
+{
+ "channels": {
+  "BROWSE_CHANNELID=_FILTERS=": {
+   "channelKey": "BROWSE_CHANNELID=_FILTERS=",
+   "products": [
+    {
+     "productId": "BT5P2X999VH2"
+    },
+    {
+     "productId": "BPJ686W6S0NH"
+    }
+   ],
+   "encodedCT": null,
+   "totalItems": 5
+  }
+ },
+ "productSummaries": [
+  {
+   "productId": "BT5P2X999VH2",
+   "title": "Fortnite",
+   "productKind": "Game",
+   "productFamily": "Games",
+   "availableOn": [
+    "PC",
+    "XboxOne",
+    "XboxSeriesX",
+    "XCloud",
+    "Handheld"
+   ],
+   "releaseDate": "2017-07-25T00:00:00.0000000Z",
+   "specificPrices": {
+    "purchaseable": [
+     {
+      "skuId": "0001",
+      "listPrice": 0.0,
+      "msrp": 0.0,
+      "discountPercentage": 0.0,
+      "currency": "GBP"
+     }
+    ]
+   }
+  },
+  {
+   "productId": "BPJ686W6S0NH",
+   "title": "Grand Theft Auto V (Xbox One)",
+   "productKind": "Game",
+   "productFamily": "Games",
+   "availableOn": [
+    "XboxOne",
+    "XboxSeriesX"
+   ],
+   "specificPrices": {
+    "purchaseable": []
+   }
+  }
+ ]
+}

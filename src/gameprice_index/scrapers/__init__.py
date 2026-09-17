@@ -5,6 +5,7 @@ from gameprice_index.scrapers.nintendo import NintendoScraper
 from gameprice_index.scrapers.playstation_direct import PlayStationDirectScraper
 from gameprice_index.scrapers.playstation_store import PlayStationStoreScraper
 from gameprice_index.scrapers.steam import SteamScraper
+from gameprice_index.scrapers.xbox import XboxScraper
 
 SCRAPERS: dict[str, type[Scraper]] = {
     scraper.name: scraper
@@ -13,6 +14,7 @@ SCRAPERS: dict[str, type[Scraper]] = {
         PlayStationStoreScraper,
         PlayStationDirectScraper,
         SteamScraper,
+        XboxScraper,
     )
 }
 

@@ -49,15 +49,21 @@ class Scraper(ABC):
     def fetch_records(self) -> list[dict[str, Any]]:
         """Returns one record per product, built with `self.record`."""
 
-    def get_json(self, url: str, **kwargs: Any) -> Any:
-        """GETs a JSON document through the shared retrying session, pausing briefly afterwards."""
+    def _request_json(self, method: str, url: str, **kwargs: Any) -> Any:
+        """Requests a JSON document through the shared retrying session, pausing briefly afterwards."""
         if self.session is None:
             self.session = build_session()
 
-        response = fetch(url, session=self.session, **kwargs)
+        response = fetch(url, session=self.session, method=method, **kwargs)
         if config.REQUEST_DELAY:
             time.sleep(config.REQUEST_DELAY)
         return response.json()
+
+    def get_json(self, url: str, **kwargs: Any) -> Any:
+        return self._request_json("GET", url, **kwargs)
+
+    def post_json(self, url: str, **kwargs: Any) -> Any:
+        return self._request_json("POST", url, **kwargs)
 
     def has_enough(self, records: list[dict[str, Any]]) -> bool:
         """True once the limit is reached, so paging can stop early."""

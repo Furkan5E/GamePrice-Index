@@ -1,0 +1,88 @@
+{
+ "channels": {
+  "BROWSE_CHANNELID=_FILTERS=": {
+   "channelKey": "BROWSE_CHANNELID=_FILTERS=",
+   "products": [
+    {
+     "productId": "9N4PT8HGCDHQ"
+    },
+    {
+     "productId": "9NNZSNHLR63L"
+    },
+    {
+     "productId": "9NJ6F163VF8C"
+    }
+   ],
+   "encodedCT": "TOKEN-PAGE-2",
+   "totalItems": 5
+  }
+ },
+ "productSummaries": [
+  {
+   "productId": "9N4PT8HGCDHQ",
+   "title": "Gears of War: E-Day",
+   "productKind": "Game",
+   "productFamily": "Games",
+   "availableOn": [
+    "PC",
+    "XboxSeriesX",
+    "XCloud",
+    "Handheld"
+   ],
+   "releaseDate": "2026-10-06T15:00:00.0000000Z",
+   "specificPrices": {
+    "purchaseable": [
+     {
+      "skuId": "0010",
+      "listPrice": 59.99,
+      "msrp": 59.99,
+      "discountPercentage": 0.0,
+      "currency": "GBP"
+     }
+    ]
+   }
+  },
+  {
+   "productId": "9NNZSNHLR63L",
+   "title": "Grand Theft Auto VI: Ultimate Edition",
+   "productKind": "Game",
+   "productFamily": "Games",
+   "availableOn": [
+    "XboxSeriesX"
+   ],
+   "releaseDate": "2026-11-19T00:00:00.0000000Z",
+   "specificPrices": {
+    "purchaseable": [
+     {
+      "skuId": "0017",
+      "listPrice": 89.99,
+      "msrp": 89.99,
+      "discountPercentage": 0.0,
+      "currency": "GBP"
+     }
+    ]
+   }
+  },
+  {
+   "productId": "9NJ6F163VF8C",
+   "title": "EA SPORTS™ Madden NFL 27",
+   "productKind": "Game",
+   "productFamily": "Games",
+   "availableOn": [
+    "XboxSeriesX"
+   ],
+   "releaseDate": "2026-08-13T18:00:00.0000000Z",
+   "specificPrices": {
+    "purchaseable": [
+     {
+      "skuId": "0010",
+      "listPrice": 35.0,
+      "msrp": 69.99,
+      "discountPercentage": 49.992855,
+      "currency": "GBP"
+     }
+    ]
+   }
+  }
+ ]
+}
