@@ -32,6 +32,7 @@ MUTED = "#6b6a63"
 GRID = "#e4e3dd"
 
 PRICE_CEILING_QUANTILE = 0.98  # collector's editions would otherwise flatten every chart
+MIN_GAMES_FOR_DISTRIBUTION = 20  # a handful of games is not a distribution worth drawing
 
 
 def colour_for(source: str) -> str:
@@ -78,13 +79,15 @@ def _save(fig: plt.Figure, output_dir: str, filename: str) -> str:
 def plot_platform_distribution(df: pd.DataFrame, output_dir: str = "plots") -> str:
     """Bar chart of how many games each platform contributes, coloured by storefront."""
     counts = df.groupby(["source", "platform"]).size().reset_index(name="games").sort_values("games")
+    # two storefronts can sell for the same platform, so the row label names both
+    counts["label"] = counts["source"] + " · " + counts["platform"].fillna("unknown")
 
     fig, ax = plt.subplots(figsize=(9, max(3.5, 0.5 * len(counts) + 1.5)))
     labelled = set()
     for _, row in counts.iterrows():
         label = row["source"] if row["source"] not in labelled else None
         labelled.add(row["source"])
-        bar = ax.barh(row["platform"], row["games"], color=colour_for(row["source"]), height=0.6, label=label)
+        bar = ax.barh(row["label"], row["games"], color=colour_for(row["source"]), height=0.6, label=label)
         ax.bar_label(bar, padding=4, color=INK, fontsize=10)
 
     _style(ax, "Games per platform", "Number of games", "")
@@ -97,6 +100,10 @@ def plot_platform_distribution(df: pd.DataFrame, output_dir: str = "plots") -> s
 def plot_price_analysis(df: pd.DataFrame, output_dir: str = "plots") -> str:
     """Two views of how prices are spread per storefront: by percentile and as a distribution."""
     priced = df.dropna(subset=["price"])
+    sizes = priced["source"].value_counts()
+    too_small = sorted(sizes[sizes < MIN_GAMES_FOR_DISTRIBUTION].index)
+    if len(too_small) < len(sizes):
+        priced = priced[~priced["source"].isin(too_small)]
     fig, (ax_rank, ax_hist) = plt.subplots(1, 2, figsize=(14, 5.5))
 
     ceiling = float(priced["price"].quantile(PRICE_CEILING_QUANTILE)) if not priced.empty else 1.0
@@ -111,9 +118,7 @@ def plot_price_analysis(df: pd.DataFrame, output_dir: str = "plots") -> str:
 
         # percentiles put catalogues of very different sizes on the same x axis
         percentiles = np.linspace(0, 100, len(prices)) if len(prices) > 1 else np.array([50.0])
-        ax_rank.plot(
-            percentiles, prices, color=colour, linewidth=2, label=label, marker="o" if len(prices) < 30 else ""
-        )
+        ax_rank.plot(percentiles, prices, color=colour, linewidth=2, label=label)
 
         share = np.histogram(np.clip(prices, 0, ceiling), bins=bins)[0] / len(prices) * 100
         ax_hist.stairs(share, bins, color=colour, linewidth=2, label=label)
@@ -127,10 +132,13 @@ def plot_price_analysis(df: pd.DataFrame, output_dir: str = "plots") -> str:
     _style(ax_hist, "Share of games in each price band", "Price (£)", "Share of the storefront's games (%)")
     _legend(ax_hist, loc="upper right")
     top_share = 100 - PRICE_CEILING_QUANTILE * 100
+    note = f"Prices above £{ceiling:,.0f} (the top {top_share:.0f}%) are off the scale or counted in the last band."
+    if too_small and len(too_small) < len(sizes):
+        note += f" Not shown (under {MIN_GAMES_FOR_DISTRIBUTION} games): {', '.join(too_small)}."
     fig.text(
         0.99,
         0.01,
-        f"Prices above £{ceiling:,.0f} (the top {top_share:.0f}%) are off the scale or counted in the last band.",
+        note,
         ha="right",
         fontsize=9,
         color=MUTED,
@@ -162,5 +170,6 @@ def plot_price_vs_discount(df: pd.DataFrame, output_dir: str = "plots") -> str:
         ax.set_xlim(0, float(deals["price_old"].quantile(PRICE_CEILING_QUANTILE)) * 1.05)
     else:
         ax.text(0.5, 0.5, "No games on sale", transform=ax.transAxes, ha="center", color=MUTED)
-    _legend(ax, loc="lower right")
+    # hundreds of points fill the whole plot area, so the legend sits above it
+    _legend(ax, loc="lower right", bbox_to_anchor=(1, 1), ncol=5, columnspacing=1.2, handletextpad=0.3)
     return _save(fig, output_dir, "price_vs_discount.png")

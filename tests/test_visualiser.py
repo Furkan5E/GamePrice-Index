@@ -65,3 +65,23 @@ def test_sources_keep_a_fixed_colour_order():
     assert visualiser.sources_in(df) == ["Nintendo", "Steam", "Xbox", "Zeta Store"]
     assert visualiser.colour_for("Nintendo") == visualiser.SOURCE_COLOURS["Nintendo"]
     assert visualiser.colour_for("Zeta Store") == visualiser.FALLBACK_COLOUR
+
+
+def test_tiny_catalogues_are_left_out_of_the_distribution(tmp_path, monkeypatch):
+    """Four collector's editions used to draw as a 100% spike that hid every other store."""
+    df = pd.concat([_dataset(["Nintendo", "Steam"]), _dataset(["PlayStation Direct"]).head(4)])
+    plotted = []
+    monkeypatch.setattr(visualiser, "colour_for", lambda source: plotted.append(source) or "#000000")
+
+    visualiser.plot_price_analysis(df, output_dir=str(tmp_path))
+
+    assert set(plotted) == {"Nintendo", "Steam"}
+
+
+def test_a_lone_tiny_catalogue_is_still_plotted(tmp_path, monkeypatch):
+    plotted = []
+    monkeypatch.setattr(visualiser, "colour_for", lambda source: plotted.append(source) or "#000000")
+
+    visualiser.plot_price_analysis(_dataset(["PlayStation Direct"]).head(4), output_dir=str(tmp_path))
+
+    assert plotted == ["PlayStation Direct"]
