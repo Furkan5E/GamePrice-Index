@@ -4,6 +4,7 @@ from gameprice_index.scrapers.base import RECORD_FIELDS, ScrapeError, Scraper
 from gameprice_index.scrapers.nintendo import NintendoScraper
 from gameprice_index.scrapers.playstation_direct import PlayStationDirectScraper
 from gameprice_index.scrapers.playstation_store import PlayStationStoreScraper
+from gameprice_index.scrapers.steam import SteamScraper
 
 SCRAPERS: dict[str, type[Scraper]] = {
     scraper.name: scraper
@@ -11,6 +12,7 @@ SCRAPERS: dict[str, type[Scraper]] = {
         NintendoScraper,
         PlayStationStoreScraper,
         PlayStationDirectScraper,
+        SteamScraper,
     )
 }
 

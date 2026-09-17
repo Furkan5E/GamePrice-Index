@@ -54,6 +54,14 @@ PLAYSTATION_STORE_LOCALE = "en-GB"
 PLAYSTATION_STORE_PAGE_SIZE = 100
 PLAYSTATION_STORE_LINK_PREFIX = "https://store.playstation.com/en-gb/product/"
 
+# --- Steam ---
+# the search page loads further results from this feed as you scroll
+STEAM_SEARCH_URL = "https://store.steampowered.com/search/results/"
+STEAM_COUNTRY = "gb"  # prices in pounds
+STEAM_CATEGORY_GAMES = 998  # games only: no DLC, software or soundtracks
+STEAM_FILTER = "topsellers"
+STEAM_PAGE_SIZE = 100
+
 # --- Output locations ---
 DATA_DIR = "data"
 PLOTS_DIR = "plots"

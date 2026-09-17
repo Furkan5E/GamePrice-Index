@@ -47,7 +47,7 @@ Command line options:
 | Option | Description |
 | --- | --- |
 | `--cached` | Reuse the processed CSVs in `data/` instead of scraping. |
-| `--source NAME` | Only include one storefront (`nintendo`, `playstation`, `playstation-direct`); repeat for several. |
+| `--source NAME` | Only include one storefront (`nintendo`, `playstation`, `playstation-direct`, `steam`); repeat for several. |
 | `--no-plots` | Skip generating the plots. |
 | `--output-dir DIR` | Directory that holds the `data/` and `plots/` folders. |
 | `--db PATH` | SQLite database to record prices in. |
