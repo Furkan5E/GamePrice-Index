@@ -107,3 +107,13 @@ def test_limit_caps_every_source(tmp_path, offline):
 
     df = pd.read_csv(tmp_path / "data" / "data.csv")
     assert df["source"].value_counts().to_dict() == {"Nintendo": 2, "PlayStation Direct": 2}
+
+
+def test_invalid_data_stops_the_run_before_anything_is_written(tmp_path, offline):
+    """A source that still parses but returns nonsense must not reach the cache, the CSV or the history."""
+    broken = json.loads(json.dumps(offline.routes["api.direct.playstation.com"]))
+    broken["products"][0]["price"]["value"] = -69.99
+    offline.routes["api.direct.playstation.com"] = broken
+
+    assert cli.main([*SOURCE_ARGS, "--output-dir", str(tmp_path), "--no-plots"]) == cli.EXIT_INVALID_DATA
+    assert list((tmp_path / "data").iterdir()) == []

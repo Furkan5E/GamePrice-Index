@@ -9,11 +9,15 @@ import pandas as pd
 from gameprice_index import config, storage
 from gameprice_index.processor import build_frame, combine_frames
 from gameprice_index.scrapers import SCRAPERS, ScrapeError, get_scraper
+from gameprice_index.validation import DataValidationError, validate_dataset
 from gameprice_index.visualiser import plot_platform_distribution, plot_price_analysis, plot_price_vs_discount
 
 logger = logging.getLogger(__name__)
 
 SOURCES = tuple(SCRAPERS)
+
+EXIT_SCRAPE_FAILED = 1
+EXIT_INVALID_DATA = 2
 
 
 def configure_logging() -> None:
@@ -75,11 +79,15 @@ def run_pipeline(
         logger.info(f"Starting live web scraping for: {', '.join(sources)}")
         frames = {source: scrape_source(source, limit=limit) for source in sources}
 
-        # only touch the cache once every requested source has succeeded
+    # a source that parses but produces nonsense must not get any further
+    frames = {source: validate_dataset(frame, f"{source} data") for source, frame in frames.items()}
+
+    if not use_cache:
+        # only touch the cache once every requested source has succeeded and passed validation
         for source in sources:
             write_cache(frames[source], cache_path(data_dir, source))
 
-    df_final = combine_frames(frames.values())
+    df_final = validate_dataset(combine_frames(frames.values()), "combined dataset")
     df_final.to_csv(final_data_path, index=False)
     logger.info(f"Saved master dataset to {final_data_path}")
 
@@ -163,7 +171,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         )
     except ScrapeError as e:
         logger.error(e)
-        return 1
+        return EXIT_SCRAPE_FAILED
+    except DataValidationError as e:
+        logger.error(e)
+        return EXIT_INVALID_DATA
     return 0
 
 
