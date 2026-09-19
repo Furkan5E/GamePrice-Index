@@ -124,6 +124,16 @@ def cross_store_prices(df: pd.DataFrame, min_stores: int = 2) -> pd.DataFrame:
     return result
 
 
+COMPARISON_COLUMNS = [
+    "source",
+    "shared_games",
+    "median_price",
+    "median_price_elsewhere",
+    "mean_difference_pct",
+    "cheapest_share_pct",
+]
+
+
 def store_comparison(matched: pd.DataFrame, stores: list[str]) -> pd.DataFrame:
     """Summarises, per storefront, how its prices compare on the games it shares with other stores."""
     rows = []
@@ -148,4 +158,4 @@ def store_comparison(matched: pd.DataFrame, stores: list[str]) -> pd.DataFrame:
                 "cheapest_share_pct": round(float((shared[store] <= lowest + 0.005).mean() * 100), 1),
             }
         )
-    return pd.DataFrame(rows)
+    return pd.DataFrame(rows, columns=COMPARISON_COLUMNS)

@@ -85,3 +85,19 @@ def test_a_lone_tiny_catalogue_is_still_plotted(tmp_path, monkeypatch):
     visualiser.plot_price_analysis(_dataset(["PlayStation Direct"]).head(4), output_dir=str(tmp_path))
 
     assert plotted == ["PlayStation Direct"]
+
+
+def test_cross_store_plot(tmp_path):
+    comparison = pd.DataFrame(
+        {
+            "source": ["Nintendo", "Steam"],
+            "shared_games": [311, 383],
+            "mean_difference_pct": [1.9, -0.6],
+        }
+    )
+
+    visualiser.plot_cross_store_prices(comparison, output_dir=str(tmp_path))
+    visualiser.plot_cross_store_prices(comparison.head(0), output_dir=str(tmp_path / "empty"))
+
+    assert (tmp_path / "cross_store_prices.png").stat().st_size > 5_000
+    assert (tmp_path / "empty" / "cross_store_prices.png").exists()

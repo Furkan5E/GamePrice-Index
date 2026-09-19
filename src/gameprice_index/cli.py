@@ -7,10 +7,17 @@ from collections.abc import Sequence
 import pandas as pd
 
 from gameprice_index import config, storage
+from gameprice_index.matching import cross_store_prices, store_comparison
 from gameprice_index.processor import build_frame, combine_frames
 from gameprice_index.scrapers import SCRAPERS, ScrapeError, get_scraper
 from gameprice_index.validation import DataValidationError, validate_dataset
-from gameprice_index.visualiser import plot_platform_distribution, plot_price_analysis, plot_price_vs_discount
+from gameprice_index.visualiser import (
+    plot_cross_store_prices,
+    plot_platform_distribution,
+    plot_price_analysis,
+    plot_price_vs_discount,
+    sources_in,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -91,6 +98,10 @@ def run_pipeline(
     df_final.to_csv(final_data_path, index=False)
     logger.info(f"Saved master dataset to {final_data_path}")
 
+    # the same games on different stores, for a like-for-like comparison
+    matched = cross_store_prices(df_final)
+    matched.to_csv(os.path.join(data_dir, config.CROSS_STORE_CSV_NAME), index=False)
+
     # cached data was already recorded when it was scraped, so only fresh scrapes go into the history
     if use_cache:
         logger.info("Skipping the price history for cached data.")
@@ -102,6 +113,7 @@ def run_pipeline(
         plot_platform_distribution(df_final, output_dir=plots_dir)
         plot_price_analysis(df_final, output_dir=plots_dir)
         plot_price_vs_discount(df_final, output_dir=plots_dir)
+        plot_cross_store_prices(store_comparison(matched, sources_in(df_final)), output_dir=plots_dir)
     else:
         logger.info("Skipping plots.")
     logger.info("Pipeline executed successfully!")

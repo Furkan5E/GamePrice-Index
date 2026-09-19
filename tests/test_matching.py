@@ -135,3 +135,13 @@ def test_store_comparison_counts_ties_for_every_store():
     assert summary.loc["Nintendo", "cheapest_share_pct"] == 100.0  # tied with Steam on both games
     assert summary.loc["PlayStation Store", "cheapest_share_pct"] == 0.0
     assert summary.loc["PlayStation Store", "mean_difference_pct"] == 20.0
+
+
+def test_store_comparison_with_no_shared_games_keeps_its_columns():
+    """Regression: an empty comparison had no columns and crashed the plot that reads it."""
+    matched = cross_store_prices(_dataset().query("source == 'Steam'"))
+
+    summary = store_comparison(matched, ["Steam", "Xbox"])
+
+    assert summary.empty
+    assert "shared_games" in summary.columns

@@ -173,3 +173,36 @@ def plot_price_vs_discount(df: pd.DataFrame, output_dir: str = "plots") -> str:
     # hundreds of points fill the whole plot area, so the legend sits above it
     _legend(ax, loc="lower right", bbox_to_anchor=(1, 1), ncol=5, columnspacing=1.2, handletextpad=0.3)
     return _save(fig, output_dir, "price_vs_discount.png")
+
+
+def plot_cross_store_prices(comparison: pd.DataFrame, output_dir: str = "plots") -> str:
+    """Bar chart of how each storefront prices the games it shares with other stores.
+
+    `comparison` is the table from `matching.store_comparison`: the same games,
+    regular prices, so the stores are compared like for like.
+    """
+    # an average over a handful of shared games says nothing about a store
+    enough = comparison[comparison["shared_games"] >= MIN_GAMES_FOR_DISTRIBUTION]
+    comparison = enough if not enough.empty else comparison
+
+    fig, ax = plt.subplots(figsize=(9, max(3.0, 0.7 * len(comparison) + 1.8)))
+
+    for _, row in comparison.iloc[::-1].iterrows():
+        bar = ax.barh(row["source"], row["mean_difference_pct"], color=colour_for(row["source"]), height=0.55)
+        ax.bar_label(
+            bar,
+            labels=[f"{row['mean_difference_pct']:+.1f}%  ({row['shared_games']:,} shared games)"],
+            padding=6,
+            color=INK,
+            fontsize=10,
+        )
+
+    _style(ax, "Regular price of the same games, against the other stores", "Average price difference (%)", "")
+    ax.grid(axis="y", visible=False)
+    ax.axvline(0, color=MUTED, linewidth=1)
+    if comparison.empty:
+        ax.text(0.5, 0.5, "No games shared between storefronts", transform=ax.transAxes, ha="center", color=MUTED)
+    else:
+        reach = max(float(comparison["mean_difference_pct"].abs().max()), 1.0)
+        ax.set_xlim(-reach * 1.6, reach * 3.2)  # room on the right for the labels
+    return _save(fig, output_dir, "cross_store_prices.png")

@@ -137,4 +137,9 @@ def test_cached_run_writes_plots_under_output_dir(tmp_path):
     assert cli.main(["--cached", "--source", "nintendo", "--output-dir", str(tmp_path)]) == 0
 
     plots = sorted(p.name for p in (tmp_path / "plots").iterdir())
-    assert plots == ["platform_distribution.png", "price_analysis.png", "price_vs_discount.png"]
+    assert plots == [
+        "cross_store_prices.png",
+        "platform_distribution.png",
+        "price_analysis.png",
+        "price_vs_discount.png",
+    ]

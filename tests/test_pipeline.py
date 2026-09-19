@@ -72,6 +72,15 @@ def test_live_run_writes_dataset_cache_and_database(tmp_path, offline):
     assert df[df["name"] == "Minecraft"]["badge"].tolist() == ["PRE-ORDER"]
 
 
+def test_run_writes_the_cross_store_table(tmp_path, offline):
+    """The table is written even when no game is shared, so later steps can rely on the file."""
+    assert cli.main([*SOURCE_ARGS, "--output-dir", str(tmp_path), "--no-plots"]) == 0
+
+    matched = pd.read_csv(tmp_path / "data" / "cross_store_prices.csv")
+    assert "cheapest_store" in matched.columns
+    assert matched.empty  # the Nintendo and PlayStation Direct fixtures have no game in common
+
+
 def test_cached_run_reproduces_the_live_run(tmp_path, offline):
     """A --cached run must rebuild exactly the same dataset without scraping or logging history."""
     args = [*SOURCE_ARGS, "--output-dir", str(tmp_path), "--no-plots"]
