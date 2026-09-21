@@ -1,0 +1,69 @@
+name: Daily Scrape
+
+on:
+  schedule:
+    - cron: "17 6 * * *" # every day at 06:17 UTC, off the hour to avoid the scheduler rush
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: "Products per storefront (0 for everything)"
+        default: "1000"
+
+# never run two scrapes at once: they would both write the same day's history
+concurrency:
+  group: daily-scrape
+  cancel-in-progress: false
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Install dependencies
+        run: uv sync --frozen --no-dev
+
+      # the price history lives on the `data` branch so main's history stays about code
+      - name: Restore the price history
+        run: |
+          mkdir -p published
+          if git fetch --depth=1 origin data 2>/dev/null; then
+            git --work-tree=published checkout FETCH_HEAD -- .
+            git reset -q
+            echo "Restored $(ls published | wc -l) files from the data branch."
+          else
+            echo "No data branch yet; starting a new history."
+          fi
+
+      # a failed or invalid scrape exits non-zero, which fails the job before anything is published
+      - name: Scrape every storefront
+        run: |
+          uv run gameprice-index \
+            --output-dir published \
+            --db published/game_prices.db \
+            --limit "${{ inputs.limit || '1000' }}"
+
+      - name: Publish to the data branch
+        run: |
+          cd published
+          rm -rf .git
+          git init -q -b data
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "chore: price snapshot for $(date -u +%F)"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" data
