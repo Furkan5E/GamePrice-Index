@@ -1,8 +1,11 @@
+from datetime import date
+
 import pandas as pd
 import pytest
 
-from gameprice_index import cli
+from gameprice_index import cli, storage
 from gameprice_index.cli import load_cache, write_cache
+from gameprice_index.processor import build_frame
 from gameprice_index.scrapers import ScrapeError
 
 
@@ -143,3 +146,65 @@ def test_cached_run_writes_plots_under_output_dir(tmp_path):
         "price_analysis.png",
         "price_vs_discount.png",
     ]
+
+
+@pytest.fixture
+def history_db(tmp_path):
+    """A database with two days of prices: Kero Kero Cowboy is on sale and dropped in price."""
+
+    def frame(kero_price):
+        return build_frame(
+            [
+                {"source": "Nintendo", "product_code": "70010000096802", "name": "Mario Kart World", "price": 66.99},
+                {
+                    "source": "Nintendo",
+                    "product_code": "70010000126803",
+                    "name": "Kero Kero Cowboy",
+                    "price": kero_price,
+                    "price_old": 8.99,
+                },
+            ]
+        )
+
+    db_path = tmp_path / "prices.db"
+    with storage.open_db(str(db_path)) as conn:
+        storage.record_prices(conn, frame(7.64), date(2026, 9, 1))
+        storage.record_prices(conn, frame(4.49), date(2026, 9, 2))
+    return str(db_path)
+
+
+def test_deals_command(history_db, capsys):
+    assert cli.main(["deals", "--db", history_db]) == 0
+
+    output = capsys.readouterr().out
+    assert "Kero Kero Cowboy" in output
+    assert "50.1" in output
+    assert "Mario Kart World" not in output
+
+
+def test_drops_command(history_db, capsys):
+    assert cli.main(["drops", "--db", history_db, "--top", "5"]) == 0
+
+    output = capsys.readouterr().out
+    assert "Kero Kero Cowboy" in output
+    assert "7.64" in output and "4.49" in output
+
+
+def test_history_command(history_db, capsys):
+    assert cli.main(["history", "70010000126803", "--db", history_db]) == 0
+
+    output = capsys.readouterr().out
+    assert "2026-09-01" in output and "2026-09-02" in output
+
+
+def test_history_command_for_unknown_product(history_db, capsys):
+    assert cli.main(["history", "nope", "--db", history_db]) == 0
+    assert "Nothing to show." in capsys.readouterr().out
+
+
+def test_query_without_a_database(tmp_path):
+    """A missing file must be reported, not silently created as an empty database."""
+    missing = tmp_path / "missing.db"
+
+    assert cli.main(["deals", "--db", str(missing)]) == 1
+    assert not missing.exists()

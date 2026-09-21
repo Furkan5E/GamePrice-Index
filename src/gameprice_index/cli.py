@@ -77,7 +77,7 @@ def run_pipeline(
     os.makedirs(data_dir, exist_ok=True)
 
     final_data_path = os.path.join(data_dir, config.FINAL_CSV_NAME)
-    db_path = db_path or os.path.join(data_dir, config.DATABASE_NAME)
+    db_path = db_path or default_db_path(output_dir)
 
     if use_cache:
         logger.info(f"Loading cached processed data from {data_dir}")
@@ -164,7 +164,48 @@ def build_parser() -> argparse.ArgumentParser:
         metavar="N",
         help=f"Most products to take from each storefront; 0 means everything. Defaults to {config.DEFAULT_LIMIT}.",
     )
+    # read-only commands over the recorded history; without one the pipeline runs
+    commands = parser.add_subparsers(dest="command", metavar="COMMAND", title="history commands")
+
+    deals = commands.add_parser("deals", help="List games on sale right now, deepest discount first.")
+    drops = commands.add_parser("drops", help="List games whose price fell since the previous scrape.")
+    history = commands.add_parser("history", help="Show every recorded price of one product.")
+    history.add_argument("product_code", help="The store's id for the product, as shown by the other commands.")
+
+    for command in (deals, drops, history):
+        command.add_argument("--db", default=None, metavar="PATH", help="SQLite database to read.")
+    for command in (deals, drops):
+        command.add_argument("--top", type=non_negative_int, default=20, metavar="N", help="Rows to show.")
     return parser
+
+
+def default_db_path(output_dir: str = ".") -> str:
+    return os.path.join(output_dir, config.DATA_DIR, config.DATABASE_NAME)
+
+
+def run_query(command: str, args: argparse.Namespace) -> int:
+    """Prints the result of one history command and returns the exit code."""
+    db_path = args.db or default_db_path()
+    if not os.path.exists(db_path):
+        logger.error(f"No price history at {db_path}; run the pipeline first or pass --db.")
+        return EXIT_SCRAPE_FAILED
+
+    with storage.open_db(db_path) as conn:
+        if command == "deals":
+            columns = ["source", "name", "price", "price_old", "discount_pct", "product_code"]
+            table = storage.current_deals(conn, limit=args.top or None)[columns]
+        elif command == "drops":
+            columns = ["source", "name", "previous_price", "price", "drop_pct", "scrape_date", "product_code"]
+            drops = storage.price_drops(conn)
+            table = (drops.head(args.top) if args.top else drops)[columns]
+        else:
+            table = storage.price_history(conn, args.product_code)
+
+    if table.empty:
+        print("Nothing to show.")
+    else:
+        print(table.to_string(index=False))
+    return 0
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -172,6 +213,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
 
     configure_logging()
+    if args.command:
+        return run_query(args.command, args)
+
     try:
         run_pipeline(
             use_cache=args.cached,

@@ -53,6 +53,13 @@ Command line options:
 | `--db PATH` | SQLite database to record prices in. |
 | `--limit N` | Most products to take from each storefront (default 1000, `0` for everything). |
 
+Query the recorded price history:
+```bash
+uv run gameprice-index deals            # games on sale now, deepest discount first
+uv run gameprice-index drops            # prices that fell since the previous scrape
+uv run gameprice-index history 730      # every recorded price of one product
+```
+
 Run the test suite:
 ```bash
 uv run pytest
