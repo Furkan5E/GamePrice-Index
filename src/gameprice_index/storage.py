@@ -1,8 +1,9 @@
 """SQLite storage for the price history.
 
-Two tables: `games` holds one row per product per storefront, and `prices`
-holds at most one row per game per day. Re-running the pipeline on the same
-day updates that day's row instead of adding a duplicate.
+`games` holds one row per product per storefront and `prices` at most one row
+per game per day, so re-running the pipeline on the same day updates that
+day's row instead of adding a duplicate. `alerts_sent` remembers which price
+alerts have gone out.
 """
 
 import logging
@@ -43,6 +44,13 @@ CREATE TABLE IF NOT EXISTS prices (
 );
 
 CREATE INDEX IF NOT EXISTS idx_prices_scrape_date ON prices (scrape_date);
+
+CREATE TABLE IF NOT EXISTS alerts_sent (
+    game_id   INTEGER NOT NULL REFERENCES games (id) ON DELETE CASCADE,
+    price     REAL NOT NULL,
+    sent_date TEXT NOT NULL,
+    PRIMARY KEY (game_id, price)
+);
 """
 
 UPSERT_GAME = """
