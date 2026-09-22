@@ -57,6 +57,13 @@ jobs:
             --db published/game_prices.db \
             --limit "${{ inputs.limit || '1000' }}"
 
+      # needs a committed watchlist.toml; add the webhook as a repository secret to get Discord messages
+      - name: Send watchlist alerts
+        if: hashFiles('watchlist.toml') != ''
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: uv run gameprice-index alerts --db published/game_prices.db
+
       - name: Publish to the data branch
         run: |
           cd published
