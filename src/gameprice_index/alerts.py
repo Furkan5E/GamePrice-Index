@@ -11,7 +11,8 @@ A watchlist is a TOML file of games to keep an eye on:
     source = "Steam"            # optional: only this storefront
 
 Each game and price is only reported once, so a sale that lasts a fortnight
-does not send fourteen messages.
+does not send fourteen messages. Alerts are printed, and also posted to Discord
+when a webhook URL is supplied through the DISCORD_WEBHOOK_URL environment variable.
 """
 
 import logging
@@ -21,8 +22,10 @@ from dataclasses import dataclass
 from datetime import date
 
 import pandas as pd
+import requests
 
 from gameprice_index import storage
+from gameprice_index.http_client import fetch
 from gameprice_index.matching import normalise_title
 
 logger = logging.getLogger(__name__)
@@ -154,3 +157,55 @@ def mark_sent(conn: sqlite3.Connection, alerts: list[Alert], sent_on: date | Non
             "INSERT OR IGNORE INTO alerts_sent (game_id, price, sent_date) VALUES (?, ?, ?)",
             [(alert.game_id, alert.price, day) for alert in alerts],
         )
+
+
+# --- Delivery ---
+
+DISCORD_MESSAGE_LIMIT = 2000  # characters; Discord rejects anything longer
+
+
+def chunk_messages(alerts: list[Alert], limit: int = DISCORD_MESSAGE_LIMIT) -> list[str]:
+    """Packs alert messages into as few posts as the length limit allows."""
+    chunks: list[str] = []
+    current = ""
+    for alert in alerts:
+        message = alert.message()[:limit]
+        if current and len(current) + len(message) + 2 > limit:
+            chunks.append(current)
+            current = ""
+        current = f"{current}\n\n{message}" if current else message
+    if current:
+        chunks.append(current)
+    return chunks
+
+
+def send_discord(alerts: list[Alert], webhook_url: str, session: requests.Session | None = None) -> int:
+    """Posts the alerts to a Discord webhook and returns how many posts were made."""
+    chunks = chunk_messages(alerts)
+    for chunk in chunks:
+        # mentions are switched off so a game title can never ping a channel
+        fetch(webhook_url, session=session, method="POST", json={"content": chunk, "allowed_mentions": {"parse": []}})
+    return len(chunks)
+
+
+def run_alerts(
+    db_path: str,
+    watchlist_path: str,
+    webhook_url: str | None = None,
+    dry_run: bool = False,
+    session: requests.Session | None = None,
+) -> list[Alert]:
+    """Finds new alerts, delivers them and records them as sent; a dry run only reports them."""
+    watchlist = load_watchlist(watchlist_path)
+
+    with storage.open_db(db_path) as conn:
+        fresh = unsent(conn, find_alerts(conn, watchlist))
+        if not fresh or dry_run:
+            return fresh
+
+        if webhook_url:
+            posts = send_discord(fresh, webhook_url, session=session)
+            logger.info(f"Sent {len(fresh)} alerts to Discord in {posts} posts.")
+        # only remembered once delivery has worked, so a failed post is retried on the next run
+        mark_sent(conn, fresh)
+    return fresh

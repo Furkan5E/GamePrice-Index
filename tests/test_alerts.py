@@ -1,10 +1,12 @@
 from datetime import date
 
 import pytest
+import requests
 
-from gameprice_index import alerts, storage
+from gameprice_index import alerts, cli, storage
 from gameprice_index.alerts import Watch, WatchlistError, find_alerts, load_watchlist
 from gameprice_index.processor import build_frame
+from helpers import FakeSession
 
 DAY_ONE = date(2026, 9, 1)
 DAY_TWO = date(2026, 9, 2)
@@ -148,3 +150,77 @@ def test_alerts_are_only_sent_once_per_price(conn):
     storage.record_prices(conn, _frame(9.99), DAY_THREE)
     again = alerts.unsent(conn, find_alerts(conn, watchlist))
     assert [alert.price for alert in again] == [9.99]
+
+
+WATCHLIST = '[[watch]]\ntitle = "Hogwarts Legacy"\nmax_price = 20\n\n[[watch]]\ntitle = "Hades II"\n'
+WEBHOOK = "https://discord.test/api/webhooks/1/token"
+
+
+@pytest.fixture
+def db_path(tmp_path, conn):
+    return str(tmp_path / "prices.db")
+
+
+def test_chunk_messages_respects_the_discord_limit(conn):
+    found = find_alerts(conn, [Watch(title="Hogwarts Legacy", max_price=100)])
+    one_message = len(found[0].message())
+
+    assert len(alerts.chunk_messages(found)) == 1
+    chunks = alerts.chunk_messages(found, limit=one_message + 5)
+    assert len(chunks) == 2
+    assert all(len(chunk) <= one_message + 5 for chunk in chunks)
+    assert alerts.chunk_messages([]) == []
+
+
+def test_run_alerts_posts_to_discord_and_remembers(tmp_path, db_path):
+    session = FakeSession({"discord.test": ""})
+    watchlist = _write(tmp_path, WATCHLIST)
+
+    found = alerts.run_alerts(db_path, watchlist, webhook_url=WEBHOOK, session=session)
+
+    assert [alert.name for alert in found] == ["Hogwarts Legacy", "Hades II"]
+    assert len(session.calls) == 1
+    post = session.calls[0]
+    assert post["method"] == "POST"
+    assert "**Hogwarts Legacy** on Steam: £12.49" in post["json"]["content"]
+    assert post["json"]["allowed_mentions"] == {"parse": []}
+
+    # the second run has nothing new to say
+    assert alerts.run_alerts(db_path, watchlist, webhook_url=WEBHOOK, session=session) == []
+    assert len(session.calls) == 1
+
+
+def test_dry_run_sends_and_records_nothing(tmp_path, db_path):
+    session = FakeSession({"discord.test": ""})
+    watchlist = _write(tmp_path, WATCHLIST)
+
+    assert len(alerts.run_alerts(db_path, watchlist, webhook_url=WEBHOOK, dry_run=True, session=session)) == 2
+    assert session.calls == []
+    assert len(alerts.run_alerts(db_path, watchlist, webhook_url=WEBHOOK, dry_run=True, session=session)) == 2
+
+
+def test_failed_delivery_is_retried_next_time(tmp_path, db_path):
+    """Alerts must not be marked as sent when Discord did not accept them."""
+    watchlist = _write(tmp_path, WATCHLIST)
+    failing = FakeSession({})  # every URL answers 404
+
+    with pytest.raises(requests.HTTPError):
+        alerts.run_alerts(db_path, watchlist, webhook_url=WEBHOOK, session=failing)
+
+    working = FakeSession({"discord.test": ""})
+    assert len(alerts.run_alerts(db_path, watchlist, webhook_url=WEBHOOK, session=working)) == 2
+
+
+def test_alerts_command_prints_without_a_webhook(tmp_path, db_path, capsys, monkeypatch):
+    monkeypatch.delenv("DISCORD_WEBHOOK_URL", raising=False)
+    watchlist = _write(tmp_path, WATCHLIST)
+
+    assert cli.main(["alerts", "--db", db_path, "--watchlist", watchlist]) == 0
+    assert "**Hades II** on Steam: £19.99" in capsys.readouterr().out
+
+    assert cli.main(["alerts", "--db", db_path, "--watchlist", watchlist]) == 0
+    assert "No new alerts." in capsys.readouterr().out
+
+
+def test_alerts_command_reports_a_bad_watchlist(tmp_path, db_path):
+    assert cli.main(["alerts", "--db", db_path, "--watchlist", str(tmp_path / "nope.toml")]) == 2

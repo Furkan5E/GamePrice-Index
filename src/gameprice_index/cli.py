@@ -5,8 +5,9 @@ import sys
 from collections.abc import Sequence
 
 import pandas as pd
+import requests
 
-from gameprice_index import config, storage
+from gameprice_index import alerts, config, storage
 from gameprice_index.matching import cross_store_prices, store_comparison
 from gameprice_index.processor import build_frame, combine_frames
 from gameprice_index.scrapers import SCRAPERS, ScrapeError, get_scraper
@@ -172,7 +173,11 @@ def build_parser() -> argparse.ArgumentParser:
     history = commands.add_parser("history", help="Show every recorded price of one product.")
     history.add_argument("product_code", help="The store's id for the product, as shown by the other commands.")
 
-    for command in (deals, drops, history):
+    alert = commands.add_parser("alerts", help="Report watchlist games that hit a target price or a new low.")
+    alert.add_argument("--watchlist", default=config.WATCHLIST_NAME, metavar="PATH", help="Watchlist TOML file.")
+    alert.add_argument("--dry-run", action="store_true", help="Show the alerts without sending or recording them.")
+
+    for command in (deals, drops, history, alert):
         command.add_argument("--db", default=None, metavar="PATH", help="SQLite database to read.")
     for command in (deals, drops):
         command.add_argument("--top", type=non_negative_int, default=20, metavar="N", help="Rows to show.")
@@ -190,6 +195,9 @@ def run_query(command: str, args: argparse.Namespace) -> int:
         logger.error(f"No price history at {db_path}; run the pipeline first or pass --db.")
         return EXIT_SCRAPE_FAILED
 
+    if command == "alerts":
+        return run_alerts_command(db_path, args)
+
     with storage.open_db(db_path) as conn:
         if command == "deals":
             columns = ["source", "name", "price", "price_old", "discount_pct", "product_code"]
@@ -205,6 +213,27 @@ def run_query(command: str, args: argparse.Namespace) -> int:
         print("Nothing to show.")
     else:
         print(table.to_string(index=False))
+    return 0
+
+
+def run_alerts_command(db_path: str, args: argparse.Namespace) -> int:
+    """Prints new watchlist alerts and, unless it is a dry run, sends and records them."""
+    webhook_url = os.environ.get(config.DISCORD_WEBHOOK_ENV)
+    try:
+        found = alerts.run_alerts(db_path, args.watchlist, webhook_url=webhook_url, dry_run=args.dry_run)
+    except alerts.WatchlistError as e:
+        logger.error(e)
+        return EXIT_INVALID_DATA
+    except requests.RequestException as e:
+        logger.error(f"Could not deliver the alerts: {e}")
+        return EXIT_SCRAPE_FAILED
+
+    if not found:
+        print("No new alerts.")
+    for alert in found:
+        print(alert.message())
+    if found and not args.dry_run and not webhook_url:
+        logger.info(f"Set {config.DISCORD_WEBHOOK_ENV} to also post alerts to Discord.")
     return 0
 
 

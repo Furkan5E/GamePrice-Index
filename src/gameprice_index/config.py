@@ -78,3 +78,7 @@ PLOTS_DIR = "plots"
 FINAL_CSV_NAME = "data.csv"
 CROSS_STORE_CSV_NAME = "cross_store_prices.csv"
 DATABASE_NAME = "game_prices.db"
+
+# --- Alerts ---
+WATCHLIST_NAME = "watchlist.toml"
+DISCORD_WEBHOOK_ENV = "DISCORD_WEBHOOK_URL"  # the URL is a secret, so it is read from the environment

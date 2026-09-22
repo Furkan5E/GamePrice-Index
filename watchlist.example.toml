@@ -1,0 +1,13 @@
+# Copy this file to watchlist.toml and list the games you want alerts for.
+#   uv run gameprice-index alerts --dry-run
+#
+# Titles are matched on every storefront, however the store spells them
+# ("Marvel’s Wolverine - PS5" and "Marvel's Wolverine" are the same game).
+
+[[watch]]
+title = "Hogwarts Legacy"
+max_price = 15.00 # alert when any store sells it for this or less
+
+[[watch]]
+title = "Hades II" # no max_price: alert whenever it reaches a new all-time low
+source = "Steam"   # optional: only watch this storefront
