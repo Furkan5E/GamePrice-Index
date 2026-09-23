@@ -60,6 +60,21 @@ uv run gameprice-index drops            # prices that fell since the previous sc
 uv run gameprice-index history 730      # every recorded price of one product
 ```
 
+Serve the history as a JSON API (interactive docs at http://127.0.0.1:8000/docs):
+```bash
+uv sync --extra api
+uv run gameprice-index serve
+```
+
+| Endpoint | Returns |
+| --- | --- |
+| `GET /games?source=&q=&limit=&offset=` | Games with their latest price. |
+| `GET /games/{id}` | One game. |
+| `GET /games/{id}/history` | Every recorded price of a game and its all-time low. |
+| `GET /deals?source=&min_discount=` | Games on sale now, deepest discount first. |
+| `GET /drops?min_drop=` | Prices that fell since the previous scrape. |
+| `GET /sources` | Games tracked, games on sale and average price per storefront. |
+
 Run the test suite:
 ```bash
 uv run pytest

@@ -177,7 +177,11 @@ def build_parser() -> argparse.ArgumentParser:
     alert.add_argument("--watchlist", default=config.WATCHLIST_NAME, metavar="PATH", help="Watchlist TOML file.")
     alert.add_argument("--dry-run", action="store_true", help="Show the alerts without sending or recording them.")
 
-    for command in (deals, drops, history, alert):
+    serve = commands.add_parser("serve", help="Serve the price history as an HTTP API (needs the api extra).")
+    serve.add_argument("--host", default="127.0.0.1", help="Address to listen on. Defaults to this machine only.")
+    serve.add_argument("--port", type=int, default=8000, help="Port to listen on.")
+
+    for command in (deals, drops, history, alert, serve):
         command.add_argument("--db", default=None, metavar="PATH", help="SQLite database to read.")
     for command in (deals, drops):
         command.add_argument("--top", type=non_negative_int, default=20, metavar="N", help="Rows to show.")
@@ -197,6 +201,8 @@ def run_query(command: str, args: argparse.Namespace) -> int:
 
     if command == "alerts":
         return run_alerts_command(db_path, args)
+    if command == "serve":
+        return run_server(db_path, args.host, args.port)
 
     with storage.open_db(db_path) as conn:
         if command == "deals":
@@ -213,6 +219,20 @@ def run_query(command: str, args: argparse.Namespace) -> int:
         print("Nothing to show.")
     else:
         print(table.to_string(index=False))
+    return 0
+
+
+def run_server(db_path: str, host: str, port: int) -> int:
+    """Starts the HTTP API; the web stack is imported here so the pipeline does not depend on it."""
+    try:
+        import uvicorn
+
+        from gameprice_index.api import create_app
+    except ImportError:
+        logger.error("The API needs extra packages; install them with: uv sync --extra api")
+        return EXIT_SCRAPE_FAILED
+
+    uvicorn.run(create_app(db_path), host=host, port=port)
     return 0
 
 

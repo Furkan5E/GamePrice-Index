@@ -208,3 +208,13 @@ def test_query_without_a_database(tmp_path):
 
     assert cli.main(["deals", "--db", str(missing)]) == 1
     assert not missing.exists()
+
+
+def test_serve_command_starts_the_api(history_db, monkeypatch):
+    import uvicorn
+
+    started = {}
+    monkeypatch.setattr(uvicorn, "run", lambda app, host, port: started.update(title=app.title, host=host, port=port))
+
+    assert cli.main(["serve", "--db", history_db, "--port", "9001"]) == 0
+    assert started == {"title": "GamePrice-Index API", "host": "127.0.0.1", "port": 9001}
