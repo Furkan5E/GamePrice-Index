@@ -259,3 +259,48 @@ def test_queries_on_an_empty_database(conn):
     assert storage.price_drops(conn).empty
     assert storage.lowest_prices(conn).empty
     assert storage.current_deals(conn).empty
+
+
+def test_find_games_lists_everything_with_latest_prices(history):
+    games = storage.find_games(history)
+
+    assert games["name"].tolist() == ["Astro Bot - PS5", "Mario Kart World"]
+    assert games["price"].tolist() == [34.99, 49.99]
+    assert games["scrape_date"].unique().tolist() == ["2026-09-03"]
+    assert games["first_seen"].unique().tolist() == ["2026-09-01"]
+
+
+def test_find_games_filters_by_source_and_name(history):
+    assert storage.find_games(history, source="Nintendo")["name"].tolist() == ["Mario Kart World"]
+    assert storage.find_games(history, query="astro")["name"].tolist() == ["Astro Bot - PS5"]
+    assert storage.find_games(history, source="Nintendo", query="astro").empty
+
+
+def test_find_games_treats_wildcards_literally(history):
+    """A search for "%" must not match every game."""
+    assert storage.find_games(history, query="%").empty
+    assert storage.find_games(history, query="_").empty
+
+
+def test_find_games_paginates(history):
+    assert storage.find_games(history, limit=1)["name"].tolist() == ["Astro Bot - PS5"]
+    assert storage.find_games(history, limit=1, offset=1)["name"].tolist() == ["Mario Kart World"]
+    assert storage.find_games(history, limit=1, offset=2).empty
+
+
+def test_get_game_and_history(history):
+    game_id = int(storage.find_games(history, query="astro")["game_id"][0])
+
+    assert storage.get_game(history, game_id)["name"].tolist() == ["Astro Bot - PS5"]
+    assert storage.game_history(history, game_id)["price"].tolist() == [39.99, 29.99, 34.99]
+    assert storage.get_game(history, 9999).empty
+    assert storage.game_history(history, 9999).empty
+
+
+def test_source_summary(history):
+    summary = storage.source_summary(history).set_index("source")
+
+    assert summary.loc["Nintendo", "games"] == 1
+    assert summary.loc["Nintendo", "on_sale"] == 1
+    assert summary.loc["PlayStation", "average_price"] == 34.99
+    assert summary.loc["PlayStation", "last_scrape"] == "2026-09-03"

@@ -8,7 +8,7 @@ alerts have gone out.
 
 import logging
 import sqlite3
-from collections.abc import Iterator
+from collections.abc import Iterator, Mapping
 from contextlib import contextmanager
 from datetime import UTC, date, datetime
 
@@ -280,7 +280,7 @@ ORDER BY g.source, g.name
 """
 
 
-def _query(conn: sqlite3.Connection, sql: str, params: dict[str, object] | None = None) -> pd.DataFrame:
+def _query(conn: sqlite3.Connection, sql: str, params: Mapping[str, object] | None = None) -> pd.DataFrame:
     """Runs a SELECT and returns the result as a dataframe, keeping the column names when it is empty."""
     cursor = conn.execute(sql, params or {})
     columns = [column[0] for column in cursor.description]
@@ -314,3 +314,85 @@ def current_deals(conn: sqlite3.Connection, limit: int | None = None) -> pd.Data
     deals["discount_pct"] = (100 * (deals["price_old"] - deals["price"]) / deals["price_old"]).round(1)
     deals = deals.sort_values(["discount_pct", "name"], ascending=[False, True]).reset_index(drop=True)
     return deals.head(limit) if limit else deals
+
+
+# --- Lookups used by the API and the dashboard ---
+
+FIND_GAMES = """
+WITH ranked AS (
+    SELECT p.*, ROW_NUMBER() OVER (PARTITION BY p.game_id ORDER BY p.scrape_date DESC) AS recency
+    FROM prices p
+)
+SELECT g.id AS game_id, g.source, g.product_code, g.name, g.platform, g.url, g.first_seen, g.last_seen,
+       r.scrape_date, r.price, r.price_old, r.discount_amount, r.badge, r.out_of_stock
+FROM games g
+LEFT JOIN ranked r ON r.game_id = g.id AND r.recency = 1
+WHERE (:source IS NULL OR g.source = :source)
+  AND (:pattern IS NULL OR g.name LIKE :pattern ESCAPE '\\')
+  AND (:game_id IS NULL OR g.id = :game_id)
+ORDER BY g.name, g.source
+LIMIT :limit OFFSET :offset
+"""
+
+GAME_HISTORY = """
+SELECT scrape_date, price, price_old, discount_amount, badge, out_of_stock
+FROM prices
+WHERE game_id = :game_id
+ORDER BY scrape_date
+"""
+
+SOURCE_SUMMARY = """
+WITH ranked AS (
+    SELECT p.*, ROW_NUMBER() OVER (PARTITION BY p.game_id ORDER BY p.scrape_date DESC) AS recency
+    FROM prices p
+)
+SELECT g.source,
+       COUNT(*) AS games,
+       SUM(r.price_old > r.price) AS on_sale,
+       ROUND(AVG(r.price), 2) AS average_price,
+       MAX(r.scrape_date) AS last_scrape
+FROM games g
+JOIN ranked r ON r.game_id = g.id AND r.recency = 1
+GROUP BY g.source
+ORDER BY g.source
+"""
+
+
+def _like_pattern(text: str) -> str:
+    """Wraps a search term for LIKE, escaping the characters LIKE treats as wildcards."""
+    escaped = text.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+    return f"%{escaped}%"
+
+
+def find_games(
+    conn: sqlite3.Connection,
+    source: str | None = None,
+    query: str | None = None,
+    limit: int = 50,
+    offset: int = 0,
+) -> pd.DataFrame:
+    """Lists games with their latest price, optionally filtered by storefront and a name fragment."""
+    params = {
+        "source": source,
+        "pattern": _like_pattern(query) if query else None,
+        "game_id": None,
+        "limit": limit,
+        "offset": offset,
+    }
+    return _query(conn, FIND_GAMES, params)
+
+
+def get_game(conn: sqlite3.Connection, game_id: int) -> pd.DataFrame:
+    """Returns one game with its latest price, or an empty dataframe if the id is unknown."""
+    params = {"source": None, "pattern": None, "game_id": game_id, "limit": 1, "offset": 0}
+    return _query(conn, FIND_GAMES, params)
+
+
+def game_history(conn: sqlite3.Connection, game_id: int) -> pd.DataFrame:
+    """Returns every recorded price of one game, oldest first."""
+    return _query(conn, GAME_HISTORY, {"game_id": game_id})
+
+
+def source_summary(conn: sqlite3.Connection) -> pd.DataFrame:
+    """Returns the number of games, games on sale and average price per storefront."""
+    return _query(conn, SOURCE_SUMMARY)
