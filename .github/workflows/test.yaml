@@ -24,7 +24,7 @@ jobs:
           python-version: "3.14"
 
       - name: Install dependencies
-        run: uv sync --frozen
+        run: uv sync --frozen --all-extras
 
       - name: Lint
         run: uv run ruff check .
@@ -54,7 +54,7 @@ jobs:
           python-version: "3.14"
 
       - name: Install dependencies
-        run: uv sync --frozen
+        run: uv sync --frozen --all-extras
 
       - name: Run test suite
         run: uv run pytest --cov --cov-report=term --cov-report=xml

@@ -13,11 +13,18 @@ dependencies = [
     "requests>=2.34.2",
 ]
 
+[project.optional-dependencies]
+api = [
+    "fastapi>=0.115",
+    "uvicorn>=0.34",
+]
+
 [project.scripts]
 gameprice-index = "gameprice_index.cli:main"
 
 [dependency-groups]
 dev = [
+    "httpx2>=1.0",
     "mypy>=1.18",
     "pandas-stubs>=2.3",
     "pre-commit>=4.0",

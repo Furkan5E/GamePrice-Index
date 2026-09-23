@@ -348,7 +348,7 @@ WITH ranked AS (
 )
 SELECT g.source,
        COUNT(*) AS games,
-       SUM(r.price_old > r.price) AS on_sale,
+       COALESCE(SUM(r.price_old > r.price), 0) AS on_sale,
        ROUND(AVG(r.price), 2) AS average_price,
        MAX(r.scrape_date) AS last_scrape
 FROM games g

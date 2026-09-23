@@ -304,3 +304,10 @@ def test_source_summary(history):
     assert summary.loc["Nintendo", "on_sale"] == 1
     assert summary.loc["PlayStation", "average_price"] == 34.99
     assert summary.loc["PlayStation", "last_scrape"] == "2026-09-03"
+
+
+def test_source_summary_counts_zero_deals_as_zero(conn):
+    """Regression: a storefront with nothing on sale reported NULL instead of 0."""
+    storage.record_prices(conn, _frame(price_old=float("nan"), discount_amount=float("nan")), DAY_ONE)
+
+    assert storage.source_summary(conn)["on_sale"].tolist() == [0, 0]
