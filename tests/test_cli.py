@@ -218,3 +218,19 @@ def test_serve_command_starts_the_api(history_db, monkeypatch):
 
     assert cli.main(["serve", "--db", history_db, "--port", "9001"]) == 0
     assert started == {"title": "GamePrice-Index API", "host": "127.0.0.1", "port": 9001}
+
+
+def test_dashboard_command_launches_streamlit(history_db, monkeypatch):
+    launched = {}
+
+    def fake_call(command, env):
+        launched.update(command=command, db=env["GAMEPRICE_DB"])
+        return 0
+
+    monkeypatch.setattr(cli.subprocess, "call", fake_call)
+
+    assert cli.main(["dashboard", "--db", history_db, "--port", "8600"]) == 0
+    assert launched["command"][1:4] == ["-m", "streamlit", "run"]
+    assert launched["command"][4].endswith("dashboard.py")
+    assert launched["command"][-2:] == ["--server.port", "8600"]
+    assert launched["db"] == history_db

@@ -1,6 +1,8 @@
 import argparse
+import importlib.util
 import logging
 import os
+import subprocess
 import sys
 from collections.abc import Sequence
 
@@ -181,7 +183,10 @@ def build_parser() -> argparse.ArgumentParser:
     serve.add_argument("--host", default="127.0.0.1", help="Address to listen on. Defaults to this machine only.")
     serve.add_argument("--port", type=int, default=8000, help="Port to listen on.")
 
-    for command in (deals, drops, history, alert, serve):
+    board = commands.add_parser("dashboard", help="Open the Streamlit dashboard (needs the dashboard extra).")
+    board.add_argument("--port", type=int, default=8501, help="Port to listen on.")
+
+    for command in (deals, drops, history, alert, serve, board):
         command.add_argument("--db", default=None, metavar="PATH", help="SQLite database to read.")
     for command in (deals, drops):
         command.add_argument("--top", type=non_negative_int, default=20, metavar="N", help="Rows to show.")
@@ -203,6 +208,8 @@ def run_query(command: str, args: argparse.Namespace) -> int:
         return run_alerts_command(db_path, args)
     if command == "serve":
         return run_server(db_path, args.host, args.port)
+    if command == "dashboard":
+        return run_dashboard(db_path, args.port)
 
     with storage.open_db(db_path) as conn:
         if command == "deals":
@@ -234,6 +241,18 @@ def run_server(db_path: str, host: str, port: int) -> int:
 
     uvicorn.run(create_app(db_path), host=host, port=port)
     return 0
+
+
+def run_dashboard(db_path: str, port: int) -> int:
+    """Launches the Streamlit dashboard in a child process and waits for it to exit."""
+    if importlib.util.find_spec("streamlit") is None:
+        logger.error("The dashboard needs extra packages; install them with: uv sync --extra dashboard")
+        return EXIT_SCRAPE_FAILED
+
+    app_path = os.path.join(os.path.dirname(__file__), "dashboard.py")
+    command = [sys.executable, "-m", "streamlit", "run", app_path, "--server.port", str(port)]
+    # the app reads its database path from the environment because Streamlit owns the command line
+    return subprocess.call(command, env={**os.environ, "GAMEPRICE_DB": db_path})
 
 
 def run_alerts_command(db_path: str, args: argparse.Namespace) -> int:

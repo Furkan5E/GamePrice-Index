@@ -75,6 +75,12 @@ uv run gameprice-index serve
 | `GET /drops?min_drop=` | Prices that fell since the previous scrape. |
 | `GET /sources` | Games tracked, games on sale and average price per storefront. |
 
+Explore the history in a browser dashboard (deals, cross-store comparison, price history per game):
+```bash
+uv sync --extra dashboard
+uv run gameprice-index dashboard
+```
+
 Run the test suite:
 ```bash
 uv run pytest
