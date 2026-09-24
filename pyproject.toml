@@ -18,6 +18,9 @@ api = [
     "fastapi>=0.115",
     "uvicorn>=0.34",
 ]
+dashboard = [
+    "streamlit>=1.45",
+]
 
 [project.scripts]
 gameprice-index = "gameprice_index.cli:main"
