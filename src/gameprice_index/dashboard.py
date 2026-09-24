@@ -85,7 +85,7 @@ def render_overview(latest: pd.DataFrame, summary: pd.DataFrame) -> None:
     )
     st.subheader("Price distribution")
     st.caption(f"Each storefront on its own row; the dearest 2% of games (over £{ceiling:,.0f}) are left out.")
-    st.altair_chart(chart, use_container_width=True)
+    st.altair_chart(chart, width="stretch")
 
 
 def render_deals(latest: pd.DataFrame) -> None:
@@ -106,7 +106,7 @@ def render_deals(latest: pd.DataFrame) -> None:
     st.dataframe(
         shown[["name", "source", "platform", "price", "price_old", "discount_pct", "url"]],
         hide_index=True,
-        use_container_width=True,
+        width="stretch",
         column_config={
             "price": money("Now"),
             "price_old": money("Was"),
@@ -146,13 +146,13 @@ def render_comparison(latest: pd.DataFrame) -> None:
         )
         .properties(height=60 * max(len(comparison), 1))
     )
-    st.altair_chart(chart, use_container_width=True)
+    st.altair_chart(chart, width="stretch")
 
     st.subheader("Biggest price gaps for the same game")
     st.dataframe(
         matched.drop(columns=["title_key"]).sort_values("spread", ascending=False).head(200),
         hide_index=True,
-        use_container_width=True,
+        width="stretch",
         column_config={**{store: money(store) for store in stores}, "spread": money("Gap")},
     )
 
@@ -165,7 +165,7 @@ def render_history(db_path: str, latest: pd.DataFrame, drops: pd.DataFrame) -> N
         st.dataframe(
             drops[["name", "source", "previous_price", "price", "drop_pct", "scrape_date"]].head(100),
             hide_index=True,
-            use_container_width=True,
+            width="stretch",
             column_config={
                 "previous_price": money("Before"),
                 "price": money("Now"),

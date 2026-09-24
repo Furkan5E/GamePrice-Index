@@ -19,7 +19,7 @@ api = [
     "uvicorn>=0.34",
 ]
 dashboard = [
-    "streamlit>=1.45",
+    "streamlit>=1.50",
 ]
 
 [project.scripts]
