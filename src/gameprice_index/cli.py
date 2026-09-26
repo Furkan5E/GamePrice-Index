@@ -10,6 +10,7 @@ import pandas as pd
 import requests
 
 from gameprice_index import alerts, config, storage
+from gameprice_index.analysis import build_report
 from gameprice_index.matching import cross_store_prices, store_comparison
 from gameprice_index.processor import build_frame, combine_frames
 from gameprice_index.scrapers import SCRAPERS, ScrapeError, get_scraper
@@ -186,6 +187,10 @@ def build_parser() -> argparse.ArgumentParser:
     board = commands.add_parser("dashboard", help="Open the Streamlit dashboard (needs the dashboard extra).")
     board.add_argument("--port", type=int, default=8501, help="Port to listen on.")
 
+    report = commands.add_parser("report", help="Write the findings report from the latest dataset.")
+    report.add_argument("--data", default=None, metavar="PATH", help="Dataset CSV. Defaults to data/data.csv.")
+    report.add_argument("--output", default=config.REPORT_PATH, metavar="PATH", help="Markdown file to write.")
+
     for command in (deals, drops, history, alert, serve, board):
         command.add_argument("--db", default=None, metavar="PATH", help="SQLite database to read.")
     for command in (deals, drops):
@@ -199,6 +204,9 @@ def default_db_path(output_dir: str = ".") -> str:
 
 def run_query(command: str, args: argparse.Namespace) -> int:
     """Prints the result of one history command and returns the exit code."""
+    if command == "report":
+        return run_report(args.data or os.path.join(config.DATA_DIR, config.FINAL_CSV_NAME), args.output)
+
     db_path = args.db or default_db_path()
     if not os.path.exists(db_path):
         logger.error(f"No price history at {db_path}; run the pipeline first or pass --db.")
@@ -240,6 +248,21 @@ def run_server(db_path: str, host: str, port: int) -> int:
         return EXIT_SCRAPE_FAILED
 
     uvicorn.run(create_app(db_path), host=host, port=port)
+    return 0
+
+
+def run_report(data_path: str, output_path: str) -> int:
+    """Writes the Markdown findings for a dataset CSV."""
+    try:
+        df = validate_dataset(load_cache(data_path), data_path)
+    except (ScrapeError, DataValidationError) as e:
+        logger.error(e)
+        return EXIT_INVALID_DATA
+
+    os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
+    with open(output_path, "w", encoding="utf-8", newline="\n") as file:
+        file.write(build_report(df))
+    logger.info(f"Wrote findings for {len(df)} games to {output_path}")
     return 0
 
 

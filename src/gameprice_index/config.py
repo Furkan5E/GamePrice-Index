@@ -78,6 +78,7 @@ PLOTS_DIR = "plots"
 FINAL_CSV_NAME = "data.csv"
 CROSS_STORE_CSV_NAME = "cross_store_prices.csv"
 DATABASE_NAME = "game_prices.db"
+REPORT_PATH = "reports/findings.md"
 
 # --- Alerts ---
 WATCHLIST_NAME = "watchlist.toml"
