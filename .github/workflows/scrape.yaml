@@ -57,6 +57,9 @@ jobs:
             --db published/game_prices.db \
             --limit "${{ inputs.limit || '1000' }}"
 
+      - name: Write the findings report
+        run: uv run gameprice-index report --data published/data/data.csv --output published/findings.md
+
       # needs a committed watchlist.toml; add the webhook as a repository secret to get Discord messages
       - name: Send watchlist alerts
         if: hashFiles('watchlist.toml') != ''
