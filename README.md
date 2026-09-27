@@ -31,6 +31,49 @@ An automated ETL (Extract, Transform, Load) and market intelligence pipeline tha
 
 ---
 
+## Architecture
+
+```mermaid
+flowchart LR
+    subgraph Sources
+        N[Nintendo eShop<br/>search index + price service]
+        P[PlayStation Store<br/>GraphQL]
+        D[PlayStation Direct<br/>catalogue service]
+        S[Steam<br/>search feed]
+        X[Xbox<br/>browse service]
+    end
+
+    N & P & D & S & X --> SC[Scrapers<br/>retry, backoff, pacing]
+    SC --> PR[Processor<br/>clean, dedupe, discounts]
+    PR --> V{Validation<br/>pandera schema}
+    V -- invalid --> STOP[Exit non-zero,<br/>nothing written]
+    V -- valid --> CSV[(CSV dataset<br/>and cache)]
+    V -- valid --> DB[(SQLite<br/>price history)]
+
+    CSV --> M[Title matching]
+    M --> PL[Plots]
+    M --> RP[Findings report]
+    DB --> CLI[deals / drops / history]
+    DB --> AL[Watchlist alerts<br/>Discord]
+    DB --> API[FastAPI]
+    DB --> DASH[Streamlit dashboard]
+```
+
+| Module | Responsibility |
+| --- | --- |
+| `scrapers/` | One class per storefront behind the shared `Scraper` interface. |
+| `http_client.py` | The retrying, rate-limited HTTP session. |
+| `processor.py` | Cleans records into the common dataset and computes discounts. |
+| `validation.py` | The `pandera` schema every dataset must pass. |
+| `storage.py` | SQLite schema, upserts and history queries. |
+| `matching.py` | Title normalisation and cross-store matching. |
+| `alerts.py` | Watchlist rules and Discord delivery. |
+| `analysis.py`, `visualiser.py` | The findings report and the plots. |
+| `api.py`, `dashboard.py` | The FastAPI service and the Streamlit app. |
+| `cli.py` | The `gameprice-index` command. |
+
+---
+
 ## Setup Instructions
 
 Clone the repository and install dependencies using uv:
