@@ -156,8 +156,31 @@ docker run -it --rm -v "${PWD}/data:/app/data" ghcr.io/furkan5e/gameprice-index:
 ---
 ## Analytics & Visualisations
 
-### Price Distribution & Ranked Index
+The numbers below come from the committed dataset (4,004 games) and are reproduced by `uv run gameprice-index report`; the full write-up is in [reports/findings.md](reports/findings.md).
+
+| Storefront | Games | Median price | On sale | Median discount |
+| --- | --- | --- | --- | --- |
+| Nintendo | 1,000 | £19.99 | 31.0% | 67.5% |
+| PlayStation Store | 1,000 | £19.99 | 31.8% | 50.0% |
+| Steam | 1,000 | £12.79 | 37.0% | 50.0% |
+| Xbox | 1,000 | £20.61 | 20.6% | 50.0% |
+
+* **Steam is the cheapest catalogue** by median price (£12.79) and has the largest share of games on sale (37%).
+* **Nintendo discounts deepest:** when a game is on sale the typical cut is 67.5%, against 50% elsewhere. Xbox has the fewest games on sale (20.6%).
+* **The same game usually costs the same everywhere.** Across 631 games matched on at least two stores, average regular prices differ by under 2% between storefronts; the gaps come from a minority of titles.
+* **PlayStation Direct** sells only four physical titles in the UK, so it is tracked but left out of the comparisons.
+
+### Same Games, Different Stores
+![Cross-store prices](plots/cross_store_prices.png)
+
+### Price Distribution
 ![Price Analysis](plots/price_analysis.png)
+
+### Discount Depth
+![Price vs Discount](plots/price_vs_discount.png)
+
+### Catalogue by Platform
+![Platform Distribution](plots/platform_distribution.png)
 
 ---
 ## Disclaimer
