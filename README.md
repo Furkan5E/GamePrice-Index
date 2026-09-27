@@ -145,13 +145,18 @@ Build the Docker image:
 ```bash
 docker build -t gameprice-index .
 ```
-Run the container, maps output files to your local data/ and plots/ directories:
+Run the pipeline, mapping the output to your local `data/` and `plots/` directories:
 ```bash
 docker run --rm -v "$(pwd)/data:/app/data" -v "$(pwd)/plots:/app/plots" gameprice-index
 ```
-Pre-built container
+Anything after the image name is passed to the command, for example a cached run or the API:
 ```bash
-docker run -it --rm -v "${PWD}/data:/app/data" ghcr.io/furkan5e/gameprice-index:latest
+docker run --rm -v "$(pwd)/data:/app/data" -v "$(pwd)/plots:/app/plots" gameprice-index --cached
+docker run --rm -p 8000:8000 -v "$(pwd)/data:/app/data" gameprice-index serve --host 0.0.0.0
+```
+Pre-built container:
+```bash
+docker run --rm -v "$(pwd)/data:/app/data" -v "$(pwd)/plots:/app/plots" ghcr.io/furkan5e/gameprice-index:latest
 ```
 ---
 ## Analytics & Visualisations
