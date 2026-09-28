@@ -1,5 +1,5 @@
 # Install once with: uv run pre-commit install
-exclude: ^(data|plots)/
+exclude: ^(data|plots|reports|tests/fixtures)/
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
