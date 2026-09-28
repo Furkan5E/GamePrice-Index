@@ -11,3 +11,5 @@ scripts/
 .ruff_cache/
 *.md
 !README.md
+reports/
+watchlist*.toml

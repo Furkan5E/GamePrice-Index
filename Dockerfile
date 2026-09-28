@@ -16,12 +16,12 @@ WORKDIR /app
 
 # install dependencies first so this layer is cached until the lockfile changes
 COPY --chown=app:app pyproject.toml uv.lock ./
-RUN uv sync --frozen --no-dev --no-install-project
+RUN uv sync --frozen --no-dev --extra api --no-install-project
 
-# only the package itself goes into the image; tests and dev tools stay out
+# only the package and its API go into the image; tests, dev tools and the dashboard stay out
 COPY --chown=app:app README.md ./
 COPY --chown=app:app src/ src/
-RUN uv sync --frozen --no-dev
+RUN uv sync --frozen --no-dev --extra api
 
 # call the installed script directly so the container never re-syncs at start-up
 ENV PATH="/app/.venv/bin:$PATH"
