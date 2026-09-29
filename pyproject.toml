@@ -1,6 +1,6 @@
 [project]
 name = "gameprice-index"
-version = "0.1.0"
+version = "0.2.0"
 description = "ETL pipeline that scrapes, stores and analyses video game prices across storefronts"
 readme = "README.md"
 requires-python = ">=3.14"
