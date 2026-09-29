@@ -129,6 +129,12 @@ uv sync --extra dashboard
 uv run gameprice-index dashboard
 ```
 
+Get alerts for games you are waiting on. Copy `watchlist.example.toml` to `watchlist.toml`, list the games, then:
+```bash
+uv run gameprice-index alerts --dry-run   # show what would be sent
+uv run gameprice-index alerts             # print, and post to Discord if DISCORD_WEBHOOK_URL is set
+```
+
 Run the test suite:
 ```bash
 uv run pytest
@@ -139,6 +145,18 @@ uv run ruff check .
 uv run ruff format .
 uv run mypy
 ```
+---
+## Scheduled Scraping
+
+The [Daily Scrape](.github/workflows/scrape.yaml) workflow runs the pipeline every morning and publishes the result to a separate `data` branch, so `main` stays about code:
+
+* `game_prices.db` is restored from the `data` branch, extended with the day's prices and pushed back, which is how the history grows.
+* The dataset CSVs, plots and `findings.md` are refreshed alongside it.
+* A failed or invalid scrape fails the job before anything is published.
+* If a `watchlist.toml` is committed, alerts are sent after each scrape. Add the webhook as a repository secret named `DISCORD_WEBHOOK_URL`.
+
+It can also be started by hand from the Actions tab, with a different `--limit`.
+
 ---
 ## Docker
 Build the Docker image:
