@@ -1,0 +1,625 @@
+title_key,name,Nintendo,PlayStation Direct,PlayStation Store,Steam,Xbox,stores,cheapest_store,spread
+red dead redemption,Red Dead Redemption,39.99,,49.99,60.98,49.99,4,Nintendo,20.99
+resident evil 4,Resident Evil 4,15.99,,34.99,34.99,32.98,4,Nintendo,19.0
+warhammer 40 000 rogue trader,"Warhammer 40,000: Rogue Trader",42.99,,39.99,56.23,42.99,4,PlayStation Store,16.24
+silver pines,Silver Pines,21.99,,19.99,30.58,21.99,4,PlayStation Store,10.59
+dragon ball sparking zero,DRAGON BALL: Sparking! ZERO,54.99,,44.99,44.99,44.99,4,PlayStation Store,10.0
+ea sports madden nfl 27,EA SPORTS™ Madden NFL 27,69.99,,69.99,59.99,69.99,4,Steam,10.0
+final fantasy resonance,FINAL FANTASY RESONANCE,49.99,,49.99,39.99,49.99,4,Steam,10.0
+indiana jones and great circle,Indiana Jones and the Great Circle,59.99,,69.99,59.99,69.99,4,Nintendo,10.0
+nba 2k27,NBA 2K27,69.99,,69.99,59.99,69.99,4,Steam,10.0
+no mans sky,No Man's Sky,39.99,,39.99,49.99,39.99,4,Nintendo,10.0
+wwe 2k26,WWE 2K26,59.99,,69.99,59.99,69.99,4,Nintendo,10.0
+high on life 2,High On Life 2,30.49,,34.99,35.75,33.49,4,Nintendo,5.26
+five nights at freddys security breach,Five Nights at Freddy's: Security Breach,35.99,,32.99,30.99,33.49,4,Steam,5.0
+hell is us,Hell is Us,49.99,,49.99,44.99,49.99,4,Steam,5.0
+onimusha way of sword,Onimusha: Way of the Sword,59.99,,64.99,59.99,64.99,4,Nintendo,5.0
+resident evil requiem,Resident Evil Requiem,64.99,,64.99,59.99,64.99,4,Steam,5.0
+subnautica,Subnautica,25.99,,29.99,25.99,24.99,4,Xbox,5.0
+well dweller,Well Dweller,17.99,,15.99,13.49,16.74,4,Steam,4.5
+dispatch,Dispatch,24.99,,28.99,24.99,24.99,4,Nintendo,4.0
+harvest moon echoes of teradea,Harvest Moon: Echoes of Teradea,44.99,,44.99,44.99,41.74,4,Xbox,3.25
+ratatan,Ratatan,31.49,,29.99,28.39,29.24,4,Steam,3.1
+tcg card shop simulator,TCG Card Shop Simulator,18.49,,15.99,17.75,16.74,4,PlayStation Store,2.5
+lord of rings war in north legacy edition,The Lord of the Rings: War in the North™ - Legacy Edition,17.59,,18.99,16.75,16.74,4,Xbox,2.25
+escape backrooms,Escape the Backrooms,9.99,,9.99,7.99,9.99,4,Steam,2.0
+grounded,Grounded,34.99,,32.99,34.99,34.99,4,PlayStation Store,2.0
+valheim,Valheim,23.49,,24.99,23.49,23.49,4,Nintendo,1.5
+clive barkers hellraiser revival,Clive Barker's Hellraiser: Revival,35.99,,34.99,34.99,34.99,4,PlayStation Store,1.0
+dave diver,DAVE THE DIVER,16.99,,15.99,16.99,16.74,4,PlayStation Store,1.0
+stray,Stray,23.99,,24.99,23.99,24.99,4,Nintendo,1.0
+witchs bakery,The Witch's Bakery,16.99,,15.99,16.99,16.99,4,PlayStation Store,1.0
+among us,Among Us,3.89,,3.29,3.99,4.19,4,PlayStation Store,0.9
+hollow knight silksong,Hollow Knight: Silksong,16.75,,15.99,16.75,16.75,4,PlayStation Store,0.76
+neon abyss 2,Neon Abyss 2,15.99,,15.99,16.75,16.74,4,Nintendo,0.76
+disney dreamlight valley,Disney Dreamlight Valley,33.49,,32.99,33.49,33.49,4,PlayStation Store,0.5
+castlevania belmonts curse,Castlevania: Belmont's Curse,24.98,,24.99,24.98,24.98,4,Nintendo,0.01
+runescape dragonwilds,RuneScape: Dragonwilds,24.99,,25.0,24.99,24.99,4,Nintendo,0.01
+dynasty warriors 3 complete edition remastered,DYNASTY WARRIORS 3: Complete Edition Remastered,32.99,,32.99,32.99,32.99,4,Nintendo,0.0
+hades 2,Hades II,24.99,,24.99,24.99,24.99,4,Nintendo,0.0
+kingdom hearts hd 1 5 2 5 remix,KINGDOM HEARTS -HD 1.5+2.5 ReMIX-,32.99,,32.99,32.99,32.99,4,Nintendo,0.0
+minecraft dungeons 2,Minecraft Dungeons II,24.99,,24.99,24.99,24.99,4,Nintendo,0.0
+monster hunter wilds,Monster Hunter Wilds,34.99,,34.99,34.99,34.99,4,Nintendo,0.0
+pga tour 2k25,PGA TOUR 2K25,39.99,,39.99,39.99,39.99,4,Nintendo,0.0
+pragmata,PRAGMATA,49.99,,49.99,49.99,49.99,4,Nintendo,0.0
+powerwash simulator,PowerWash Simulator,19.99,,19.99,19.99,19.99,4,Nintendo,0.0
+powerwash simulator 2,PowerWash Simulator 2,19.99,,19.99,19.99,19.99,4,Nintendo,0.0
+reanimal,REANIMAL,34.99,,34.99,34.99,34.99,4,Nintendo,0.0
+risk of rain 2,Risk of Rain 2,19.99,,19.99,19.99,19.99,4,Nintendo,0.0
+sonic racing crossworlds,Sonic Racing: CrossWorlds,34.99,,34.99,34.99,34.99,4,Nintendo,0.0
+elder scrolls 4 oblivion remastered,The Elder Scrolls IV: Oblivion Remastered,49.99,,49.99,49.99,49.99,4,Nintendo,0.0
+vampire survivors,Vampire Survivors,3.99,,3.99,3.99,3.99,4,Nintendo,0.0
+call of duty modern warfare 4,Call of Duty®: Modern Warfare® 4,99.99,,,59.99,69.99,3,Steam,40.0
+resident evil 2,RESIDENT EVIL 2,,,7.99,34.99,31.99,3,PlayStation Store,27.0
+f1 25,F1® 25,,,69.99,44.99,69.99,3,Steam,25.0
+assassins creed shadows,Assassin's Creed Shadows,49.99,,69.99,,69.99,3,Nintendo,20.0
+nba 2k26,NBA 2K26,49.99,,69.99,,69.99,3,Nintendo,20.0
+saints row,Saints Row,,,24.99,26.49,8.99,3,Xbox,17.5
+terraria,Terraria,24.99,,,8.5,13.59,3,Steam,16.49
+lego harry potter collection,LEGO®  Harry Potter™ Collection,24.99,,32.99,,16.99,3,Xbox,16.0
+ark survival ascended,ARK: Survival Ascended,,,39.99,49.26,33.43,3,Xbox,15.83
+hogwarts legacy,Hogwarts Legacy,49.99,,,49.99,64.99,3,Nintendo,15.0
+crime scene cleaner,Crime Scene Cleaner,,,24.99,38.46,24.99,3,PlayStation Store,13.47
+horse club ride west,HORSE CLUB Ride West,35.99,,24.99,,24.99,3,PlayStation Store,11.0
+mewgenics,Mewgenics,35.99,,32.99,24.99,,3,Steam,11.0
+snowrunner,SnowRunner,35.99,,,24.99,34.99,3,Steam,11.0
+a plague tale requiem,A Plague Tale: Requiem,,,49.99,59.99,49.99,3,PlayStation Store,10.0
+ace combat 8 wings of theve,ACE COMBAT 8: WINGS OF THEVE,,,64.99,54.99,64.99,3,Steam,10.0
+borderlands 3,Borderlands 3,,,59.99,49.99,59.99,3,Steam,10.0
+cyberpunk 2077,Cyberpunk 2077,,,39.99,49.99,49.99,3,PlayStation Store,10.0
+ea sports college football 27,EA SPORTS™ College Football 27,,,69.99,59.99,69.99,3,Steam,10.0
+insurgency sandstorm,Insurgency: Sandstorm,,,34.99,24.99,34.99,3,Steam,10.0
+kingdom come deliverance 2,Kingdom Come: Deliverance II,,,59.99,49.99,59.99,3,Steam,10.0
+mortal kombat 1,Mortal Kombat 1,34.99,,44.99,,44.99,3,Nintendo,10.0
+rematch,REMATCH,,,19.99,29.99,20.99,3,PlayStation Store,10.0
+resident evil 3,RESIDENT EVIL 3,24.99,,34.99,,32.99,3,Nintendo,10.0
+star wars zero company,STAR WARS Zero Company™,,,49.99,39.99,49.99,3,Steam,10.0
+farming simulator 25,Farming Simulator 25,,,34.99,25.99,34.99,3,Steam,9.0
+gang beasts,Gang Beasts,24.99,,,15.99,15.99,3,Steam,9.0
+john carpenters toxic commando,John Carpenter's Toxic Commando,,,34.99,43.99,34.99,3,PlayStation Store,9.0
+dead by daylight,Dead by Daylight,25.79,,,17.19,25.79,3,Steam,8.6
+clair obscur expedition 33,Clair Obscur: Expedition 33,,,44.99,49.99,41.74,3,Xbox,8.25
+backrooms escape together,Backrooms: Escape Together,,,11.99,8.5,16.74,3,Steam,8.24
+baldurs gate 3,Baldur's Gate 3,,,57.99,49.99,57.99,3,Steam,8.0
+gothic 1 remake,Gothic 1 Remake,,,49.99,41.99,49.99,3,Steam,8.0
+ravenswatch,Ravenswatch,26.99,,24.99,20.99,,3,Steam,6.0
+resonance a plague tale legacy,Resonance: A Plague Tale Legacy,,,49.99,43.99,49.99,3,Steam,6.0
+witcher 3 wild hunt remastered,The Witcher 3: Wild Hunt — Remastered,45.99,,,39.99,39.99,3,Steam,6.0
+ark survival evolved,ARK: Survival Evolved,17.99,,,12.79,12.49,3,Xbox,5.5
+trailmakers,Trailmakers,,,24.99,19.49,24.99,3,Steam,5.5
+undertale,UNDERTALE,11.99,,,6.99,12.49,3,Steam,5.5
+age of empires 4 anniversary edition,Age of Empires IV: Anniversary Edition,,,34.99,29.99,34.99,3,Steam,5.0
+date everything,Date Everything!,29.99,,,34.99,29.99,3,Nintendo,5.0
+infection free zone,Infection Free Zone,,,24.99,19.99,24.99,3,Steam,5.0
+jujutsu kaisen cursed clash,Jujutsu Kaisen Cursed Clash,54.99,,49.99,49.99,,3,PlayStation Store,5.0
+mxgp 26 official game,MXGP 26 - The Official Game,,,49.99,44.99,49.99,3,Steam,5.0
+mortal shell 2,Mortal Shell II,,,44.99,39.99,39.99,3,Steam,5.0
+naruto 10 boruto ultimate ninja storm connections,NARUTO X BORUTO ULTIMATE NINJA STORM CONNECTIONS,54.99,,49.99,,49.99,3,PlayStation Store,5.0
+overcooked all you can eat,Overcooked! All You Can Eat,29.99,,34.99,29.99,,3,Nintendo,5.0
+persona 5 royal,Persona 5 Royal,54.99,,49.99,,49.99,3,PlayStation Store,5.0
+split fiction,SPLIT FICTION,44.99,,,39.99,44.99,3,Steam,5.0
+star trek voyager across unknown,Star Trek: Voyager - Across the Unknown,32.49,,34.99,29.99,,3,Steam,5.0
+trepang2,Trepang2,,,29.99,24.99,29.99,3,Steam,5.0
+warhammer 40 000 space marine 2,"Warhammer 40,000: Space Marine 2",,,59.99,54.99,59.99,3,Steam,5.0
+disco elysium final cut,Disco Elysium - The Final Cut,35.99,,32.99,31.99,,3,Steam,4.0
+golf with your friends,Golf With Your Friends,14.99,,,10.99,14.99,3,Steam,4.0
+human fall flat,Human Fall Flat,15.99,,15.99,,19.99,3,Nintendo,4.0
+minecraft,Minecraft,19.99,,15.99,,19.99,3,PlayStation Store,4.0
+sifu,Sifu,35.99,,32.99,31.99,,3,Steam,4.0
+binding of isaac repentance,The Binding of Isaac: Repentance,53.99,,49.99,,49.99,3,PlayStation Store,4.0
+trails in sky 2nd chapter,Trails in the Sky 2nd Chapter,53.99,,49.99,49.99,,3,PlayStation Store,4.0
+formula legends,Formula Legends,17.99,,15.99,19.87,,3,PlayStation Store,3.88
+valor mortis,Valor Mortis,,,34.99,38.68,34.99,3,PlayStation Store,3.69
+crusader kings 3,Crusader Kings III,,,44.99,41.99,41.74,3,Xbox,3.25
+gladio mori,Gladio Mori,,,15.99,13.49,16.74,3,Steam,3.25
+mortal kombat legacy kollection,Mortal Kombat: Legacy Kollection,41.99,,44.99,,41.74,3,Xbox,3.25
+abiotic factor,Abiotic Factor,,,26.99,29.99,29.99,3,PlayStation Store,3.0
+cult of lamb,Cult of the Lamb,22.49,,19.99,19.49,,3,Steam,3.0
+medieval dynasty,Medieval Dynasty,,,29.99,26.99,29.24,3,Steam,3.0
+doki doki literature club plus,Doki Doki Literature Club Plus!,11.29,,9.79,,12.49,3,PlayStation Store,2.7
+five nights at freddys,Five Nights at Freddy's,6.29,,,3.99,6.69,3,Steam,2.7
+outlast trials,The Outlast Trials,,,30.99,33.5,31.99,3,PlayStation Store,2.51
+graveyard keeper 2,Graveyard Keeper 2,22.49,,19.99,22.49,,3,PlayStation Store,2.5
+green hell,Green Hell,,,19.99,22.49,20.99,3,PlayStation Store,2.5
+hades,Hades,22.49,,19.99,20.99,,3,PlayStation Store,2.5
+high on life,High On Life,30.49,,32.99,30.49,,3,Nintendo,2.5
+warhammer 40 000 boltgun 2,"Warhammer 40,000: Boltgun 2",,,19.99,22.49,20.99,3,PlayStation Store,2.5
+halloween game,Halloween: The Game,,,34.99,35.75,33.49,3,Xbox,2.26
+goat simulator 3,Goat Simulator 3,26.99,,24.99,,27.24,3,PlayStation Store,2.25
+raft,Raft,,,18.99,17.75,19.99,3,Steam,2.24
+active matter,Active Matter,,,24.99,24.99,26.99,3,PlayStation Store,2.0
+cuphead,Cuphead,16.99,,,14.99,16.74,3,Steam,2.0
+dark souls remastered,DARK SOULS: REMASTERED,34.99,,,34.99,32.99,3,Xbox,2.0
+deltarune,DELTARUNE,20.99,,18.99,20.99,,3,PlayStation Store,2.0
+dragon ball xenoverse 2,DRAGON BALL XENOVERSE 2,17.99,,,16.99,15.99,3,Xbox,2.0
+dune awakening,Dune: Awakening,,,39.99,41.99,39.99,3,PlayStation Store,2.0
+marvel cosmic invasion,MARVEL Cosmic Invasion,26.99,,24.99,,24.99,3,PlayStation Store,2.0
+mount and blade 2 bannerlord,Mount & Blade II: Bannerlord,,,44.99,42.99,42.99,3,Steam,2.0
+resident evil village,Resident Evil Village,,,34.99,34.99,32.99,3,Xbox,2.0
+dark pictures anthology man of medan,The Dark Pictures Anthology: Man Of Medan,17.99,,15.99,16.99,,3,PlayStation Store,2.0
+tiny bookshop,Tiny Bookshop,17.99,,15.99,16.99,,3,PlayStation Store,2.0
+what remains of edith finch,What Remains of Edith Finch,17.99,,15.99,15.99,,3,PlayStation Store,2.0
+order of sinking star,Order of the Sinking Star,26.75,,24.99,26.75,,3,PlayStation Store,1.76
+jackbox party pack 12,The Jackbox Party Pack 12,24.99,,,26.75,24.99,3,Nintendo,1.76
+farm together 2,Farm Together 2,23.39,,21.99,21.66,,3,Steam,1.73
+content warning,Content Warning,,,7.99,6.39,7.99,3,Steam,1.6
+saints row third remastered,Saints Row The Third Remastered,,,24.99,26.49,24.99,3,PlayStation Store,1.5
+house flipper 2,House Flipper 2,33.79,,32.99,32.49,,3,Steam,1.3
+my recycling center 2,My Recycling Center 2,,,13.99,15.25,14.24,3,PlayStation Store,1.26
+astral ascent,Astral Ascent,20.99,,19.99,20.99,,3,PlayStation Store,1.0
+brotato,Brotato,4.99,,3.99,3.99,,3,PlayStation Store,1.0
+hello kitty island adventure,Hello Kitty Island Adventure,35.99,,34.99,35.99,,3,PlayStation Store,1.0
+hunt showdown 1896,Hunt: Showdown 1896,,,24.99,25.99,24.99,3,PlayStation Store,1.0
+mio memories in orbit,MIO: Memories in Orbit,16.99,,15.99,16.99,,3,PlayStation Store,1.0
+outer wilds,Outer Wilds,20.99,,19.99,19.99,,3,PlayStation Store,1.0
+payday 3,PAYDAY 3,,,24.99,23.99,23.99,3,Steam,1.0
+south park stick of truth,South Park™ : The Stick of Truth™,24.99,,,25.99,24.99,3,Nintendo,1.0
+stardew valley,Stardew Valley,10.99,,,10.99,11.99,3,Nintendo,1.0
+teardown,Teardown,,,24.99,25.99,24.99,3,PlayStation Store,1.0
+planet crafter,The Planet Crafter,,,18.99,19.99,19.99,3,PlayStation Store,1.0
+warhammer 40 000 boltgun,"Warhammer 40,000: Boltgun",,,17.99,18.99,17.99,3,PlayStation Store,1.0
+poppy playtime chapter 4,Poppy Playtime: Chapter 4,15.89,,15.99,,16.74,3,Nintendo,0.85
+poppy playtime chapter 5,Poppy Playtime: Chapter 5,15.89,,15.99,,16.74,3,Nintendo,0.85
+plateup,PlateUp!,16.75,,15.99,16.75,,3,PlayStation Store,0.76
+echo weaver,Echo Weaver,15.99,,15.99,,16.74,3,Nintendo,0.75
+cloverpit,CloverPit,8.5,,7.99,8.5,,3,PlayStation Store,0.51
+satisfactory,Satisfactory,,,32.99,33.5,33.49,3,PlayStation Store,0.51
+arma reforger,Arma Reforger,,,32.99,32.99,33.49,3,PlayStation Store,0.5
+big walk,Big Walk,15.99,,15.49,15.99,,3,PlayStation Store,0.5
+forever ago,Forever Ago,,,15.49,15.99,15.99,3,PlayStation Store,0.5
+leafy corner,Leafy Corner,8.49,,7.99,8.49,,3,PlayStation Store,0.5
+mixtape,Mixtape,15.99,,15.49,,15.99,3,PlayStation Store,0.5
+moss forgotten relic,Moss: The Forgotten Relic,15.99,,15.49,15.99,,3,PlayStation Store,0.5
+no more room in hell 2,No More Room in Hell 2,,,24.49,24.99,24.99,3,PlayStation Store,0.5
+palworld,Palworld,,,24.49,24.99,24.99,3,PlayStation Store,0.5
+poppy playtime chapter 1,Poppy Playtime: Chapter 1,4.09,,3.69,,4.19,3,PlayStation Store,0.5
+toem 2,TOEM 2,15.99,,15.49,15.99,,3,PlayStation Store,0.5
+waterpark simulator,Waterpark Simulator,,,9.49,9.99,9.99,3,PlayStation Store,0.5
+dumb ways to build,Dumb Ways to Build,,,6.49,6.4,6.69,3,Steam,0.29
+fallout 4,Fallout 4,,,15.99,15.99,15.74,3,Xbox,0.25
+balatro,Balatro,12.79,,12.99,12.79,,3,Nintendo,0.2
+metal gear solid master collection version,METAL GEAR SOLID - Master Collection Version,15.99,,15.99,,15.98,3,Xbox,0.01
+mafia 3 definitive edition,Mafia III: Definitive Edition,,,25.0,24.99,24.99,3,Steam,0.01
+resident evil 7 biohazard,RESIDENT EVIL 7 biohazard,,,15.99,15.98,15.99,3,Steam,0.01
+resident evil 5,Resident Evil 5,15.99,,,15.98,15.99,3,Steam,0.01
+resident evil 6,Resident Evil 6,15.99,,,15.98,15.99,3,Steam,0.01
+solarpunk,Solarpunk,20.7,,20.71,20.7,,3,Nintendo,0.01
+007 first light,007 First Light,,,59.99,59.99,59.99,3,PlayStation Store,0.0
+arc raiders,ARC Raiders,,,34.99,34.99,34.99,3,PlayStation Store,0.0
+aliens fireteam elite 2,Aliens: Fireteam Elite 2,,,44.99,44.99,44.99,3,PlayStation Store,0.0
+assassins creed black flag resynced,Assassin's Creed Black Flag Resynced,,,49.99,49.99,49.99,3,PlayStation Store,0.0
+assetto corsa competizione,Assetto Corsa Competizione,,,34.99,34.99,34.99,3,PlayStation Store,0.0
+avatar legends fighting game,Avatar Legends: The Fighting Game,24.99,,24.99,,24.99,3,Nintendo,0.0
+avatar frontiers of pandora,Avatar: Frontiers of Pandora™,,,24.99,24.99,24.99,3,PlayStation Store,0.0
+blasphemous 2,Blasphemous 2,24.99,,24.99,24.99,,3,Nintendo,0.0
+blue prince,Blue Prince,24.99,,24.99,24.99,,3,Nintendo,0.0
+blueys happy snaps,Bluey's Happy Snaps,34.99,,,34.99,34.99,3,Nintendo,0.0
+control resonant,CONTROL Resonant,,,49.99,49.99,49.99,3,PlayStation Store,0.0
+call of duty black ops,Call of Duty®: Black Ops,,,34.99,34.99,34.99,3,PlayStation Store,0.0
+call of duty black ops 2,Call of Duty®: Black Ops II,,,34.99,34.99,34.99,3,PlayStation Store,0.0
+core keeper,Core Keeper,15.99,,15.99,15.99,,3,Nintendo,0.0
+dragons dogma 2,Dragon's Dogma 2,,,34.99,34.99,34.99,3,PlayStation Store,0.0
+elden ring,ELDEN RING,,,49.99,49.99,49.99,3,PlayStation Store,0.0
+elden ring nightreign,ELDEN RING NIGHTREIGN,,,34.99,34.99,34.99,3,PlayStation Store,0.0
+f1 manager 2024,F1® Manager 2024,29.99,,29.99,29.99,,3,Nintendo,0.0
+fable,Fable,,,59.99,59.99,59.99,3,PlayStation Store,0.0
+fallout 76,Fallout 76,,,34.99,34.99,34.99,3,PlayStation Store,0.0
+forza horizon 6,Forza Horizon 6,,,59.99,59.99,59.99,3,PlayStation Store,0.0
+gear club unlimited 3,Gear.Club Unlimited 3,44.99,,44.99,,44.99,3,Nintendo,0.0
+gears of war reloaded,Gears of War: Reloaded,,,39.99,39.99,39.99,3,PlayStation Store,0.0
+hell let loose vietnam,Hell Let Loose: Vietnam,,,34.99,34.99,34.99,3,PlayStation Store,0.0
+holdfast nations at war,Holdfast: Nations At War,,,15.99,15.99,15.99,3,PlayStation Store,0.0
+jurassic world evolution 3,Jurassic World Evolution 3,,,49.99,49.99,49.99,3,PlayStation Store,0.0
+kingdom hearts 3 re mind dlc,KINGDOM HEARTS III + Re Mind (DLC),32.99,,32.99,,32.99,3,Nintendo,0.0
+lego batman legacy of dark knight,LEGO® Batman™: Legacy of the Dark Knight,59.99,,59.99,,59.99,3,Nintendo,0.0
+little nightmares 3,Little Nightmares III,34.99,,34.99,,34.99,3,Nintendo,0.0
+mouse p i for hire,MOUSE: P.I. For Hire,24.99,,24.99,,24.99,3,Nintendo,0.0
+mafia definitive edition,Mafia: Definitive Edition,,,34.99,34.99,34.99,3,PlayStation Store,0.0
+mafia old country,Mafia: The Old Country,,,44.99,44.99,44.99,3,PlayStation Store,0.0
+minecraft dungeons,Minecraft Dungeons,16.74,,,16.74,16.74,3,Nintendo,0.0
+mortal kombat 11,Mortal Kombat 11,39.99,,39.99,,39.99,3,Nintendo,0.0
+outbound,Outbound,19.99,,19.99,,19.99,3,Nintendo,0.0
+persona 3 reload,Persona 3 Reload,54.99,,54.99,,54.99,3,Nintendo,0.0
+planet zoo 2,Planet Zoo 2,,,39.99,39.99,39.99,3,PlayStation Store,0.0
+plants vs zombies replanted,Plants vs. Zombies™: Replanted,17.99,,17.99,17.99,,3,Nintendo,0.0
+ready or not,Ready or Not,,,44.99,44.99,44.99,3,PlayStation Store,0.0
+s t a l k e r 2 heart of chornobyl,S.T.A.L.K.E.R. 2: Heart of Chornobyl,,,49.99,49.99,49.99,3,PlayStation Store,0.0
+sonic 10 shadow generations,SONIC X SHADOW GENERATIONS,44.99,,44.99,44.99,,3,Nintendo,0.0
+star wars galactic racer,STAR WARS: Galactic Racer™,,,49.99,49.99,49.99,3,PlayStation Store,0.0
+story of seasons grand bazaar,STORY OF SEASONS: Grand Bazaar,44.99,,44.99,44.99,,3,Nintendo,0.0
+sesame street friends and fun,Sesame Street: Friends & Fun,24.99,,24.99,,24.99,3,Nintendo,0.0
+sonic frontiers,Sonic Frontiers,,,34.99,34.99,34.99,3,PlayStation Store,0.0
+south park fractured but whole,South Park™: The Fractured But Whole™,24.99,,,24.99,24.99,3,Nintendo,0.0
+starfield,Starfield,,,44.99,44.99,44.99,3,PlayStation Store,0.0
+street fighter 6,Street Fighter™ 6,34.99,,,34.99,34.99,3,Nintendo,0.0
+tekken 8,TEKKEN 8,,,34.99,34.99,34.99,3,PlayStation Store,0.0
+blood of dawnwalker,The Blood of Dawnwalker,,,59.99,59.99,59.99,3,PlayStation Store,0.0
+elder scrolls 5 skyrim special edition,The Elder Scrolls V: Skyrim Special Edition,,,34.99,34.99,34.99,3,PlayStation Store,0.0
+thomas and friends wonders of sodor,Thomas & Friends™: Wonders of Sodor,29.99,,29.99,29.99,,3,Nintendo,0.0
+two point museum,Two Point Museum,24.99,,24.99,24.99,,3,Nintendo,0.0
+ultimate chicken horse,Ultimate Chicken Horse,10.99,,,10.99,10.99,3,Nintendo,0.0
+warhammer 40 000 darktide,"Warhammer 40,000: Darktide",,,32.99,32.99,32.99,3,PlayStation Store,0.0
+warrior cats clans of forest,Warrior Cats: Clans of the Forest,24.99,,24.99,24.99,,3,Nintendo,0.0
+way of hunter 2,Way of the Hunter 2,,,34.99,34.99,34.99,3,PlayStation Store,0.0
+wobbly life,Wobbly Life,19.99,,19.99,,19.99,3,Nintendo,0.0
+sid meiers civilization 7,Sid Meier's Civilization VII,49.99,,,89.99,,2,Nintendo,40.0
+call of duty modern warfare 2,Call of Duty®: Modern Warfare® 2,,,,59.99,24.99,2,Xbox,35.0
+call of duty modern warfare 3,Call of Duty®: Modern Warfare® 3,,,,59.99,24.99,2,Xbox,35.0
+hitman world of assassination,HITMAN World of Assassination,,,,24.99,58.49,2,Steam,33.5
+metaphor refantazio,Metaphor: ReFantazio,34.99,,59.99,,,2,Nintendo,25.0
+sid meiers civilization 6,Sid Meier's Civilization VI,24.99,,,49.99,,2,Nintendo,25.0
+marvels spider man 2,Marvel's Spider-Man 2,,,69.99,49.99,,2,Steam,20.0
+lost judgment,Lost Judgment,,,49.99,34.99,,2,Steam,15.0
+mlb show 26,MLB® The Show™ 26,,,44.99,,59.99,2,PlayStation Store,15.0
+motogp26,MotoGP™26,44.99,,59.99,,,2,Nintendo,15.0
+pacific drive,Pacific Drive,,,24.99,37.49,,2,PlayStation Store,12.5
+batman arkham knight,Batman™: Arkham Knight,,,,15.99,27.99,2,Steam,12.0
+uboat,UBOAT,,,24.99,36.43,,2,PlayStation Store,11.44
+cities skylines,Cities: Skylines,35.99,,,24.99,,2,Steam,11.0
+sekiro shadows die twice goty edition,Sekiro™: Shadows Die Twice - GOTY Edition,,,,49.9,59.99,2,Steam,10.09
+anomalith,ANOMALITH,49.99,,39.99,,,2,PlayStation Store,10.0
+battlefield 6,Battlefield™ 6,,,,59.99,69.99,2,Steam,10.0
+call of duty black ops cold war,Call of Duty®: Black Ops Cold War,,,,49.99,59.99,2,Steam,10.0
+dragon quest i and 2 hd 2d remake,DRAGON QUEST I & II HD-2D Remake,,,59.99,49.99,,2,Steam,10.0
+dying light 2 stay human reloaded edition,Dying Light 2 Stay Human: Reloaded Edition,,,,49.99,59.99,2,Steam,10.0
+ea sports fc 27,EA SPORTS FC™ 27,49.99,,,59.99,,2,Nintendo,10.0
+final fantasy 7 revelation,FINAL FANTASY VII REVELATION,69.99,,,59.99,,2,Steam,10.0
+l a noire,L.A. Noire,44.99,,,,34.99,2,Xbox,10.0
+leisure suit larry wet dreams dont dry,Leisure Suit Larry - Wet Dreams Don't Dry,35.99,,,25.99,,2,Steam,10.0
+life is strange reunion,Life is Strange: Reunion,,,44.99,34.99,,2,Steam,10.0
+marvels midnight suns,Marvel's Midnight Suns,,,,69.99,59.99,2,Xbox,10.0
+sea of thieves 2026 edition,Sea of Thieves: 2026 Edition,,,,29.99,39.99,2,Steam,10.0
+stellar blade,Stellar Blade™,,,69.99,59.99,,2,Steam,10.0
+tom clancys ghost recon breakpoint,Tom Clancy's Ghost Recon Breakpoint,,,,49.99,59.99,2,Steam,10.0
+long dark,The Long Dark,,,24.99,15.99,,2,Steam,9.0
+wreckfest,Wreckfest,34.99,,,,26.74,2,Xbox,8.25
+diablo 4,Diablo® IV,,,,41.99,49.99,2,Steam,8.0
+sleeping dogs definitive edition,Sleeping Dogs: Definitive Edition,,,,15.99,23.99,2,Steam,8.0
+thehunter call of wild,theHunter: Call of the Wild™,,,,16.75,23.99,2,Steam,7.24
+portal 2,Portal 2,,,,8.19,14.99,2,Steam,6.8
+dayz,DayZ,,,,39.99,45.99,2,Steam,6.0
+middle earth shadow of mordor game of year edition,Middle-earth™: Shadow of Mordor™ - Game of the Year Edition,17.99,,,,23.99,2,Nintendo,6.0
+resident evil 4 gold edition,Resident Evil 4 Gold Edition,44.99,,,,39.98,2,Xbox,5.01
+silent hill 2,SILENT HILL 2,,,59.99,,54.98,2,Xbox,5.01
+assassins creed ezio collection,ASSASSIN’S CREED®: THE EZIO COLLECTION,44.99,,,,39.99,2,Xbox,5.0
+alien rogue incursion evolved edition,Alien: Rogue Incursion Evolved Edition,14.99,,19.99,,,2,Nintendo,5.0
+assassins creed origins,Assassin's Creed Origins,,,,49.99,54.99,2,Steam,5.0
+atomic heart,Atomic Heart,,,59.99,54.99,,2,Steam,5.0
+call of duty black ops cold war cross gen bundle,Call of Duty®: Black Ops Cold War - Cross-Gen Bundle,,,69.99,,64.99,2,Xbox,5.0
+cyberpunk 2077 ultimate edition,Cyberpunk 2077: Ultimate Edition,59.99,,,,64.99,2,Nintendo,5.0
+divinity original sin 2 definitive edition,Divinity: Original Sin 2 - Definitive Edition,44.99,,49.99,,,2,Nintendo,5.0
+endless legend 2,ENDLESS Legend™ 2,,,39.99,44.99,,2,PlayStation Store,5.0
+far cry 5,Far Cry® 5,,,,49.99,54.99,2,Steam,5.0
+grand theft auto trilogy definitive edition,Grand Theft Auto: The Trilogy – The Definitive Edition,49.99,,,,54.99,2,Nintendo,5.0
+hell let loose,Hell Let Loose,,,39.99,,44.99,2,PlayStation Store,5.0
+invincible vs,Invincible VS,,,39.99,,44.99,2,PlayStation Store,5.0
+lego jurassic world,LEGO® Jurassic World,34.99,,,,39.99,2,Nintendo,5.0
+leisure suit larry wet dreams dry twice,Leisure Suit Larry - Wet Dreams Dry Twice,35.99,,,30.99,,2,Steam,5.0
+metal gear rising revengeance,METAL GEAR RISING: REVENGEANCE,,,,19.99,14.99,2,Xbox,5.0
+marvels guardians of galaxy,Marvel's Guardians of the Galaxy,,,54.99,,59.99,2,PlayStation Store,5.0
+nba run,NBA THE RUN,,,19.99,,24.99,2,PlayStation Store,5.0
+paw patrol dino world,PAW Patrol™: Dino World,34.99,,29.99,,,2,PlayStation Store,5.0
+phantom blade zero,Phantom Blade Zero,,,54.99,49.99,,2,Steam,5.0
+planet zoo,Planet Zoo,,,39.99,34.99,,2,Steam,5.0
+robocop rogue city,RoboCop: Rogue City,,,34.99,39.99,,2,PlayStation Store,5.0
+rollercoaster tycoon 3 complete edition,RollerCoaster Tycoon 3 Complete Edition,19.99,,24.99,,,2,Nintendo,5.0
+crew motorfest,The Crew Motorfest,44.99,,,49.99,,2,Nintendo,5.0
+elder scrolls 5 skyrim anniversary edition,The Elder Scrolls V: Skyrim Anniversary Edition,52.99,,,,47.99,2,Xbox,5.0
+last of us part 2 remastered,The Last of Us™ Part II Remastered,,,44.99,39.99,,2,Steam,5.0
+transport fever 3,Transport Fever 3,,,49.99,44.99,,2,Steam,5.0
+uncharted legacy of thieves collection,UNCHARTED: Legacy of Thieves Collection,,,44.99,39.99,,2,Steam,5.0
+undisputed,Undisputed,,,44.99,,39.99,2,Xbox,5.0
+beat saber,Beat Saber,,,15.99,19.99,,2,PlayStation Store,4.0
+bus simulator 27,Bus Simulator 27,,,28.99,24.99,,2,Steam,4.0
+lollipop chainsaw repop,LOLLIPOP CHAINSAW RePOP,41.99,,,,37.99,2,Xbox,4.0
+this bed we made,This Bed We Made,,,24.99,20.99,,2,Steam,4.0
+trails in sky 1st chapter,Trails in the Sky 1st Chapter,53.99,,49.99,,,2,PlayStation Store,4.0
+darkest dungeon 2,Darkest Dungeon II,34.0,,,30.49,,2,Steam,3.51
+bmx streets,BMX Streets,,,24.49,20.99,,2,Steam,3.5
+5 rising,V Rising,,,32.99,29.5,,2,Steam,3.49
+ember knights,Ember Knights,,,19.99,16.75,,2,Steam,3.24
+star wars battlefront classic collection,STAR WARS™ Battlefront Classic Collection,25.95,,28.99,,,2,Nintendo,3.04
+dark souls 2 scholar of first sin,DARK SOULS™ II: Scholar of the First Sin,,,,29.99,32.99,2,Steam,3.0
+darkwood,Darkwood,,,14.99,17.99,,2,PlayStation Store,3.0
+factorio,Factorio,27.0,,,30.0,,2,Nintendo,3.0
+grizzy and lemmings crazy party,Grizzy and the Lemmings - Crazy Party,35.99,,32.99,,,2,PlayStation Store,3.0
+hardspace shipbreaker,Hardspace: Shipbreaker,,,32.99,29.99,,2,Steam,3.0
+lego marvel super heroes,LEGO Marvel Super Heroes,34.99,,,,31.99,2,Xbox,3.0
+middle earth shadow bundle,Middle-earth™: Shadow Bundle,62.99,,,,59.99,2,Xbox,3.0
+escapists 2,The Escapists 2,19.99,,,22.99,,2,Nintendo,3.0
+world war z,World War Z,,,,21.99,24.99,2,Steam,3.0
+police stories,Police Stories,13.99,,,16.75,,2,Nintendo,2.76
+crime simulator,Crime Simulator,,,15.99,13.48,,2,Steam,2.51
+absolum,Absolum,22.49,,19.99,,,2,PlayStation Store,2.5
+agefield high rock school,Agefield High: Rock the School,,,24.99,,22.49,2,Xbox,2.5
+breathedge,Breathedge,22.49,,,19.99,,2,Steam,2.5
+bye sweet carole,Bye Sweet Carole,22.49,,19.99,,,2,PlayStation Store,2.5
+dead cells,Dead Cells,22.49,,19.99,,,2,PlayStation Store,2.5
+dont starve together,Don't Starve Together,13.49,,,10.99,,2,Steam,2.5
+little kitty big city,"Little Kitty, Big City",22.49,,19.99,,,2,PlayStation Store,2.5
+rollercoaster tycoon classic,RollerCoaster Tycoon Classic,22.49,,19.99,,,2,PlayStation Store,2.5
+house of dead remake,THE HOUSE OF THE DEAD: Remake,22.49,,19.99,,,2,PlayStation Store,2.5
+teenage mutant ninja turtles shredders revenge,Teenage Mutant Ninja Turtles: Shredder's Revenge,22.49,,19.99,,,2,PlayStation Store,2.5
+scootx,ScootX,,,18.99,16.75,,2,Steam,2.24
+chants of sennaar,Chants of Sennaar,15.98,,,17.99,,2,Nintendo,2.01
+arizona sunshine,Arizona Sunshine®,,,19.99,21.99,,2,PlayStation Store,2.0
+beyblade 10 evobattle,BEYBLADE X EVOBATTLE,41.99,,39.99,,,2,PlayStation Store,2.0
+control ultimate edition,CONTROL Ultimate Edition,,,34.99,32.99,,2,Steam,2.0
+celeste,Celeste,17.99,,,15.99,,2,Steam,2.0
+doom,DOOM,16.99,,,,14.99,2,Xbox,2.0
+dragon ball fighterz,DRAGON BALL FighterZ PS4 & PS5,49.99,,47.99,,,2,PlayStation Store,2.0
+dredge,DREDGE,21.99,,,23.99,,2,Nintendo,2.0
+diablo 2 resurrected infernal edition,Diablo II: Resurrected – Infernal Edition,33.99,,,35.99,,2,Nintendo,2.0
+dying light beast,Dying Light: The Beast,,,57.99,,59.99,2,PlayStation Store,2.0
+final fantasy 14 online,FINAL FANTASY XIV Online,11.99,,,9.99,,2,Steam,2.0
+guilty gear strive,GUILTY GEAR -STRIVE-,,,34.99,36.99,,2,PlayStation Store,2.0
+inscryption,Inscryption,17.99,,15.99,,,2,PlayStation Store,2.0
+instant sports 2,Instant Sports 2,26.99,,24.99,,,2,PlayStation Store,2.0
+qliphah in providences shadow,Qliphah in Providence's Shadow,21.99,,19.99,,,2,PlayStation Store,2.0
+rise of tomb raider 20 year celebration,Rise of the Tomb Raider: 20 Year Celebration,26.99,,,,24.99,2,Xbox,2.0
+slime rancher 2,Slime Rancher 2,,,24.99,,22.99,2,Xbox,2.0
+snufkin melody of moominvalley,Snufkin: Melody of Moominvalley,17.99,,15.99,,,2,PlayStation Store,2.0
+dark pictures anthology little hope,The Dark Pictures Anthology: Little Hope,17.99,,15.99,,,2,PlayStation Store,2.0
+jackbox party pack 11,The Jackbox Party Pack 11,,,24.99,26.99,,2,PlayStation Store,2.0
+stanley parable ultra deluxe,The Stanley Parable: Ultra Deluxe,,,17.99,19.99,,2,PlayStation Store,2.0
+tokyo xtreme racer,Tokyo Xtreme Racer,,,39.99,41.99,,2,PlayStation Store,2.0
+unpacking,Unpacking,17.99,,15.99,,,2,PlayStation Store,2.0
+winx club magic is back,Winx Club: The Magic is Back,26.99,,24.99,,,2,PlayStation Store,2.0
+hollow knight,Hollow Knight,10.99,,,12.79,,2,Nintendo,1.8
+sengoku dynasty,Sengoku Dynasty,,,24.99,23.23,,2,Steam,1.76
+time to wake up,Time To Wake Up,,,11.99,13.75,,2,PlayStation Store,1.76
+car dealer simulator,Car Dealer Simulator,,,18.99,17.39,,2,Steam,1.6
+moomintroll winters warmth,Moomintroll: Winter's Warmth,17.59,,15.99,,,2,PlayStation Store,1.6
+darkest dungeon,Darkest Dungeon®,17.99,,,19.49,,2,Nintendo,1.5
+deep dish dungeon,Deep Dish Dungeon,,,,13.99,12.49,2,Xbox,1.5
+minecraft legends,Minecraft Legends,33.49,,34.99,,,2,Nintendo,1.5
+art of rally,art of rally,20.99,,,22.49,,2,Nintendo,1.5
+berry bury berry,Berry Bury Berry,,,7.99,6.69,,2,Steam,1.3
+wolfsschanze operation gotterdammerung,Wolfsschanze – Operation Götterdämmerung,,,,13.75,12.49,2,Xbox,1.26
+five hearts under one roof season2,Five Hearts Under One Roof season2,,,17.99,,19.24,2,PlayStation Store,1.25
+deaths door,Death's Door,17.99,,,16.75,,2,Steam,1.24
+kingdom two crowns,Kingdom Two Crowns,17.99,,,16.75,,2,Steam,1.24
+animal well,ANIMAL WELL,,,19.99,20.99,,2,PlayStation Store,1.0
+abyssus,Abyssus,,,19.99,,20.99,2,PlayStation Store,1.0
+deep rock galactic survivor,Deep Rock Galactic: Survivor,,,9.99,10.99,,2,PlayStation Store,1.0
+drug dealer simulator 2,Drug Dealer Simulator 2,,,19.99,,20.99,2,PlayStation Store,1.0
+ender magnolia bloom in mist,ENDER MAGNOLIA: Bloom in the Mist,20.99,,19.99,,,2,PlayStation Store,1.0
+escape simulator,Escape Simulator,,,,14.99,15.99,2,Steam,1.0
+ferocious,FEROCIOUS,,,19.99,,20.99,2,PlayStation Store,1.0
+hello neighbor,Hello Neighbor,,,24.99,,23.99,2,Xbox,1.0
+is this seat taken,Is This Seat Taken?,8.99,,7.99,,,2,PlayStation Store,1.0
+marvel maximum collection,MARVEL MaXimum Collection,,,19.99,,20.99,2,PlayStation Store,1.0
+monster train 2,Monster Train 2,,,19.99,20.99,,2,PlayStation Store,1.0
+moros protocol,Moros Protocol,19.99,,18.99,,,2,PlayStation Store,1.0
+neva,Neva,17.99,,,16.99,,2,Steam,1.0
+shape of dreams,Shape of Dreams,,,19.99,,20.99,2,PlayStation Store,1.0
+superliminal,Superliminal,,,16.99,15.99,,2,Steam,1.0
+thank goodness youre here,Thank Goodness You're Here!,15.99,,14.99,,,2,PlayStation Store,1.0
+binding of isaac rebirth,The Binding of Isaac: Rebirth,,,,10.99,11.99,2,Steam,1.0
+elder scrolls online,The Elder Scrolls Online: Standard Edition,,,,15.99,14.99,2,Xbox,1.0
+talos principle reawakened,The Talos Principle: Reawakened,,,34.99,33.99,,2,Steam,1.0
+totally accurate battle simulator,Totally Accurate Battle Simulator,,,,15.99,14.99,2,Xbox,1.0
+farming simulator 22,Farming Simulator 22,,,24.99,,25.95,2,PlayStation Store,0.96
+mavrix by matt jones,MAVRIX by Matt Jones,,,28.99,29.95,,2,PlayStation Store,0.96
+hidden dogs,Hidden Dogs,,,3.29,,4.19,2,PlayStation Store,0.9
+bread and fred,Bread & Fred,12.79,,11.99,,,2,PlayStation Store,0.8
+yet another zombie survivors,Yet Another Zombie Survivors,,,11.99,12.79,,2,PlayStation Store,0.8
+cash cleaner simulator,Cash Cleaner Simulator,,,15.99,16.75,,2,PlayStation Store,0.76
+constance,Constance,16.75,,15.99,,,2,PlayStation Store,0.76
+mina hollower,Mina the Hollower,17.75,,16.99,,,2,PlayStation Store,0.76
+peglin,Peglin,,,15.99,16.75,,2,PlayStation Store,0.76
+deck of haunts,Deck of Haunts,,,15.99,,16.74,2,PlayStation Store,0.75
+five nights at freddys into pit,Five Nights at Freddy's Into the Pit,,,15.99,,16.74,2,PlayStation Store,0.75
+predator hunting grounds,Predator: Hunting Grounds,,,15.99,,16.74,2,PlayStation Store,0.75
+retrospace,RetroSpace,,,15.99,,16.74,2,PlayStation Store,0.75
+meccha chameleon,MECCHA CHAMELEON,4.59,,,5.29,,2,Nintendo,0.7
+poppy playtime chapter 2,Poppy Playtime: Chapter 2,8.09,,7.39,,,2,PlayStation Store,0.7
+tomb raider definitive edition,Tomb Raider: Definitive Edition,16.39,,,,15.74,2,Xbox,0.65
+bellwright,Bellwright,,,24.49,,24.99,2,PlayStation Store,0.5
+cities skylines remastered,Cities: Skylines - Remastered,,,32.99,,33.49,2,PlayStation Store,0.5
+escape academy,Escape Academy,,,15.99,15.49,,2,Steam,0.5
+five nights at freddys secret of mimic,Five Nights at Freddy's: Secret of the Mimic,,,32.99,,33.49,2,PlayStation Store,0.5
+haste,Haste,,,15.49,15.99,,2,PlayStation Store,0.5
+heartworm,Heartworm,,,11.99,,12.49,2,PlayStation Store,0.5
+nascar 25,NASCAR 25,,,32.99,,33.49,2,PlayStation Store,0.5
+nine sols,Nine Sols,24.99,,24.49,,,2,PlayStation Store,0.5
+pba pro bowling 2026,PBA Pro Bowling 2026,,,32.99,,33.49,2,PlayStation Store,0.5
+party animals,Party Animals,,,14.99,,15.49,2,PlayStation Store,0.5
+phasmophobia,Phasmophobia,,,15.49,15.99,,2,PlayStation Store,0.5
+speedrunners 2 king of speed,SpeedRunners 2: King of Speed,,,11.99,,12.49,2,PlayStation Store,0.5
+strange horticulture,Strange Horticulture,13.99,,,13.49,,2,Steam,0.5
+tainted grail fall of avalon,Tainted Grail: The Fall of Avalon,,,36.99,,37.49,2,PlayStation Store,0.5
+texas chain saw massacre,The Texas Chain Saw Massacre,,,12.99,,12.49,2,Xbox,0.5
+woodo,Woodo,15.49,,15.99,,,2,Nintendo,0.5
+wylde flowers,Wylde Flowers,19.49,,19.99,,,2,Nintendo,0.5
+yooka replaylee,Yooka-Replaylee,24.99,,24.49,,,2,PlayStation Store,0.5
+hollow knight voidheart edition,Hollow Knight Voidheart Edition,,,11.59,,11.99,2,PlayStation Store,0.4
+outlast bundle of terror,Outlast: Bundle of Terror,15.29,,,,14.99,2,Xbox,0.3
+doom eternal,DOOM Eternal,26.99,,,,26.74,2,Xbox,0.25
+quarantine zone last check,Quarantine Zone: The Last Check,,,,16.99,16.74,2,Xbox,0.25
+ultimate admiral dreadnoughts,Ultimate Admiral: Dreadnoughts,,,28.99,,29.24,2,PlayStation Store,0.25
+cookie clicker,Cookie Clicker,,,4.49,4.29,,2,Steam,0.2
+end of abyss,End of Abyss,,,22.49,,22.69,2,PlayStation Store,0.2
+storebound,Storebound,,,8.99,,8.79,2,Xbox,0.2
+tunic,TUNIC,25.19,,,24.99,,2,Steam,0.2
+tingus goose,Tingus Goose,,,6.49,,6.69,2,PlayStation Store,0.2
+mypopgoes,myPOPGOES,4.09,,,,4.19,2,Nintendo,0.1
+blazblue entropy effect 10,BlazBlue Entropy Effect X,20.0,,19.99,,,2,PlayStation Store,0.01
+keep driving,Keep Driving,,,14.99,15.0,,2,PlayStation Store,0.01
+like a dragon infinite wealth,Like a Dragon: Infinite Wealth,,,59.99,59.98,,2,Steam,0.01
+metal gear solid 4 guns of patriots master collection version,METAL GEAR SOLID 4: Guns of the Patriots - Master Collection Version,,,26.99,,26.98,2,Xbox,0.01
+metal gear solid snake eater,METAL GEAR SOLID Δ: SNAKE EATER,,,44.99,,44.98,2,Xbox,0.01
+paperhead,PAPERHEAD,,,,16.75,16.74,2,Xbox,0.01
+silent hill f,SILENT HILL f,,,54.99,,54.98,2,Xbox,0.01
+silent hill townfall,SILENT HILL: Townfall,,,44.99,44.98,,2,Steam,0.01
+super bomberman collection,SUPER BOMBERMAN COLLECTION,15.98,,15.99,,,2,Nintendo,0.01
+supermarket simulator,Supermarket Simulator,,,,16.75,16.74,2,Xbox,0.01
+a little to left,A Little to the Left,12.99,,,12.99,,2,Nintendo,0.0
+a o t 3,A.O.T. 3,,,54.99,,54.99,2,PlayStation Store,0.0
+ace combat 7 skies unknown,ACE COMBAT™ 7: SKIES UNKNOWN,,,,49.99,49.99,2,Steam,0.0
+anno 117 pax romana,Anno 117: Pax Romana,,,49.99,49.99,,2,PlayStation Store,0.0
+assassins creed valhalla,Assassin's Creed Valhalla,,,59.99,,59.99,2,PlayStation Store,0.0
+avatar last airbender quest for balance,Avatar The Last Airbender: Quest for Balance,39.99,,39.99,,,2,Nintendo,0.0
+beast of reincarnation,Beast of Reincarnation,,,49.99,,49.99,2,PlayStation Store,0.0
+black myth wukong,Black Myth: Wukong,,,54.99,,54.99,2,PlayStation Store,0.0
+bluey videogame,Bluey: The Videogame,24.99,,24.99,,,2,Nintendo,0.0
+borderlands4,Borderlands®4,,,69.99,,69.99,2,PlayStation Store,0.0
+bramble mountain king,Bramble: The Mountain King,24.99,,24.99,,,2,Nintendo,0.0
+captain tsubasa 2 world fighters,CAPTAIN TSUBASA 2: WORLD FIGHTERS,54.99,,54.99,,,2,Nintendo,0.0
+cairn,Cairn,,,24.99,24.99,,2,PlayStation Store,0.0
+call of duty world at war,Call of Duty: World at War,,,,19.99,19.99,2,Steam,0.0
+call of wild angler,Call of the Wild: The Angler™,,,24.99,,24.99,2,PlayStation Store,0.0
+car mechanic simulator 2021,Car Mechanic Simulator 2021,,,24.99,,24.99,2,PlayStation Store,0.0
+carx street,CarX Street,,,24.99,,24.99,2,PlayStation Store,0.0
+construction simulator,Construction Simulator,,,24.99,,24.99,2,PlayStation Store,0.0
+coral island,Coral Island,,,24.99,24.99,,2,PlayStation Store,0.0
+crash bandicoot n sane trilogy,Crash Bandicoot™ N. Sane Trilogy,34.99,,,,34.99,2,Nintendo,0.0
+crimson desert enhanced,Crimson Desert Enhanced,,,,54.99,54.99,2,Steam,0.0
+death stranding 2 on beach,DEATH STRANDING 2: ON THE BEACH,,,69.99,69.99,,2,PlayStation Store,0.0
+doom dark ages,DOOM: The Dark Ages,,,44.99,,44.99,2,PlayStation Store,0.0
+dragon ball z kakarot,DRAGON BALL Z: KAKAROT,,,15.99,,15.99,2,PlayStation Store,0.0
+dead island 2,Dead Island 2,,,44.99,,44.99,2,PlayStation Store,0.0
+dead space,Dead Space,,,69.99,,69.99,2,PlayStation Store,0.0
+deadzone rogue,Deadzone: Rogue,,,19.99,19.99,,2,PlayStation Store,0.0
+demeo 10 dungeons and dragons battlemarked,Demeo x Dungeons & Dragons: Battlemarked,24.99,,,,24.99,2,Nintendo,0.0
+demon slayer kimetsu no yaiba hinokami chronicles 2,Demon Slayer -Kimetsu no Yaiba- The Hinokami Chronicles 2,34.99,,34.99,,,2,Nintendo,0.0
+denshattack,Denshattack!,15.99,,15.99,,,2,Nintendo,0.0
+descenders,Descenders,19.99,,,,19.99,2,Nintendo,0.0
+devil may cry 5 special edition,Devil May Cry 5 Special Edition,,,34.99,,34.99,2,PlayStation Store,0.0
+diablo 4 age of hatred collection,Diablo® IV: Age of Hatred Collection,62.99,,,,62.99,2,Nintendo,0.0
+dicevaders,Dicevaders,12.99,,,12.99,,2,Nintendo,0.0
+digimon story time stranger,Digimon Story Time Stranger,54.99,,54.99,,,2,Nintendo,0.0
+disney epic mickey rebrushed,Disney Epic Mickey: Rebrushed,34.99,,34.99,,,2,Nintendo,0.0
+docked,Docked,,,24.99,24.99,,2,PlayStation Store,0.0
+dragon quest heroes torneko s mystery dungeon classic hd,Dragon Quest Heroes: Torneko‘s Mystery Dungeon -Classic HD-,19.99,,19.99,,,2,Nintendo,0.0
+dragons dogma 2 dark arisen,Dragon's Dogma 2: Dark Arisen,44.99,,,,44.99,2,Nintendo,0.0
+duskfade,Duskfade,24.99,,24.99,,,2,Nintendo,0.0
+ea sports madden nfl 26,EA SPORTS™ Madden NFL 26,,,69.99,,69.99,2,PlayStation Store,0.0
+ea sports pga tour,EA SPORTS™ PGA TOUR™,,,69.99,,69.99,2,PlayStation Store,0.0
+echoes of aincrad,Echoes of Aincrad,,,54.99,,54.99,2,PlayStation Store,0.0
+final fantasy 9,FINAL FANTASY IX,16.99,,,,16.99,2,Nintendo,0.0
+final fantasy 7,FINAL FANTASY VII,12.79,,,,12.79,2,Nintendo,0.0
+final fantasy 7 rebirth,FINAL FANTASY VII REBIRTH,49.99,,,,49.99,2,Nintendo,0.0
+final fantasy 7 remake intergrade,FINAL FANTASY VII REMAKE INTERGRADE,39.99,,,,39.99,2,Nintendo,0.0
+final fantasy 8 remastered,FINAL FANTASY VIII Remastered,15.99,,,,15.99,2,Nintendo,0.0
+final fantasy 10 10 2 hd remaster,FINAL FANTASY X/X-2 HD Remaster,44.99,,,,44.99,2,Nintendo,0.0
+for honor,FOR HONOR - Standard Edition,,,,24.99,24.99,2,Steam,0.0
+fallout new vegas,Fallout: New Vegas,,,,8.99,8.99,2,Steam,0.0
+forza horizon 5,Forza Horizon 5 Standard Edition,,,54.99,,54.99,2,PlayStation Store,0.0
+gundam rogue orbit,GUNDAM ROGUE ORBIT,,,49.99,,49.99,2,PlayStation Store,0.0
+gallipoli,Gallipoli,,,24.99,24.99,,2,PlayStation Store,0.0
+gears of war e day,Gears of War: E-Day,,,,59.99,59.99,2,Steam,0.0
+gotham knights,Gotham Knights,,,64.99,,64.99,2,PlayStation Store,0.0
+grounded 2,Grounded 2,,,24.99,24.99,,2,PlayStation Store,0.0
+helldivers 2,HELLDIVERS™ 2,,,34.99,,34.99,2,PlayStation Store,0.0
+hot wheels infinite rush,HOT WHEELS™ Infinite Rush,44.99,,44.99,,,2,Nintendo,0.0
+halo campaign evolved,Halo: Campaign Evolved,,,,49.99,49.99,2,Steam,0.0
+halo master chief collection,Halo: The Master Chief Collection,,,,39.99,39.99,2,Steam,0.0
+horizon zero dawn remastered,Horizon Zero Dawn™ Remastered,,,44.99,44.99,,2,PlayStation Store,0.0
+icarus console edition,ICARUS: Console Edition,,,32.99,,32.99,2,PlayStation Store,0.0
+inazuma eleven victory road,INAZUMA ELEVEN: Victory Road,57.99,,57.99,,,2,Nintendo,0.0
+it takes two,It Takes Two,34.99,,,34.99,,2,Nintendo,0.0
+jojos bizarre adventure all star battle r,JoJo's Bizarre Adventure: All-Star Battle R,44.99,,,,44.99,2,Nintendo,0.0
+kingdom hearts collection i 3,KINGDOM HEARTS Collection [I～III],64.99,,,,64.99,2,Nintendo,0.0
+kingdom hearts hd 2 8 final chapter prologue,KINGDOM HEARTS HD 2.8 Final Chapter Prologue,32.99,,,,32.99,2,Nintendo,0.0
+kynseed,Kynseed,19.99,,19.99,,,2,Nintendo,0.0
+lego party,LEGO® Party!,34.99,,34.99,,,2,Nintendo,0.0
+lego star wars skywalker saga,LEGO® Star Wars™: The Skywalker Saga,49.99,,49.99,,,2,Nintendo,0.0
+lego voyagers,LEGO® Voyagers,19.99,,19.99,,,2,Nintendo,0.0
+lego worlds,LEGO® Worlds,24.99,,,,24.99,2,Nintendo,0.0
+lawn mowing simulator 2,Lawn Mowing Simulator 2,,,21.99,,21.99,2,PlayStation Store,0.0
+lies of p,Lies of P,,,49.99,49.99,,2,PlayStation Store,0.0
+little nightmares enhanced edition,Little Nightmares Enhanced Edition,,,15.99,,15.99,2,PlayStation Store,0.0
+lords of fallen,Lords of the Fallen,,,24.99,,24.99,2,PlayStation Store,0.0
+madison,MADiSON,29.99,,29.99,,,2,Nintendo,0.0
+marvel vs capcom fighting collection arcade classics,MARVEL vs. CAPCOM Fighting Collection: Arcade Classics,39.99,,,,39.99,2,Nintendo,0.0
+metal gear solid master collection vol 1,METAL GEAR SOLID: MASTER COLLECTION Vol.1,49.99,,,,49.99,2,Nintendo,0.0
+metal gear solid master collection vol 2,METAL GEAR SOLID: MASTER COLLECTION Vol.2,44.98,,,,44.98,2,Nintendo,0.0
+metro 2039,METRO 2039,,,59.99,59.99,,2,PlayStation Store,0.0
+mx vs atv legends,MX vs ATV Legends,,,34.99,,34.99,2,PlayStation Store,0.0
+mxgp 2020 official motocross videogame,MXGP 2020 - The Official Motocross Videogame,,,24.99,,24.99,2,PlayStation Store,0.0
+machinarium,Machinarium,16.99,,,16.99,,2,Nintendo,0.0
+marathon,Marathon,,,,34.99,34.99,2,Steam,0.0
+marsupilami 2 salsa palombia,Marsupilami 2 - Salsa Palombia,24.99,,24.99,,,2,Nintendo,0.0
+marvels spider man remastered,Marvel's Spider-Man Remastered,,,49.99,49.99,,2,PlayStation Store,0.0
+marvels wolverine,Marvel’s Wolverine,,69.99,69.99,,,2,PlayStation Direct,0.0
+max payne 3,Max Payne 3,,,,17.99,17.99,2,Steam,0.0
+metro exodus,Metro Exodus,,,24.99,,24.99,2,PlayStation Store,0.0
+microsoft flight simulator 2024,Microsoft Flight Simulator 2024,,,,69.99,69.99,2,Steam,0.0
+mistfall hunter,Mistfall Hunter,,,22.49,,22.49,2,PlayStation Store,0.0
+monster hunter stories 3 twisted reflection,Monster Hunter Stories 3: Twisted Reflection,54.99,,54.99,,,2,Nintendo,0.0
+moonlighter 2 endless vault,Moonlighter 2: The Endless Vault,24.99,,24.99,,,2,Nintendo,0.0
+mortal shell enhanced edition,Mortal Shell: Enhanced Edition,,,24.99,,24.99,2,PlayStation Store,0.0
+moving out 2,Moving Out 2,24.99,,24.99,,,2,Nintendo,0.0
+naruto to boruto shinobi striker,NARUTO TO BORUTO: SHINOBI STRIKER,,,,16.99,16.99,2,Steam,0.0
+new monopoly,NEW MONOPOLY®,,,24.99,,24.99,2,PlayStation Store,0.0
+need for speed unbound,Need for Speed™ Unbound,,,69.99,,69.99,2,PlayStation Store,0.0
+one piece grand gourmet,ONE PIECE: Grand Gourmet,15.99,,,15.99,,2,Nintendo,0.0
+one piece pirate warriors 4,ONE PIECE: PIRATE WARRIORS 4,34.99,,34.99,,,2,Nintendo,0.0
+overcooked 2,Overcooked! 2,19.99,,,,19.99,2,Nintendo,0.0
+pac man world 2 re pac,PAC-MAN WORLD 2 Re-PAC,34.99,,34.99,,,2,Nintendo,0.0
+patapon 1 2 replay,PATAPON 1+2 REPLAY,24.99,,24.99,,,2,Nintendo,0.0
+paw patrol world,PAW Patrol World,34.99,,34.99,,,2,Nintendo,0.0
+persona 4 revival,Persona 4 Revival,,,64.99,,64.99,2,PlayStation Store,0.0
+planet coaster 2,Planet Coaster 2,,,39.99,39.99,,2,PlayStation Store,0.0
+police simulator patrol officers,Police Simulator: Patrol Officers,,,24.99,,24.99,2,PlayStation Store,0.0
+resident evil 7 biohazard gold edition,RESIDENT EVIL 7 biohazard Gold Edition,34.99,,34.99,,,2,Nintendo,0.0
+rv there yet,RV There Yet?,,,,6.69,6.69,2,Steam,0.0
+rayman 30th anniversary edition,Rayman: 30th Anniversary Edition,17.99,,17.99,,,2,Nintendo,0.0
+red dead redemption 2,Red Dead Redemption 2,,,,59.99,59.99,2,Steam,0.0
+resident evil,Resident Evil,15.99,,,,15.99,2,Nintendo,0.0
+resident evil village gold edition,Resident Evil Village Gold Edition,44.99,,,,44.99,2,Nintendo,0.0
+roadcraft,RoadCraft,,,34.99,34.99,,2,PlayStation Store,0.0
+robocop rogue city unfinished business,RoboCop: Rogue City - Unfinished Business,,,24.99,24.99,,2,PlayStation Store,0.0
+shinobi art of vengeance,SHINOBI: Art of Vengeance,24.99,,24.99,,,2,Nintendo,0.0
+sonic superstars,SONIC SUPERSTARS,54.99,,54.99,,,2,Nintendo,0.0
+stage tour,STAGE TOUR,,,34.99,34.99,,2,PlayStation Store,0.0
+star wars jedi fallen order,STAR WARS Jedi: Fallen Order™,,,44.99,,44.99,2,PlayStation Store,0.0
+star wars jedi survivor,STAR WARS Jedi: Survivor™,,,69.99,,69.99,2,PlayStation Store,0.0
+stranger than heaven,STRANGER THAN HEAVEN,,,64.99,64.99,,2,PlayStation Store,0.0
+shadows of doubt,Shadows of Doubt,,,19.99,19.99,,2,PlayStation Store,0.0
+shift at midnight,Shift At Midnight,,,,9.99,9.99,2,Steam,0.0
+skull and bones,Skull and Bones,,,24.99,,24.99,2,PlayStation Store,0.0
+sniper elite resistance,Sniper Elite: Resistance,,,54.99,,54.99,2,PlayStation Store,0.0
+sniper ghost warrior contracts 2,Sniper Ghost Warrior Contracts 2,,,34.99,34.99,,2,PlayStation Store,0.0
+sonic origins,Sonic Origins,,,27.99,27.99,,2,PlayStation Store,0.0
+spongebob squarepants titans of tide,SpongeBob SquarePants: Titans of the Tide,34.99,,34.99,,,2,Nintendo,0.0
+star wars outlaws,Star Wars Outlaws,,,69.99,,69.99,2,PlayStation Store,0.0
+state of decay 2 juggernaut edition,State of Decay 2: Juggernaut Edition,,,,24.99,24.99,2,Steam,0.0
+strange antiquities,Strange Antiquities,,,14.99,14.99,,2,PlayStation Store,0.0
+subnautica below zero,Subnautica: Below Zero,,,29.99,,29.99,2,PlayStation Store,0.0
+tales of shire a lord of rings game,Tales of the Shire: A The Lord of The Rings™ Game,29.99,,29.99,,,2,Nintendo,0.0
+terminator 2d no fate,Terminator 2D: NO FATE,24.99,,24.99,,,2,Nintendo,0.0
+exit 8,The Exit 8,3.39,,,,3.39,2,Nintendo,0.0
+jackbox party pack 7,The Jackbox Party Pack 7,,,24.99,24.99,,2,PlayStation Store,0.0
+mound omen of cthulhu,The Mound: Omen of Cthulhu,,,24.99,,24.99,2,PlayStation Store,0.0
+quarry,The Quarry for PS5™,,,64.99,,64.99,2,PlayStation Store,0.0
+relic first guardian,The Relic: First Guardian,29.99,,29.99,,,2,Nintendo,0.0
+rogue prince of persia,The Rogue Prince of Persia,24.99,,,24.99,,2,Nintendo,0.0
+talos principle 2,The Talos Principle 2,,,24.99,24.99,,2,PlayStation Store,0.0
+thing remastered,The Thing: Remastered,24.99,,24.99,,,2,Nintendo,0.0
+tom clancys division 2,Tom Clancy’s The Division 2,,,,24.99,24.99,2,Steam,0.0
+tomb raider 4 6 remastered,Tomb Raider IV-VI Remastered,,,24.99,24.99,,2,PlayStation Store,0.0
+tomb raider legacy of atlantis,Tomb Raider: Legacy of Atlantis,49.99,,,49.99,,2,Nintendo,0.0
+total war shogun 2 complete edition,Total War: SHOGUN 2 - Complete Edition,,,,34.99,34.99,2,Steam,0.0
+totally spies cyber mission,Totally Spies! - Cyber Mission,34.99,,34.99,,,2,Nintendo,0.0
+two point campus,Two Point Campus,24.99,,,24.99,,2,Nintendo,0.0
+two point hospital full health collection,Two Point Hospital: Full Health Collection,34.99,,34.99,,,2,Nintendo,0.0
+ufc 5,UFC® 5,,,69.99,,69.99,2,PlayStation Store,0.0
+ufc 6,UFC® 6,,,69.99,,69.99,2,PlayStation Store,0.0
+used cars simulator,Used Cars Simulator,,,15.99,15.99,,2,PlayStation Store,0.0
+vampire crawlers turbo wildcard from vampire survivors,Vampire Crawlers: The Turbo Wildcard from Vampire Survivors,,,8.99,8.99,,2,PlayStation Store,0.0
+voidtrain,Voidtrain,,,24.99,24.99,,2,PlayStation Store,0.0
+wrc 10 fia world rally championship,WRC 10 FIA World Rally Championship,34.99,,34.99,,,2,Nintendo,0.0
+wuchang fallen feathers,WUCHANG: Fallen Feathers,,,44.99,44.99,,2,PlayStation Store,0.0
+wwe 2k25,WWE 2K25 Standard Edition,,,64.99,,64.99,2,PlayStation Store,0.0
+warhammer 40 000 space marine master crafted edition,"Warhammer 40,000: Space Marine - Master Crafted Edition",,,,34.99,34.99,2,Steam,0.0
+watch dogs legion,Watch Dogs: Legion,,,59.99,,59.99,2,PlayStation Store,0.0
+way of hunter,Way of the Hunter,,,24.99,,24.99,2,PlayStation Store,0.0
+whos your daddy,Who's Your Daddy?!,,,7.99,,7.99,2,PlayStation Store,0.0
+worms armageddon anniversary edition,Worms Armageddon: Anniversary Edition,24.99,,24.99,,,2,Nintendo,0.0
+wrap house simulator,Wrap House Simulator,,,11.99,11.99,,2,PlayStation Store,0.0
+yar forgotten throne,YAR: Forgotten Throne,,,24.99,,24.99,2,PlayStation Store,0.0
+yakuza 0 directors cut,Yakuza 0 Director's Cut,,,44.99,44.99,,2,PlayStation Store,0.0
+yakuza kiwami 3 and dark ties,Yakuza Kiwami 3 & Dark Ties,,,54.99,54.99,,2,PlayStation Store,0.0
+yu gi oh tag force gx,Yu-Gi-Oh! TAG FORCE GX,42.08,,,42.08,,2,Nintendo,0.0
