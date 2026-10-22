@@ -99,16 +99,17 @@ def test_cached_run_reproduces_the_live_run(tmp_path, offline):
     assert len(offline.calls) == requests_made
 
 
-def test_failed_source_leaves_existing_cache_alone(tmp_path, offline):
-    """Regression: one failing source used to overwrite the other sources' good cache."""
+def test_failed_source_is_skipped_and_keeps_its_cache(tmp_path, offline):
+    """A blocked storefront is left out of the run without losing its last good cache."""
     args = [*SOURCE_ARGS, "--output-dir", str(tmp_path), "--no-plots"]
     assert cli.main(args) == 0
-    before = (tmp_path / "data" / "processed_nintendo.csv").read_text(encoding="utf-8")
+    before = (tmp_path / "data" / "processed_playstation-direct.csv").read_text(encoding="utf-8")
 
     offline.routes["api.direct.playstation.com"] = {"products": []}
 
-    assert cli.main(args) == 1
-    assert (tmp_path / "data" / "processed_nintendo.csv").read_text(encoding="utf-8") == before
+    assert cli.main(args) == 0
+    assert (tmp_path / "data" / "processed_playstation-direct.csv").read_text(encoding="utf-8") == before
+    assert pd.read_csv(tmp_path / "data" / "data.csv")["source"].unique().tolist() == ["Nintendo"]
 
 
 def test_limit_caps_every_source(tmp_path, offline):

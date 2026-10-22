@@ -49,7 +49,7 @@ jobs:
             echo "No data branch yet; starting a new history."
           fi
 
-      # a failed or invalid scrape exits non-zero, which fails the job before anything is published
+      # a blocked storefront is skipped; only a total failure or invalid data exits non-zero and stops the publish
       - name: Scrape every storefront
         run: |
           uv run gameprice-index \

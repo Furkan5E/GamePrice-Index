@@ -56,6 +56,29 @@ def test_main_returns_error_code_when_scrape_fails(monkeypatch):
     assert cli.main([]) == 1
 
 
+def test_scrape_sources_skips_a_failing_storefront(monkeypatch):
+    def fake_scrape(source, limit):
+        if source == "playstation-direct":
+            raise ScrapeError("403 Forbidden")
+        return pd.DataFrame({"source": [source]})
+
+    monkeypatch.setattr(cli, "scrape_source", fake_scrape)
+
+    frames = cli.scrape_sources(["nintendo", "playstation-direct", "steam"], limit=10)
+
+    assert list(frames) == ["nintendo", "steam"]
+
+
+def test_scrape_sources_fails_when_every_storefront_fails(monkeypatch):
+    def failing_scrape(source, limit):
+        raise ScrapeError("403 Forbidden")
+
+    monkeypatch.setattr(cli, "scrape_source", failing_scrape)
+
+    with pytest.raises(ScrapeError, match="Every storefront failed"):
+        cli.scrape_sources(["nintendo", "steam"], limit=10)
+
+
 def test_main_defaults(monkeypatch):
     seen = {}
     monkeypatch.setattr(cli, "run_pipeline", lambda **kwargs: seen.update(kwargs))

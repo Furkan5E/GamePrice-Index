@@ -68,6 +68,23 @@ def scrape_source(source: str, limit: int | None = config.DEFAULT_LIMIT) -> pd.D
     return build_frame(scraper.scrape())
 
 
+def scrape_sources(sources: Sequence[str], limit: int | None = config.DEFAULT_LIMIT) -> dict[str, pd.DataFrame]:
+    """Scrapes each storefront, skipping any that fail so one blocked site cannot sink the whole run."""
+    frames: dict[str, pd.DataFrame] = {}
+    for source in sources:
+        try:
+            frames[source] = scrape_source(source, limit=limit)
+        except ScrapeError as e:
+            logger.warning(f"Skipping {source}: {e}")
+
+    if not frames:
+        raise ScrapeError(f"Every storefront failed: {', '.join(sources)}")
+    skipped = [source for source in sources if source not in frames]
+    if skipped:
+        logger.warning(f"Continuing without: {', '.join(skipped)}")
+    return frames
+
+
 def run_pipeline(
     use_cache: bool = False,
     sources: Sequence[str] = SOURCES,
@@ -88,15 +105,15 @@ def run_pipeline(
         frames = {source: load_cache(cache_path(data_dir, source)) for source in sources}
     else:
         logger.info(f"Starting live web scraping for: {', '.join(sources)}")
-        frames = {source: scrape_source(source, limit=limit) for source in sources}
+        frames = scrape_sources(sources, limit=limit)
 
     # a source that parses but produces nonsense must not get any further
     frames = {source: validate_dataset(frame, f"{source} data") for source, frame in frames.items()}
 
     if not use_cache:
-        # only touch the cache once every requested source has succeeded and passed validation
-        for source in sources:
-            write_cache(frames[source], cache_path(data_dir, source))
+        # only touch the cache once every scraped source has passed validation
+        for source, frame in frames.items():
+            write_cache(frame, cache_path(data_dir, source))
 
     df_final = validate_dataset(combine_frames(frames.values()), "combined dataset")
     df_final.to_csv(final_data_path, index=False)

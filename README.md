@@ -18,7 +18,7 @@ An automated ETL (Extract, Transform, Load) and market intelligence pipeline tha
 ## Features
 
 * **Five Storefronts, One Interface:** Every source implements the same `Scraper` contract and returns the same record shape, so adding a storefront is one class. Catalogues are read from the JSON services behind each site, with no browser automation.
-* **Resilient Collection:** A shared `requests` session retries timeouts, rate limits and server errors with exponential backoff, paces its requests, and fails loudly: a source that errors or returns nothing stops the run with a non-zero exit code.
+* **Resilient Collection:** A shared `requests` session retries timeouts, rate limits and server errors with exponential backoff, paces its requests, and keeps going when one storefront fails: a source that errors or returns nothing is logged and skipped (its last good cache is kept), and the run only exits non-zero when every source fails.
 * **Validated ETL:** Records are cleaned with `pandas` and checked against a `pandera` schema (no negative prices, no sale price above the regular price, no rows without an id) before anything is cached, stored or plotted.
 * **Price History:** A normalised `SQLite` schema keeps one price per game per day with upserts, and answers questions such as current deals, price drops and all-time lows.
 * **Like-for-Like Comparison:** Titles are normalised and matched across stores, so the same game can be compared on regular price rather than comparing different catalogues.
@@ -152,7 +152,7 @@ The [Daily Scrape](.github/workflows/scrape.yaml) workflow runs the pipeline eve
 
 * `game_prices.db` is restored from the `data` branch, extended with the day's prices and pushed back, which is how the history grows.
 * The dataset CSVs, plots and `findings.md` are refreshed alongside it.
-* A failed or invalid scrape fails the job before anything is published.
+* A storefront that fails is skipped with a warning; the job only fails when every storefront fails or the data is invalid, and then nothing is published.
 * If a `watchlist.toml` is committed, alerts are sent after each scrape. Add the webhook as a repository secret named `DISCORD_WEBHOOK_URL`.
 
 It can also be started by hand from the Actions tab, with a different `--limit`.
